@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Toddler Musical Smash!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            overflow: hidden;
+            touch-action: none;
+            height: 100vh;
+            width: 100vw;
+            cursor: none;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .emoji-pop {
+            position: absolute;
+            user-select: none;
+            pointer-events: none;
+            animation: pop-up var(--duration, 1.5s) ease-out forwards;
+            z-index: 10;
+            will-change: transform, opacity;
+            line-height: 1;
+        }
+
+        .emoji-pop.rare {
+            z-index: 20;
+            filter: drop-shadow(0 0 20px gold);
+            animation: pop-up-rare 4s ease-in-out forwards;
+        }
+
+        @keyframes pop-up {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.5) rotate(var(--rot-start)); }
+            100% { opacity: 0; transform: translate(var(--dest-x), var(--dest-y)) scale(0.5) rotate(var(--rot-end)); }
+        }
+
+        @keyframes pop-up-rare {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
+            10% { opacity: 1; transform: translate(-50%, -50%) scale(5) rotate(-10deg); }
+            90% { opacity: 1; transform: translate(-50%, -50%) scale(6) rotate(10deg); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(8) rotate(0deg); }
+        }
+
+        .trail-sparkle {
+            position: absolute;
+            pointer-events: none;
+            animation: sparkle-fade 0.8s linear forwards;
+            font-size: 1.5rem;
+            z-index: 5;
+        }
+
+        @keyframes sparkle-fade {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, 100%) scale(0); }
+        }
+
+        #custom-cursor {
+            position: fixed;
+            pointer-events: none;
+            font-size: 3rem;
+            z-index: 100;
+            transform: translate(-20%, -20%) rotate(-20deg);
+            transition: transform 0.1s ease-out;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+
+        #hint {
+            pointer-events: none;
+            animation: fade-out 1s ease-in forwards;
+            animation-delay: 4s;
+            z-index: 50;
+        }
+        @keyframes fade-out { to { opacity: 0; } }
+
+        .confetti {
+            position: absolute;
+            width: 10px; height: 10px;
+            background-color: #ffd700;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 15;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center">
+
+<!-- Mute Button -->
+<button id="mute-btn" class="fixed top-4 right-4 z-50 bg-white/30 p-3 rounded-full backdrop-blur-md hover:bg-white/50 transition-all">
+    <span id="sound-icon">🔊</span>
+</button>
+
+<!-- Initial hint text -->
+<div id="hint" class="text-white drop-shadow-lg text-3xl md:text-5xl font-bold text-center opacity-80 select-none p-4 bg-black/20 rounded-xl backdrop-blur-sm">
+    Make Some Music! 🎵🎹
+</div>
+
+<!-- Custom Musical Cursor -->
+<div id="custom-cursor">🎵</div>
+
+<script>
+    // Expanded with many musical instruments
+    const EMOJIS = ["🎹", "🥁", "🎸", "🎺", "🎷", "🎻", "🪕", "🎤", "🎧", "🎼", "🎵", "🎶", "📯", "🔔", "🐶", "🐱", "🦁", "🐸", "🐵", "🚗", "🚀", "⭐", "🌈", "🎈", "🍦", "🍪"];
+    const RARE_EMOJIS = ["👨‍🎤", "👩‍🎤", "🕺", "💃", "🦄", "🐲", "👑"];
+    const TRAIL_EMOJIS = ["♩", "♪", "♫", "♬", "♭", "♮", "♯"];
+    const GRADIENTS = [
+        "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)",
+        "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)",
+        "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)",
+        "linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)",
+        "linear-gradient(to top, #fddb92 0%, #d1fdff 100%)",
+        "linear-gradient(to right, #fa709a 0%, #fee140 100%)"
+    ];
+
+    // C Major Pentatonic Scale (always sounds good together)
+    // C3, D3, E3, G3, A3, C4, D4, E4, G4, A4, C5
+    const SCALE = [130.81, 146.83, 164.81, 196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+    // Wave types to simulate different "instruments"
+    const WAVES = ['sine', 'triangle', 'square', 'sawtooth'];
+
+    let bgIndex = 0;
+    let smashCount = 0;
+    let isMuted = false;
+    let audioCtx;
+
+    // --- Mute Toggle ---
+    const muteBtn = document.getElementById('mute-btn');
+    const soundIcon = document.getElementById('sound-icon');
+    muteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isMuted = !isMuted;
+        soundIcon.textContent = isMuted ? '🔇' : '🔊';
+        if (isMuted && audioCtx) audioCtx.suspend();
+        if (!isMuted && audioCtx) audioCtx.resume();
+    });
+
+    // --- Audio System ---
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            // Master compressor to prevent loud distortion when smashing many keys
+            const compressor = audioCtx.createDynamicsCompressor();
+            compressor.threshold.setValueAtTime(-24, audioCtx.currentTime);
+            compressor.knee.setValueAtTime(30, audioCtx.currentTime);
+            compressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+            compressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+            compressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+            compressor.connect(audioCtx.destination);
+            audioCtx.masterGain = compressor;
+        }
+    }
+
+    function playTone(frequency, type = 'sine', duration = 0.5, volume = 0.3, detune = 0) {
+        if (isMuted) return;
+        if (!audioCtx) initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        osc.detune.setValueAtTime(detune, audioCtx.currentTime);
+
+        // Envelope for smoother sound
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.02); // Attack
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); // Decay
+
+        osc.connect(gain);
+        gain.connect(audioCtx.masterGain);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration + 0.1);
+    }
+
+    function playChord() {
+         // C Major Chord (C, E, G)
+         playTone(SCALE[5], 'triangle', 2, 0.2);
+         playTone(SCALE[7], 'sine', 2, 0.2);
+         playTone(SCALE[8], 'square', 2, 0.1);
+    }
+
+    // --- Spawning Logic ---
+    function spawnItem(x, y, isBig = false) {
+        smashCount++;
+        checkMilestone();
+
+        const isRare = Math.random() > 0.98;
+        const el = document.createElement('div');
+        el.className = `emoji-pop ${isRare ? 'rare' : ''}`;
+        el.textContent = isRare ? RARE_EMOJIS[Math.floor(Math.random() * RARE_EMOJIS.length)] : EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+
+        el.style.left = `${x}%`;
+        el.style.top = `${y}%`;
+
+        // Physics
+        const baseSize = isBig ? 8 : 4;
+        el.style.fontSize = `${baseSize + Math.random() * 4}rem`;
+        const destX = (Math.random() * 300 - 150) * (isBig ? 1.5 : 1) + '%';
+        const destY = (Math.random() * 300 - 150) * (isBig ? 1.5 : 1) + '%';
+        el.style.setProperty('--rot-start', `${Math.random() * 90 - 45}deg`);
+        el.style.setProperty('--rot-end', `${Math.random() * 720 - 360}deg`);
+        el.style.setProperty('--dest-x', destX);
+        el.style.setProperty('--dest-y', destY);
+        el.style.setProperty('--duration', `${isBig ? 2 + Math.random() : 1.5}s`);
+
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+
+        // --- MUSICAL MAPPING ---
+        // Map X position (0-100) to a note in our Pentatonic SCALE array
+        if (!isRare && !isBig) {
+            const scaleIndex = Math.floor((x / 100) * SCALE.length);
+            const note = SCALE[Math.min(scaleIndex, SCALE.length - 1)];
+            // Random instrument type for variety
+            const instrument = WAVES[Math.floor(Math.random() * WAVES.length)];
+            // Lower volume slightly for harsher wave types
+            const vol = (instrument === 'sawtooth' || instrument === 'square') ? 0.15 : 0.3;
+            playTone(note, instrument, 1, vol);
+        } else if (isRare) {
+            // Magical rare sound
+            playTone(SCALE[0], 'sine', 3, 0.4);
+            playTone(SCALE[4], 'triangle', 3, 0.4, 5); // Detuned slightly for chorus effect
+        }
+    }
+
+    function checkMilestone() {
+        if (smashCount % 20 === 0) {
+            triggerConfetti();
+            // Play a happy little run of notes
+            setTimeout(() => playTone(SCALE[5], 'sine', 0.2), 0);
+            setTimeout(() => playTone(SCALE[7], 'sine', 0.2), 100);
+            setTimeout(() => playTone(SCALE[9], 'sine', 0.4), 200);
+            cycleGradient();
+        }
+    }
+
+    function triggerConfetti() {
+        for (let i = 0; i < 50; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.top = '-5vh';
+            c.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(c);
+            c.addEventListener('animationend', () => c.remove());
+        }
+    }
+
+    function cycleGradient() {
+        bgIndex = (bgIndex + 1) % GRADIENTS.length;
+        document.body.style.background = GRADIENTS[bgIndex];
+        document.body.style.backgroundSize = "400% 400%";
+    }
+
+    // --- Cursor & Input ---
+    const cursor = document.getElementById('custom-cursor');
+    let lastTrail = 0;
+
+    document.addEventListener('pointermove', (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+
+        // Musical notation trails
+        if (Date.now() - lastTrail > 50) {
+            lastTrail = Date.now();
+            const t = document.createElement('div');
+            t.className = 'trail-sparkle';
+            t.textContent = TRAIL_EMOJIS[Math.floor(Math.random() * TRAIL_EMOJIS.length)];
+            t.style.left = `${e.clientX}px`;
+            t.style.top = `${e.clientY}px`;
+            t.style.color = `hsla(${Math.random() * 360}, 100%, 70%, 0.6)`;
+            document.body.appendChild(t);
+            t.addEventListener('animationend', () => t.remove());
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        e.preventDefault();
+        if (e.repeat && Math.random() > 0.3) return;
+        initAudio();
+        if (e.code === 'Space' || e.code === 'Enter') {
+            for (let i = 0; i < 12; i++) spawnItem(50, 50, true);
+            playChord(); // Big chord on spacebar
+            cycleGradient();
+        } else {
+            const randomX = Math.random() * 95; // 0-95%
+            spawnItem(randomX, Math.random() * 80 + 10);
+             if (Math.random() > 0.9) cycleGradient();
+        }
+    });
+
+    document.addEventListener('pointerdown', (e) => {
+        if (e.target.id === 'mute-btn' || e.target.parentNode.id === 'mute-btn') return;
+        initAudio();
+        spawnItem((e.clientX / window.innerWidth) * 100, (e.clientY / window.innerHeight) * 100);
+    });
+</script>
+</body>
+</html>
