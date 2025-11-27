@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Santa's Slope - Retro Toboggan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #2c3e50;
+            font-family: 'Press Start 2P', cursive;
+            touch-action: none; /* Prevent browser zooming/scrolling */
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #dff9fb; /* Snow color */
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-text {
+            color: #eb4d4b;
+            text-shadow: 2px 2px #fff;
+            font-size: 20px;
+        }
+
+        #powerup-status {
+            font-size: 14px;
+            color: #2980b9;
+            margin-top: 10px;
+            height: 20px;
+        }
+
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        h1 {
+            color: #c0392b;
+            text-shadow: 4px 4px #f1c40f;
+            font-size: 32px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        p {
+            color: #2c3e50;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: #27ae60;
+            color: white;
+            border: 4px solid #2c3e50;
+            padding: 20px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 6px 6px 0px #2c3e50;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #2c3e50;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            .btn { padding: 15px 30px; font-size: 14px; }
+        }
+
+        .mute-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid #2c3e50;
+            font-size: 24px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto; /* Enable clicking within the pointer-events: none layer */
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <h1>SANTA'S<br>SLOPE</h1>
+    <p>Drag to steer!<br>🎁 Collect Gifts<br>⚡ Hit Ramps for Speed<br>🧲 Grab Magnets</p>
+    <button class="btn" onclick="startGame()">TAP TO SLED!</button>
+</div>
+
+<div id="game-over-screen" class="hidden">
+    <h1>OH NO!</h1>
+    <p>Score: <span id="final-score">0</span></p>
+    <button class="btn" onclick="resetGame()">TRY AGAIN</button>
+</div>
+
+<div id="ui-layer">
+    <div>
+        <div class="hud-text">SCORE: <span id="score-display">0</span></div>
+        <div id="powerup-status"></div>
+    </div>
+    <div id="mute-btn" class="mute-btn" onclick="toggleMute()">🔊</div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    /* --- GAME ENGINE & CONSTANTS --- */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score-display');
+    const finalScoreEl = document.getElementById('final-score');
+    const powerupStatusEl = document.getElementById('powerup-status');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const muteBtn = document.getElementById('mute-btn');
+
+    let gameState = 'MENU'; // MENU, PLAYING, GAMEOVER
+    let score = 0;
+    let speed = 5;
+    let gameTime = 0;
+    let animationId;
+    let isMuted = false;
+
+    // Assets
+    const sprites = {};
+
+    // Audio Context
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        muteBtn.innerText = isMuted ? '🔇' : '🔊';
+    }
+
+    function playSound(type) {
+        if (isMuted || !audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'coin') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'crash') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'powerup') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        }
+    }
+
+    /* --- GRAPHICS GENERATION (PIXEL ART) --- */
+    function createPixelSprite(width, height, drawFn) {
+        const c = document.createElement('canvas');
+        c.width = width;
+        c.height = height;
+        const cx = c.getContext('2d');
+        drawFn(cx, width, height);
+        return c;
+    }
+
+    function generateSprites() {
+        // 1. Player (Toboggan + Kid)
+        sprites.player = createPixelSprite(40, 60, (c, w, h) => {
+            c.fillStyle = '#8e44ad'; // Purple sled
+            c.fillRect(5, 10, 30, 50);
+            c.fillStyle = '#9b59b6';
+            c.fillRect(8, 12, 24, 46);
+            c.fillStyle = '#e74c3c'; // Red coat
+            c.fillRect(10, 20, 20, 25);
+            c.fillStyle = '#f1c40f'; // Skin
+            c.fillRect(12, 10, 16, 14);
+            c.fillStyle = '#2ecc71'; // Green Hat
+            c.fillRect(10, 5, 20, 8);
+            c.fillStyle = '#ecf0f1'; // Pom pom
+            c.fillRect(18, 0, 4, 5);
+            c.fillStyle = '#ecf0f1'; // Scarf
+            c.fillRect(12, 22, 16, 4);
+            c.fillRect(25, 22, 8, 4);
+        });
+
+        // 2. Tree
+        sprites.tree = createPixelSprite(50, 60, (c, w, h) => {
+            c.fillStyle = 'rgba(0,0,0,0.1)';
+            c.beginPath(); c.ellipse(25, 55, 15, 5, 0, 0, Math.PI*2); c.fill();
+            c.fillStyle = '#795548'; c.fillRect(20, 50, 10, 10);
+
+            // Outline settings
+            c.strokeStyle = '#000';
+            c.lineWidth = 1;
+
+            c.fillStyle = '#27ae60';
+            c.beginPath(); c.moveTo(5, 50); c.lineTo(45, 50); c.lineTo(25, 20); c.closePath(); c.fill(); c.stroke();
+
+            c.fillStyle = '#2ecc71';
+            c.beginPath(); c.moveTo(10, 30); c.lineTo(40, 30); c.lineTo(25, 0); c.closePath(); c.fill(); c.stroke();
+
+            c.fillStyle = '#fff'; c.fillRect(22, 0, 6, 6); c.fillRect(15, 30, 5, 4); c.fillRect(30, 30, 5, 4);
+        });
+
+        // 3. Gift
+        sprites.gift = createPixelSprite(30, 30, (c, w, h) => {
+            c.fillStyle = '#c0392b'; c.fillRect(2, 5, 26, 23);
+            c.fillStyle = '#f1c40f'; c.fillRect(12, 5, 6, 23); c.fillRect(2, 14, 26, 6);
+            c.fillStyle = '#f39c12'; c.fillRect(10, 0, 10, 5);
+        });
+
+        // 4. Rock
+        sprites.rock = createPixelSprite(40, 30, (c, w, h) => {
+             c.fillStyle = '#95a5a6';
+             c.strokeStyle = '#000';
+             c.lineWidth = 1;
+             c.beginPath(); c.arc(20, 20, 15, 0, Math.PI*2); c.fill(); c.stroke();
+
+             c.fillStyle = '#bdc3c7'; c.beginPath(); c.arc(18, 15, 8, 0, Math.PI*2); c.fill();
+        });
+
+        // 5. Snowman (NEW)
+        sprites.snowman = createPixelSprite(40, 60, (c, w, h) => {
+            c.fillStyle = 'rgba(0,0,0,0.1)'; c.beginPath(); c.ellipse(20, 55, 15, 5, 0, 0, Math.PI*2); c.fill();
+            c.fillStyle = '#fff';
+            c.beginPath(); c.arc(20, 45, 15, 0, Math.PI*2); c.fill(); // Bottom
+            c.beginPath(); c.arc(20, 25, 12, 0, Math.PI*2); c.fill(); // Middle
+            c.beginPath(); c.arc(20, 10, 8, 0, Math.PI*2); c.fill(); // Head
+            c.fillStyle = '#e67e22'; // Nose
+            c.beginPath(); c.moveTo(20, 10); c.lineTo(28, 12); c.lineTo(20, 14); c.fill();
+            c.fillStyle = '#2c3e50'; // Eyes
+            c.fillRect(16, 8, 2, 2); c.fillRect(22, 8, 2, 2);
+        });
+
+        // 6. Magnet Powerup (NEW)
+        sprites.magnet = createPixelSprite(30, 30, (c, w, h) => {
+            c.fillStyle = 'rgba(255, 255, 255, 0.5)'; c.beginPath(); c.arc(15, 15, 15, 0, Math.PI*2); c.fill();
+            c.strokeStyle = '#3498db'; c.lineWidth = 4;
+            c.beginPath(); c.arc(15, 15, 10, Math.PI, 0); c.stroke(); // U shape
+            c.fillStyle = '#e74c3c'; c.fillRect(5, 15, 4, 6); c.fillRect(21, 15, 4, 6); // Tips
+        });
+
+        // 7. Boost Ramp (NEW)
+        sprites.ramp = createPixelSprite(50, 40, (c, w, h) => {
+            c.fillStyle = '#f39c12';
+            c.beginPath(); c.moveTo(10, 40); c.lineTo(40, 40); c.lineTo(35, 10); c.lineTo(15, 10); c.fill();
+            c.fillStyle = '#f1c40f'; // Stripes
+            c.fillRect(18, 10, 4, 30); c.fillRect(28, 10, 4, 30);
+        });
+
+        // 8. Yeti Monster (NEW)
+        sprites.yeti = createPixelSprite(50, 60, (c, w, h) => {
+             c.fillStyle = '#ecf0f1'; // White fur
+             c.strokeStyle = '#000';
+             c.lineWidth = 1;
+
+             // Body & Bulk
+             c.fillRect(10, 5, 30, 50); c.strokeRect(10, 5, 30, 50);
+             c.fillRect(5, 15, 40, 20); c.strokeRect(5, 15, 40, 20);
+
+             // Arms
+             c.fillRect(0, 15, 10, 35); c.strokeRect(0, 15, 10, 35);
+             c.fillRect(40, 15, 10, 35); c.strokeRect(40, 15, 10, 35);
+
+             // Legs
+             c.fillRect(10, 50, 12, 10); c.strokeRect(10, 50, 12, 10);
+             c.fillRect(28, 50, 12, 10); c.strokeRect(28, 50, 12, 10);
+
+             // Face
+             c.fillStyle = '#7f8c8d'; // Grey face
+             c.fillRect(15, 12, 20, 12);
+             // Eyes (Red glowing)
+             c.fillStyle = '#e74c3c';
+             c.fillRect(17, 15, 5, 3);
+             c.fillRect(28, 15, 5, 3);
+        });
+    }
+
+    /* --- GAME LOGIC --- */
+    let player = { x: 0, y: 0, width: 40, height: 60, targetX: 0 };
+    let obstacles = [];
+    let collectibles = [];
+    let powerups = [];
+    let particles = [];
+    let trailParticles = [];
+    let floatingTexts = [];
+    let gameSpeed = 5;
+    let baseSpeed = 5;
+
+    // Spawn timers (distance based)
+    let obstacleSpawnDist = 0;
+    let giftSpawnDist = 0;
+    let powerupSpawnDist = 0;
+
+    // Powerup States
+    let magnetTimer = 0;
+    let boostTimer = 0;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        player.y = canvas.height - 150;
+        if(player.x === 0) player.x = canvas.width / 2 - player.width/2;
+        player.targetX = player.x;
+    }
+
+    function spawnObstacle() {
+        const rand = Math.random();
+        let type = 'tree';
+        let width = 50;
+        let height = 60;
+
+        // Adjusted spawn rates to include Yeti
+        if (rand > 0.85) { type = 'rock'; width = 40; height = 30; }
+        else if (rand > 0.65) { type = 'snowman'; width = 40; height = 60; }
+        else if (rand > 0.55) { type = 'yeti'; width = 50; height = 60; } // Yeti is semi-rare
+
+        const sizeScale = 1 + Math.random() * 0.3;
+
+        obstacles.push({
+            x: Math.random() * (canvas.width - width),
+            y: -100,
+            width: width * sizeScale,
+            height: height * sizeScale,
+            type: type,
+            sprite: sprites[type]
+        });
+    }
+
+    function spawnCollectible() {
+        collectibles.push({
+            x: Math.random() * (canvas.width - 40),
+            y: -100,
+            width: 40,
+            height: 40,
+            sprite: sprites.gift,
+            oscOffset: Math.random() * Math.PI * 2
+        });
+    }
+
+    function spawnPowerup() {
+        const isMagnet = Math.random() > 0.5;
+        const type = isMagnet ? 'magnet' : 'ramp';
+        powerups.push({
+            x: Math.random() * (canvas.width - 50),
+            y: -100,
+            width: isMagnet ? 30 : 50,
+            height: isMagnet ? 30 : 40,
+            type: type,
+            sprite: sprites[type]
+        });
+    }
+
+    function spawnFloatingText(x, y, text, color) {
+        floatingTexts.push({
+            x: x,
+            y: y,
+            text: text,
+            color: color,
+            life: 60, // frames
+            opacity: 1
+        });
+    }
+
+    function createSnow() {
+        if (particles.length < 50) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                speed: 2 + Math.random() * 3,
+                size: 2 + Math.random() * 3
+            });
+        }
+    }
+
+    function createTrail() {
+        // Spawn snow trail behind sled
+        if (gameTime % 5 === 0) {
+            trailParticles.push({
+                x: player.x + 10 + Math.random() * 20,
+                y: player.y + 50,
+                vx: (Math.random() - 0.5) * 2,
+                vy: -gameSpeed * 0.5,
+                size: Math.random() * 4 + 2,
+                life: 30
+            });
+        }
+    }
+
+    function update() {
+        if (gameState !== 'PLAYING') return;
+        gameTime++;
+
+        // Base Speed Ramp: Continuously accelerate
+        // Increases speed by ~0.6 every 10 seconds (600 frames)
+        if (baseSpeed < 15) {
+            baseSpeed += 0.001;
+        }
+
+        // Handle Boost Logic
+        if (boostTimer > 0) {
+            boostTimer--;
+            gameSpeed = baseSpeed * 2.5; // FAST!
+            if(boostTimer === 0) gameSpeed = baseSpeed;
+        } else {
+            gameSpeed = baseSpeed;
+        }
+
+        // Handle Magnet Logic
+        if (magnetTimer > 0) {
+            magnetTimer--;
+            powerupStatusEl.innerText = "MAGNET ACTIVE!";
+        } else if (boostTimer > 0) {
+            powerupStatusEl.innerText = "TURBO BOOST!";
+        } else {
+            powerupStatusEl.innerText = "";
+        }
+
+        // Player Movement
+        player.x += (player.targetX - player.x) * 0.15;
+        if (player.x < 0) player.x = 0;
+        if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+
+        // Spawning Logic (Distance Based for smoother acceleration)
+        obstacleSpawnDist -= gameSpeed;
+        if (obstacleSpawnDist <= 0) {
+            spawnObstacle();
+            // Reset distance: 600px is base, plus random variance
+            obstacleSpawnDist = 600 + Math.random() * 200;
+        }
+
+        giftSpawnDist -= gameSpeed;
+        if (giftSpawnDist <= 0) {
+            spawnCollectible();
+            giftSpawnDist = 900 + Math.random() * 400;
+        }
+
+        powerupSpawnDist -= gameSpeed;
+        if (powerupSpawnDist <= 0) {
+            spawnPowerup();
+            powerupSpawnDist = 3000 + Math.random() * 2000; // Rare
+        }
+
+        // Update Obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i];
+            obs.y += gameSpeed;
+
+            // Yeti Logic: Move towards player
+            if (obs.type === 'yeti') {
+                const centerPlayer = player.x + player.width / 2;
+                const centerYeti = obs.x + obs.width / 2;
+                const dx = centerPlayer - centerYeti;
+
+                // Move laterally towards player, but capped speed so it's avoidable
+                if (Math.abs(dx) > 5) {
+                    obs.x += Math.sign(dx) * 1.5; // Yeti lateral speed
+                }
+            }
+
+            // Collision
+            const padding = 10;
+            if (
+                player.x < obs.x + obs.width - padding &&
+                player.x + player.width > obs.x + padding &&
+                player.y < obs.y + obs.height - padding &&
+                player.height + player.y > obs.y + padding
+            ) {
+                if (boostTimer > 0) {
+                    // SMASH through obstacle if boosting!
+                    spawnFloatingText(obs.x, obs.y, "SMASH!", "#f1c40f");
+                    obstacles.splice(i, 1);
+                    playSound('crash'); // Maybe a lighter crash sound?
+                } else {
+                    playSound('crash');
+                    gameOver();
+                }
+            }
+
+            if (obs.y > canvas.height) obstacles.splice(i, 1);
+        }
+
+        // Update Collectibles (Gifts)
+        for (let i = collectibles.length - 1; i >= 0; i--) {
+            let col = collectibles[i];
+
+            // Magnet Effect
+            if (magnetTimer > 0) {
+                const dx = (player.x + player.width/2) - (col.x + col.width/2);
+                const dy = (player.y + player.height/2) - (col.y + col.height/2);
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 300) {
+                    col.x += dx * 0.1;
+                    col.y += dy * 0.1;
+                }
+            }
+
+            col.y += gameSpeed;
+            col.x += Math.sin(gameTime * 0.1 + col.oscOffset) * 0.5;
+
+            if (
+                player.x < col.x + col.width &&
+                player.x + player.width > col.x &&
+                player.y < col.y + col.height &&
+                player.height + player.y > col.y
+            ) {
+                playSound('coin');
+                score += 10;
+                spawnFloatingText(col.x, col.y, "+10", "#eb4d4b");
+                scoreEl.innerText = score;
+                collectibles.splice(i, 1);
+            } else if (col.y > canvas.height) {
+                collectibles.splice(i, 1);
+            }
+        }
+
+        // Update Powerups
+        for (let i = powerups.length - 1; i >= 0; i--) {
+            let pup = powerups[i];
+            pup.y += gameSpeed;
+
+            if (
+                player.x < pup.x + pup.width &&
+                player.x + player.width > pup.x &&
+                player.y < pup.y + pup.height &&
+                player.height + player.y > pup.y
+            ) {
+                playSound('powerup');
+                if (pup.type === 'magnet') {
+                    magnetTimer = 300; // 5 seconds (assuming 60fps)
+                    spawnFloatingText(pup.x, pup.y, "MAGNET!", "#3498db");
+                } else if (pup.type === 'ramp') {
+                    boostTimer = 120; // 2 seconds of super speed
+                    spawnFloatingText(pup.x, pup.y, "ZOOM!", "#f39c12");
+                }
+                powerups.splice(i, 1);
+            } else if (pup.y > canvas.height) {
+                powerups.splice(i, 1);
+            }
+        }
+
+        // Update Floating Texts
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            let ft = floatingTexts[i];
+            ft.y -= 2;
+            ft.life--;
+            ft.opacity = ft.life / 60;
+            if (ft.life <= 0) floatingTexts.splice(i, 1);
+        }
+
+        // Update Snow & Trail
+        createSnow();
+        createTrail();
+        particles.forEach(p => {
+            p.y += p.speed;
+            if(p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+        });
+        for (let i = trailParticles.length - 1; i >= 0; i--) {
+            let tp = trailParticles[i];
+            tp.x += tp.vx;
+            tp.y += tp.vy + gameSpeed; // Moves relative to world
+            tp.life--;
+            if(tp.life <= 0) trailParticles.splice(i, 1);
+        }
+
+        // Passive Score
+        if(gameTime % 10 === 0) score++;
+        scoreEl.innerText = score;
+    }
+
+    function draw() {
+        // Background
+        ctx.fillStyle = '#dfe6e9';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Speed Lines (Ground)
+        for(let i=0; i<canvas.width; i+=100) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.strokeStyle = boostTimer > 0 ? 'rgba(241, 196, 15, 0.4)' : 'rgba(178, 190, 195, 0.2)';
+            ctx.lineWidth = boostTimer > 0 ? 4 : 1;
+            ctx.stroke();
+        }
+
+        // Trail
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        trailParticles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+        });
+
+        // Draw Objects
+        const allObjects = [...obstacles, ...collectibles, ...powerups];
+        allObjects.sort((a, b) => a.y - b.y);
+
+        allObjects.forEach(obj => {
+            if(obj.y < player.y) ctx.drawImage(obj.sprite, obj.x, obj.y, obj.width, obj.height);
+        });
+
+        // Draw Player
+        ctx.save();
+        ctx.translate(player.x + player.width/2, player.y + player.height/2);
+        const tilt = (player.targetX - player.x) * 0.005;
+        ctx.rotate(Math.max(-0.2, Math.min(0.2, tilt)));
+
+        // Magnet Aura
+        if (magnetTimer > 0) {
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(52, 152, 219, ${Math.abs(Math.sin(gameTime * 0.1))})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        ctx.drawImage(sprites.player, -player.width/2, -player.height/2, player.width, player.height);
+        ctx.restore();
+
+        allObjects.forEach(obj => {
+            if(obj.y >= player.y) ctx.drawImage(obj.sprite, obj.x, obj.y, obj.width, obj.height);
+        });
+
+        // Snow
+        ctx.fillStyle = '#fff';
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+        });
+
+        // Floating Text
+        ctx.font = "20px 'Press Start 2P'";
+        floatingTexts.forEach(ft => {
+            ctx.fillStyle = ft.color;
+            ctx.globalAlpha = ft.opacity;
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.globalAlpha = 1.0;
+        });
+
+        // Speed Effect Overlay
+        if (boostTimer > 0) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.2})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    function loop() {
+        update();
+        draw();
+        animationId = requestAnimationFrame(loop);
+    }
+
+    /* --- INPUT HANDLING --- */
+    function handleInput(x) {
+        if(gameState !== 'PLAYING') return;
+        player.targetX = x - player.width / 2;
+    }
+
+    window.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        handleInput(e.touches[0].clientX);
+    }, {passive: false});
+
+    window.addEventListener('touchstart', (e) => {
+        handleInput(e.touches[0].clientX);
+    }, {passive: false});
+
+    window.addEventListener('mousemove', (e) => {
+        handleInput(e.clientX);
+    });
+
+    /* --- STATE MANAGEMENT --- */
+    function startGame() {
+        initAudio();
+        startScreen.classList.add('hidden');
+        gameState = 'PLAYING';
+        score = 0;
+        baseSpeed = 5;
+        gameSpeed = 5;
+        obstacles = [];
+        collectibles = [];
+        powerups = [];
+        trailParticles = [];
+        floatingTexts = [];
+        magnetTimer = 0;
+        boostTimer = 0;
+        gameTime = 0;
+
+        // Reset spawn timers
+        obstacleSpawnDist = 600;
+        giftSpawnDist = 900;
+        powerupSpawnDist = 2000;
+
+        player.x = canvas.width/2 - player.width/2;
+        player.targetX = player.x;
+        if(!animationId) loop();
+    }
+
+    function gameOver() {
+        gameState = 'GAMEOVER';
+        finalScoreEl.innerText = score;
+        gameOverScreen.classList.remove('hidden');
+    }
+
+    function resetGame() {
+        gameOverScreen.classList.add('hidden');
+        startGame();
+    }
+
+    // Initialization
+    window.addEventListener('resize', resize);
+    generateSprites();
+    resize();
+    draw();
+
+</script>
+</body>
+</html>
