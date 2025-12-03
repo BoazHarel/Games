@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Israel's Light: Hanukkah Scroller</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0038b8; /* Israel Blue */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none; /* Prevent browser scrolling */
+        }
+        canvas {
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #score-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #0038b8;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #start-screen, #game-over-screen {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            pointer-events: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 4px solid #0038b8;
+            max-width: 80%;
+        }
+        h1 {
+            color: #0038b8;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        p {
+            color: #555;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        button {
+            background: #0038b8;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .hidden {
+            display: none !important;
+        }
+        #powerup-indicator {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="score-display" class="hidden">Score: 0</div>
+<div id="powerup-indicator">MACCABEE MODE!</div>
+
+<div id="ui-layer">
+    <div id="start-screen">
+        <h1>Israel's Light</h1>
+        <p><strong>Hanukkah Scroller</strong></p>
+        <p>Drag to move the map.</p>
+        <p>Collect candles for points:</p>
+        <p>
+            <span style="color:blue">Blue (7)</span> |
+            <span style="color:purple">Purple (20)</span><br>
+            <span style="color:green">Green (100)</span> |
+            <span style="color:orange">Orange (1000)</span>
+        </p>
+        <p><span style="color:red">RED CANDLE</span> = Speed + Invincibility!</p>
+        <p>Avoid Fish, Slides & Balls.</p>
+        <button id="start-btn">Start Game</button>
+    </div>
+
+    <div id="game-over-screen" class="hidden">
+        <h1>Game Over</h1>
+        <p id="final-score">Score: 0</p>
+        <button id="restart-btn">Restart</button>
+    </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Elements
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const scoreDisplay = document.getElementById('score-display');
+    const finalScoreText = document.getElementById('final-score');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const powerupIndicator = document.getElementById('powerup-indicator');
+
+    // Game State
+    let gameRunning = false;
+    let score = 0;
+    let frameCount = 0;
+    let baseSpeed = 4;
+    let speedMultiplier = 1;
+    let difficultyFactor = 1;
+
+    // Powerup State
+    let isInvincible = false;
+    let powerupTimer = 0;
+
+    // Entities
+    let player = { x: 0, y: 0, width: 60, height: 100 };
+    let candles = [];
+    let obstacles = [];
+    let particles = [];
+
+    // Resize Canvas
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        // Center player initially
+        if (!gameRunning) {
+            player.x = canvas.width / 2;
+            player.y = canvas.height * 0.8;
+        }
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Input Handling (Mouse & Touch)
+    let inputX = canvas.width / 2;
+    let inputY = canvas.height * 0.8;
+
+    function handleInput(x, y) {
+        inputX = x;
+        inputY = y;
+    }
+
+    canvas.addEventListener('mousemove', e => handleInput(e.clientX, e.clientY));
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault(); // Prevent scrolling
+        handleInput(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
+        handleInput(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: false });
+
+    // --- Drawing Helper Functions ---
+
+    function drawIsraelMap(x, y, w, h) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Draw Israel Shape (Stylized polygon)
+        ctx.beginPath();
+        // Start Top Left (Lebanon border)
+        ctx.moveTo(-w*0.3, -h*0.45);
+        // Top Right (Golan)
+        ctx.lineTo(w*0.3, -h*0.5);
+        // Sea of Galilee notch
+        ctx.lineTo(w*0.25, -h*0.3);
+        // Jordan Valley (bulge out)
+        ctx.lineTo(w*0.4, -h*0.1);
+        // Dead Sea indent
+        ctx.lineTo(w*0.3, h*0.1);
+        // Down to Eilat
+        ctx.lineTo(w*0.1, h*0.5);
+        // Eilat Tip
+        ctx.lineTo(0, h*0.55);
+        // Egypt Border up to Gaza
+        ctx.lineTo(-w*0.3, h*0.2);
+        // Gaza Curve
+        ctx.lineTo(-w*0.4, h*0.15);
+        // Coastline up
+        ctx.lineTo(-w*0.45, -h*0.2);
+        // Haifa Bay
+        ctx.lineTo(-w*0.2, -h*0.25);
+        // Back to top
+        ctx.lineTo(-w*0.3, -h*0.45);
+        ctx.closePath();
+
+        // Fill White
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#0038b8';
+        ctx.stroke();
+
+        // Clip for flag details
+        ctx.clip();
+
+        // Flag Stripes
+        ctx.fillStyle = '#0038b8';
+        ctx.fillRect(-w, -h*0.3, w*2, h*0.1); // Top stripe
+        ctx.fillRect(-w, h*0.2, w*2, h*0.1);  // Bottom stripe
+
+        // Star of David (Center)
+        drawStarOfDavid(0, -h*0.05, w*0.4);
+
+        ctx.restore();
+
+        // Powerup Aura
+        if (isInvincible) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.beginPath();
+            ctx.arc(0, 0, w, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255, 50, 50, ${0.5 + Math.sin(Date.now()/50)*0.5})`;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    function drawStarOfDavid(x, y, size) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.strokeStyle = '#0038b8';
+        ctx.lineWidth = 2;
+
+        // Triangle 1
+        ctx.beginPath();
+        ctx.moveTo(0, -size);
+        ctx.lineTo(size*0.866, size*0.5);
+        ctx.lineTo(-size*0.866, size*0.5);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Triangle 2
+        ctx.beginPath();
+        ctx.moveTo(0, size);
+        ctx.lineTo(-size*0.866, -size*0.5);
+        ctx.lineTo(size*0.866, -size*0.5);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawCandle(c) {
+        const w = c.width;
+        const h = c.height;
+        const x = c.x;
+        const y = c.y;
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Candle Body
+        ctx.fillStyle = c.color;
+        ctx.fillRect(-w/2, -h/2, w, h);
+
+        // Wick
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-1, -h/2 - 5, 2, 5);
+
+        // Flame
+        const flicker = Math.random() * 0.2 + 0.8;
+        ctx.beginPath();
+        ctx.moveTo(0, -h/2 - 5);
+        ctx.quadraticCurveTo(w/2 * flicker, -h/2 - 15, 0, -h/2 - 25 * flicker);
+        ctx.quadraticCurveTo(-w/2 * flicker, -h/2 - 15, 0, -h/2 - 5);
+        ctx.fillStyle = '#FFD700'; // Gold
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0, -h/2 - 5);
+        ctx.quadraticCurveTo(w/4 * flicker, -h/2 - 10, 0, -h/2 - 15 * flicker);
+        ctx.quadraticCurveTo(-w/4 * flicker, -h/2 - 10, 0, -h/2 - 5);
+        ctx.fillStyle = '#FF4500'; // Orange core
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function drawFish(o) {
+        ctx.save();
+        ctx.translate(o.x, o.y);
+        ctx.fillStyle = '#FF69B4'; // Hot pink fish
+
+        // Body
+        ctx.beginPath();
+        ctx.ellipse(0, 0, o.width/2, o.height/2, 0, 0, Math.PI*2);
+        ctx.fill();
+
+        // Tail
+        ctx.beginPath();
+        ctx.moveTo(o.width/3, 0);
+        ctx.lineTo(o.width/1.2, -o.height/2);
+        ctx.lineTo(o.width/1.2, o.height/2);
+        ctx.closePath();
+        ctx.fill();
+
+        // Eye
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(-o.width/4, -o.height/4, 4, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(-o.width/4, -o.height/4, 2, 0, Math.PI*2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function drawPlaygroundItem(o) {
+        ctx.save();
+        ctx.translate(o.x, o.y);
+
+        if (o.subType === 'ball') {
+            // Beach Ball
+            ctx.beginPath();
+            ctx.arc(0, 0, o.width/2, 0, Math.PI*2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            // Stripes
+            ctx.beginPath();
+            ctx.arc(0, 0, o.width/2, 0, Math.PI*2);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#FF4500';
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0,0, o.width/4, 0, Math.PI*2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+        } else {
+            // Slide (Triangle shape)
+            ctx.fillStyle = '#32CD32'; // Lime green
+            ctx.beginPath();
+            ctx.moveTo(0, -o.height/2);
+            ctx.lineTo(o.width/2, o.height/2);
+            ctx.lineTo(-o.width/2, o.height/2);
+            ctx.closePath();
+            ctx.fill();
+            // Ladder rungs
+            ctx.strokeStyle = '#228B22';
+            ctx.beginPath();
+            ctx.moveTo(-o.width/4, o.height/4);
+            ctx.lineTo(o.width/4, o.height/4);
+            ctx.moveTo(-o.width/6, 0);
+            ctx.lineTo(o.width/6, 0);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    // --- Game Logic ---
+
+    function spawnEntity() {
+        // Spawn Candle
+        if (Math.random() < 0.03) {
+            const rand = Math.random();
+            let type = 'blue';
+            let pts = 7;
+            let col = '#1E90FF'; // Dodger Blue
+
+            if (rand > 0.995) { type = 'orange'; pts = 1000; col = '#FFA500'; }
+            else if (rand > 0.98) { type = 'red'; pts = 0; col = '#FF0000'; } // Powerup
+            else if (rand > 0.90) { type = 'green'; pts = 100; col = '#32CD32'; }
+            else if (rand > 0.70) { type = 'purple'; pts = 20; col = '#8A2BE2'; }
+
+            candles.push({
+                x: Math.random() * (canvas.width - 40) + 20,
+                y: -50,
+                width: 20,
+                height: 50,
+                color: col,
+                points: pts,
+                type: type
+            });
+        }
+
+        // Spawn Obstacle
+        if (Math.random() < 0.02) {
+            const isMarine = Math.random() > 0.5;
+            obstacles.push({
+                x: Math.random() * (canvas.width - 60) + 30,
+                y: -60,
+                width: 50,
+                height: 50,
+                isMarine: isMarine,
+                subType: isMarine ? 'fish' : (Math.random() > 0.5 ? 'ball' : 'slide')
+            });
+        }
+    }
+
+    function update() {
+        if (!gameRunning) return;
+
+        // Update Player Position (Lerp for smoothness)
+        player.x += (inputX - player.x) * 0.2;
+        player.y += (inputY - player.y) * 0.2;
+
+        // Update Speed & Difficulty
+        frameCount++;
+        if (frameCount % 600 === 0) baseSpeed += 0.5; // Speed up every ~10s
+
+        // Powerup Timer
+        if (isInvincible) {
+            powerupTimer--;
+            if (powerupTimer <= 0) {
+                isInvincible = false;
+                speedMultiplier = 1;
+                powerupIndicator.style.display = 'none';
+            }
+        }
+
+        const currentSpeed = baseSpeed * speedMultiplier;
+
+        // Move Candles
+        for (let i = candles.length - 1; i >= 0; i--) {
+            let c = candles[i];
+            c.y += currentSpeed;
+
+            // Evasion Logic: Red and Orange candles run away from player
+            if (c.type === 'red' || c.type === 'orange') {
+                const dx = c.x - player.x;
+                const dy = c.y - player.y;
+                const dist = Math.hypot(dx, dy);
+
+                // If player is within 250 pixels, the candle flees horizontally
+                if (dist < 250) {
+                    const evadeSpeed = 5;
+                    // Move in the opposite direction of the player
+                    if (dx > 0) {
+                        c.x += evadeSpeed;
+                    } else {
+                        c.x -= evadeSpeed;
+                    }
+
+                    // Keep within canvas bounds so they don't disappear off the sides
+                    if (c.x < c.width) c.x = c.width;
+                    if (c.x > canvas.width - c.width) c.x = canvas.width - c.width;
+                }
+            }
+
+            // Collision
+            if (Math.hypot(c.x - player.x, c.y - player.y) < (player.width/2 + c.width/2)) {
+                // Collect
+                if (c.type === 'red') {
+                    activatePowerup();
+                } else {
+                    score += c.points;
+                    scoreDisplay.textContent = "Score: " + score;
+                    createParticles(c.x, c.y, c.color);
+                }
+                candles.splice(i, 1);
+                continue;
+            }
+
+            if (c.y > canvas.height + 50) candles.splice(i, 1);
+        }
+
+        // Move Obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let o = obstacles[i];
+            o.y += currentSpeed;
+
+            // Collision
+            if (!isInvincible && Math.hypot(o.x - player.x, o.y - player.y) < (player.width/3 + o.width/2)) {
+                gameOver();
+                return;
+            }
+
+            if (o.y > canvas.height + 50) obstacles.splice(i, 1);
+        }
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+            if(p.life <= 0) particles.splice(i, 1);
+        }
+
+        spawnEntity();
+    }
+
+    function drawBackground() {
+        // Fill Blue Base
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Moving Blue Stripes Background
+        ctx.fillStyle = 'rgba(0, 56, 184, 0.1)';
+        const stripeSize = 100;
+        const offset = (frameCount * (baseSpeed * speedMultiplier)) % stripeSize;
+
+        for (let i = -1; i < canvas.height / stripeSize + 1; i++) {
+            // Diagonal stripes
+            ctx.beginPath();
+            ctx.moveTo(0, i * stripeSize + offset);
+            ctx.lineTo(canvas.width, (i+2) * stripeSize + offset);
+            ctx.lineTo(canvas.width, (i+1) * stripeSize + offset);
+            ctx.lineTo(0, (i-1) * stripeSize + offset);
+            ctx.fill();
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBackground();
+
+        // Draw Obstacles
+        obstacles.forEach(o => {
+            if (o.isMarine) drawFish(o);
+            else drawPlaygroundItem(o);
+        });
+
+        // Draw Candles
+        candles.forEach(c => drawCandle(c));
+
+        // Draw Player
+        drawIsraelMap(player.x, player.y, player.width, player.height);
+
+        // Draw Particles
+        particles.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, 4, 4);
+        });
+
+        if (gameRunning) requestAnimationFrame(() => {
+            update();
+            draw();
+        });
+    }
+
+    function createParticles(x, y, color) {
+        for(let i=0; i<10; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random()-0.5)*10,
+                vy: (Math.random()-0.5)*10,
+                life: 20,
+                color: color
+            });
+        }
+    }
+
+    function activatePowerup() {
+        isInvincible = true;
+        speedMultiplier = 2.5; // Fast speed!
+        powerupTimer = 300; // 5 seconds at 60fps
+        powerupIndicator.style.display = 'block';
+    }
+
+    function startGame() {
+        score = 0;
+        baseSpeed = 4;
+        speedMultiplier = 1;
+        frameCount = 0;
+        candles = [];
+        obstacles = [];
+        particles = [];
+        isInvincible = false;
+
+        scoreDisplay.textContent = "Score: 0";
+        scoreDisplay.classList.remove('hidden');
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        powerupIndicator.style.display = 'none';
+
+        gameRunning = true;
+        resize();
+        draw();
+    }
+
+    function gameOver() {
+        gameRunning = false;
+        finalScoreText.textContent = "Score: " + score;
+        scoreDisplay.classList.add('hidden');
+        gameOverScreen.classList.remove('hidden');
+        powerupIndicator.style.display = 'none';
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
+
+</script>
+</body>
+</html>
