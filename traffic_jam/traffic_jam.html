@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Traffic Jam Sorter</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #333; touch-action: none; user-select: none; -webkit-user-select: none; }
+        canvas { display: block; width: 100%; height: 100%; }
+        /* Simple loading message */
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-family: sans-serif; pointer-events: none; }
+    </style>
+    <!-- Load Kaboom.js -->
+    <script src="https://unpkg.com/kaboom@3000.0.1/dist/kaboom.js"></script>
+</head>
+<body>
+<div id="loading">Loading Traffic...</div>
+
+<script>
+    // --- AUDIO SYSTEM (ZzFX) ---
+    // ZzFX - Zuper Zmall Zound Zynth - Micro Edition
+    // MIT License - Copyright 2019 Frank Force
+    let zzfx,zzfxV,zzfxX;zzfxV=.3;zzfx=(p,a,c,e,f,u,r,z,y,w,d,m,s,g,b,k,v,h,n,l)=>{a=100*Math.PI;f*=a;c*=a;e*=a;u*=a;r*=a;z*=a;y*=a;w*=a;m*=a;s*=a;v*=a;h*=a;g=void 0!==g?g:0;b=void 0!==b?b:0;k=void 0!==k?k:0;l=void 0!==l?l:0;v=void 0!==v?v:0;h=void 0!==h?h:0;n=void 0!==n?n:0;l=void 0!==l?l:0;p=void 0!==p?p:0;let t=2*Math.PI,M=Math.sin,x=Math.cos,A=Math.random;let B=AudioContext;if(void 0!==window&&void 0!==window[B=window.AudioContext||window.webkitAudioContext])return zzfxX=new B,zzfx=(p,a,c,e,f,u,r,z,y,w,d,m,s,g,b,k,v,h,n,l)=>{let B=zzfxX.createBuffer(1,96e3,44100),C=B.getChannelData(0),D=0,E=0;for(let B=0;B<96e3;B++)C[B]=D,E=E<g?E+1/(44100*g):1,D+=E*(M(B*f/44100)*x(B*u/44100)*x(B*r/44100)*x(B*z/44100)*x(B*y/44100)*x(B*w/44100)*x(B*m/44100)*x(B*s/44100)*x(B*v/44100)*x(B*h/44100)*x(B*n/44100)*x(B*l/44100)+d*A()*2-d);return p=zzfxX.createBufferSource(),p.buffer=B,p.connect(zzfxX.destination),p.start(),p},zzfx(p,a,c,e,f,u,r,z,y,w,d,m,s,g,b,k,v,h,n,l)}
+
+    // Sound Presets
+    const playHonk = () => zzfx(...[1.1,,295,.04,.19,.13,1,1.4,1,,,,,.1,,.1,.03,.84,.06]);
+    const playVroom = () => zzfx(...[1.5,.5,150,.1,.2,.3,2,1.5,,,,,,.3,,.2]);
+    const playWin = () => zzfx(...[,,537,.02,.09,.19,1,1.3,,-4,,,.07,.4,,.1,.07,.62,.07]);
+    const playErr = () => zzfx(...[1.2,,160,,.05,.18,4,1.6,,,,,,.1,,.1]);
+    const playPop = () => zzfx(...[.6,,317,.03,.11,.24,3,1.6,-7,,,,,.1,,.1,,.67,.06]);
+
+    // --- GAME LOGIC ---
+
+    // Wait for Kaboom to load
+    window.addEventListener("load", () => {
+        document.getElementById("loading").style.display = "none";
+
+        // Robust font stack
+        const EMOJI_FONT = "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
+
+        kaboom({
+            background: [50, 50, 60],
+            touchToMouse: true,
+            font: EMOJI_FONT // Use system font for text
+        });
+
+        // --- SPRITE GENERATION SYSTEM ---
+        function loadEmojiAsSprite(name, char) {
+            const cvs = document.createElement("canvas");
+            cvs.width = 128;
+            cvs.height = 128;
+            const ctx = cvs.getContext("2d");
+            ctx.font = "100px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(char, 64, 70);
+            loadSprite(name, cvs.toDataURL());
+        }
+
+        // Assets defined by Emoji groups
+        const GROUPS = [
+            { name: "red", color: rgb(255, 60, 60), emojis: ["🚗", "🏎️", "🚒"], hex: "#ff3c3c" },
+            { name: "blue", color: rgb(60, 120, 255), emojis: ["🚙", "🚐"], hex: "#3c78ff" },
+            { name: "yellow", color: rgb(255, 240, 0), emojis: ["🚕", "🚌"], hex: "#fff000" },
+        ];
+
+        const PRAISE_WORDS = ["YAY!", "COOL!", "WOW!", "ZOOM!", "GREAT!", "SUPER!"];
+
+        GROUPS.forEach(group => {
+            group.emojis.forEach((emoji, index) => {
+                loadEmojiAsSprite(`${group.name}_${index}`, emoji);
+            });
+        });
+
+        loadEmojiAsSprite("parking_icon", "🅿️");
+        loadEmojiAsSprite("cloud", "☁️");
+
+        scene("main", () => {
+            // --- BACKGROUND DECORATION ---
+
+            // 1. Moving Road Stripes (BACKGROUND LAYER)
+            loop(0.3, () => {
+                const stripe = add([
+                    rect(10, 80),
+                    pos(center().x, -100),
+                    color(255, 255, 255),
+                    opacity(0.3),
+                    anchor("center"),
+                    move(DOWN, 400),
+                    z(-5), // Layer: Background
+                    "road_stripe"
+                ]);
+
+                // Fix: Check position instead of time so they don't vanish on tall screens
+                stripe.onUpdate(() => {
+                    if (stripe.pos.y > height() + 200) {
+                        destroy(stripe);
+                    }
+                });
+            });
+
+            // 2. Floating Clouds (BACKGROUND LAYER)
+            loop(4, () => {
+                const cloud = add([
+                    sprite("cloud"),
+                    pos(-200, rand(0, height()/3)),
+                    scale(rand(1, 2)),
+                    opacity(0.3),
+                    move(RIGHT, rand(20, 50)),
+                    z(-5), // Layer: Background
+                ]);
+
+                // Fix: Check position instead of time
+                cloud.onUpdate(() => {
+                    if (cloud.pos.x > width() + 200) {
+                        destroy(cloud);
+                    }
+                });
+            });
+
+            add([
+                text("Traffic Sorter", { size: 36 }),
+                pos(center().x, 40),
+                anchor("center"),
+                color(255, 255, 255),
+                z(100) // Layer: Top UI
+            ]);
+
+            // --- AUDIO UNLOCKER ---
+            let audioUnlocked = false;
+            onMousePress(() => {
+                if (!audioUnlocked && zzfxX && zzfxX.state === 'suspended') {
+                    zzfxX.resume();
+                    audioUnlocked = true;
+                }
+            });
+
+            let currentGroup = null;
+            let canInteract = true;
+            let currentCar = null;
+            let isDragging = false;
+            let dragOffset = vec2(0);
+
+            const garages = [];
+            
+            // --- DYNAMIC GARAGE SIZING ---
+            const numGarages = GROUPS.length;
+            const spacing = width() / numGarages;
+            const garageWidth = spacing - 40; // Use a gap of 40px
+            const garageHeight = height() * 0.25; // Garages are 25% of the screen height
+            const garageY = height() - (garageHeight / 2) - 20; // Position at bottom with 20px margin
+
+            GROUPS.forEach((group, index) => {
+                const xPos = (spacing * index) + (spacing / 2);
+
+                const btn = add([
+                    rect(garageWidth, garageHeight, { radius: 20 }),
+                    pos(xPos, garageY),
+                    anchor("center"),
+                    color(group.color),
+                    outline(4, WHITE),
+                    area(),
+                    scale(1),
+                    z(10), // Layer: Ground
+                    "garage",
+                    { groupName: group.name }
+                ]);
+
+                add([
+                    sprite("parking_icon"),
+                    pos(xPos, garageY),
+                    anchor("center"),
+                    scale(garageHeight / 256), // Scale icon relative to garage height
+                    z(11), // Layer: Above Garage
+                    color(0,0,0)
+                ]);
+
+                garages.push(btn);
+
+                btn.onClick(() => {
+                    if (!isDragging) {
+                        checkMatch(group.name, btn);
+                    }
+                });
+            });
+
+            function spawnCar() {
+                canInteract = true;
+                isDragging = false;
+
+                const groupIdx = Math.floor(rand(0, GROUPS.length));
+                currentGroup = GROUPS[groupIdx];
+
+                const emojiIdx = Math.floor(rand(0, currentGroup.emojis.length));
+                const spriteName = `${currentGroup.name}_${emojiIdx}`;
+
+                // 40% Dynamic Scale
+                const screenRef = Math.min(width(), height());
+                const targetSize = screenRef * 0.4;
+                const dynamicScale = targetSize / 128;
+
+                currentCar = add([
+                    sprite(spriteName),
+                    pos(center().x, -200),
+                    anchor("center"),
+                    scale(dynamicScale),
+                    color(currentGroup.color),
+                    area(),
+                    z(50), // Layer: Objects/Cars
+                    "car",
+                    { originalScale: dynamicScale }
+                ]);
+
+                wait(0.1, () => playHonk());
+
+                tween(currentCar.pos.y, center().y, 1, (p) => currentCar.pos.y = p, easings.easeOutBounce).onEnd(() => {
+                    // Dust particles on landing
+                    for(let i=0; i<5; i++) {
+                        add([
+                            rect(10, 10),
+                            pos(currentCar.pos.x + rand(-40, 40), currentCar.pos.y + 40),
+                            color(200, 200, 200),
+                            move(rand(0, -180), rand(50, 100)),
+                            lifespan(0.5),
+                            opacity(0.5),
+                            z(49) // Layer: Just below car
+                        ])
+                    }
+                });
+
+                // Idle Animation (Breathing)
+                let t = 0;
+                currentCar.onUpdate(() => {
+                    if (!isDragging) {
+                        t += dt() * 4;
+                        // Gentle sine wave on scale
+                        const breathe = Math.sin(t) * 0.05;
+                        currentCar.scale = vec2(currentCar.originalScale + breathe);
+                    }
+                });
+            }
+
+            function checkMatch(selectedGroupName, btnObj) {
+                if (!canInteract || !currentCar) return;
+
+                if (selectedGroupName === currentGroup.name) {
+                    // WIN
+                    canInteract = false;
+                    playVroom();
+                    playWin();
+                    shake(5);
+
+                    // 1. Confetti
+                    for (let i = 0; i < 20; i++) {
+                        add([
+                            rect(10, 10),
+                            pos(btnObj.pos),
+                            color(currentGroup.color),
+                            move(rand(0, 360), rand(100, 300)),
+                            lifespan(1),
+                            opacity(1),
+                            scale(rand(0.5, 1)),
+                            z(80) // Layer: FX
+                        ]);
+                    }
+
+                    // 2. Praise Word Pop-up
+                    const word = choose(PRAISE_WORDS);
+                    add([
+                        text(word, { size: 48, font: EMOJI_FONT }),
+                        pos(center()),
+                        anchor("center"),
+                        color(255, 255, 255),
+                        outline(4, currentGroup.color),
+                        move(UP, 100),
+                        lifespan(1),
+                        opacity(1),
+                        z(100) // Layer: Top UI
+                    ]);
+
+                    tween(currentCar.pos, btnObj.pos, 0.4, (p) => currentCar.pos = p, easings.easeOutQuad).onEnd(() => {
+                        destroy(currentCar);
+                        wait(0.8, spawnCar); // Wait a bit longer to read the text
+                    });
+
+                    tween(currentCar.scale, vec2(0), 0.4, (p) => currentCar.scale = p);
+
+                } else {
+                    // LOSE
+                    playErr();
+                    shake(2);
+
+                    const startX = btnObj.pos.x;
+                    tween(btnObj.pos.x, startX + 10, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
+                        tween(btnObj.pos.x, startX - 10, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
+                            btnObj.pos.x = startX;
+                        });
+                    });
+
+                    if (currentCar.pos.dist(center()) > 50) {
+                        tween(currentCar.pos, center(), 0.5, (p) => currentCar.pos = p, easings.easeOutElastic);
+                    }
+                    tween(currentCar.scale, vec2(currentCar.originalScale), 0.2, (p) => currentCar.scale = p);
+                }
+            }
+
+            onMousePress(() => {
+                if (currentCar && currentCar.isHovering() && canInteract) {
+                    isDragging = true;
+                    dragOffset = mousePos().sub(currentCar.pos);
+                    playPop(); // Little sound on pickup
+                    tween(currentCar.scale, vec2(currentCar.originalScale * 1.1), 0.1, (p) => currentCar.scale = p);
+                }
+            });
+
+            onMouseRelease(() => {
+                if (isDragging && currentCar) {
+                    isDragging = false;
+
+                    let droppedOnGarage = false;
+                    garages.forEach(garage => {
+                        // STRICTER CHECK: Center of car must be inside the garage button
+                        if (garage.hasPoint(currentCar.pos)) {
+                            droppedOnGarage = true;
+                            checkMatch(garage.groupName, garage);
+                        }
+                    });
+
+                    if (!droppedOnGarage) {
+                        playPop(); // Little sound on drop
+                        tween(currentCar.pos, center(), 0.5, (p) => currentCar.pos = p, easings.easeOutElastic);
+                        tween(currentCar.scale, vec2(currentCar.originalScale), 0.2, (p) => currentCar.scale = p);
+                    }
+                }
+            });
+
+            onUpdate(() => {
+                if (isDragging && currentCar) {
+                    currentCar.pos = mousePos().sub(dragOffset);
+                }
+            });
+
+            spawnCar();
+        });
+
+        go("main");
+    });
+</script>
+</body>
+</html>

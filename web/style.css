@@ -14,7 +14,7 @@ body {
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 20px;
     width: 95vw;
@@ -44,7 +44,7 @@ body {
 @media (max-width: 768px) {
     .grid-container {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, 1fr);
+        grid-template-rows: repeat(5, 1fr);
         width: 90vw;
         height: 90vh;
     }
