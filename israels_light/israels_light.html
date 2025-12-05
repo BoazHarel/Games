@@ -455,28 +455,6 @@
             let c = candles[i];
             c.y += currentSpeed;
 
-            // Evasion Logic: Red and Orange candles run away from player
-            if (c.type === 'red' || c.type === 'orange') {
-                const dx = c.x - player.x;
-                const dy = c.y - player.y;
-                const dist = Math.hypot(dx, dy);
-
-                // If player is within 250 pixels, the candle flees horizontally
-                if (dist < 250) {
-                    const evadeSpeed = 5;
-                    // Move in the opposite direction of the player
-                    if (dx > 0) {
-                        c.x += evadeSpeed;
-                    } else {
-                        c.x -= evadeSpeed;
-                    }
-
-                    // Keep within canvas bounds so they don't disappear off the sides
-                    if (c.x < c.width) c.x = c.width;
-                    if (c.x > canvas.width - c.width) c.x = canvas.width - c.width;
-                }
-            }
-
             // Collision
             if (Math.hypot(c.x - player.x, c.y - player.y) < (player.width/2 + c.width/2)) {
                 // Collect
