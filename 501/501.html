@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Wheel Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1e3a8a 0%, #000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .game-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        /* The Chrome Bezel */
+        .wheel-bezel {
+            position: relative;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #555, #111);
+            padding: 12px;
+            box-shadow:
+                0 0 0 4px #333,
+                0 20px 60px rgba(0,0,0,0.8),
+                inset 0 2px 5px rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Running Lights */
+        .led {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #222;
+            border-radius: 50%;
+            z-index: 10;
+            transition: background 0.05s, box-shadow 0.05s;
+        }
+
+        .led.active {
+            background: #ff3333;
+            box-shadow: 0 0 8px #ff0000, 0 0 15px #ff0000;
+        }
+
+        /* The SVG Wheel */
+        #wheel-svg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: rotate(-90deg); /* Start at top */
+        }
+
+        .segment-path {
+            stroke: #fff;
+            stroke-width: 1;
+        }
+
+        /* Center Piece */
+        .center-hub {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #444, #000);
+            border-radius: 50%;
+            z-index: 20;
+            border: 3px solid #222;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .spin-btn {
+            margin-top: 40px;
+            background: linear-gradient(to bottom, #facc15, #eab308);
+            color: #000;
+            font-weight: 900;
+            font-size: 1.5rem;
+            padding: 1rem 4rem;
+            border-radius: 9999px;
+            border: none;
+            box-shadow: 0 6px 0 #854d0e, 0 10px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .spin-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #854d0e;
+        }
+
+        .spin-btn:disabled {
+            filter: grayscale(0.8);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Modal styling */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- Brand Header -->
+    <div class="mb-8 text-center">
+        <h1 class="text-4xl font-black text-white italic tracking-tighter">EL<span class="text-yellow-400">AL</span>
+        </h1>
+        <p class="text-blue-200 text-sm font-bold uppercase tracking-widest mt-1">Open Skies • שמים פתוחים</p>
+    </div>
+
+    <!-- Wheel Bezel -->
+    <div class="wheel-bezel">
+        <div id="led-container"></div>
+
+        <svg id="wheel-svg" viewBox="0 0 100 100">
+            <g id="segments-group"></g>
+        </svg>
+
+        <div class="center-hub"></div>
+    </div>
+
+    <button id="spin-btn" class="spin-btn">SPIN!</button>
+</div>
+
+<!-- Win Modal -->
+<div id="modal" class="modal-backdrop">
+    <div class="modal-content">
+        <div id="win-icon" class="text-7xl mb-4">✈️</div>
+        <h2 id="win-title" class="text-2xl font-black text-blue-900 mb-2 uppercase"></h2>
+        <p id="win-desc" class="text-gray-600 font-bold mb-6 leading-relaxed"></p>
+        <button id="modal-close-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl w-full">CONTINUE
+            GAME
+        </button>
+    </div>
+</div>
+
+<script>
+    const prizes = [
+        {
+            icon: '✈️',
+            label: 'OPEN SKIES',
+            color: '#FFD700',
+            desc: 'Proceed directly to one of your destinations!'
+        },
+        {
+            icon: '⭐',
+            label: 'BACK TRACK',
+            color: '#1E40AF',
+            desc: 'Go back to the nearest star.'
+        },
+        {
+            icon: '🌟',
+            label: 'GLOWING STAR',
+            color: '#312E81',
+            desc: 'Proceed forward to the nearest star.'
+        },
+        {
+            icon: '➕',
+            label: 'AIRPORT ACCESS',
+            color: '#E5E7EB',
+            desc: 'Proceed forward to the nearest airport.'
+        },
+        {
+            icon: '😔',
+            label: 'SAD FACE',
+            color: '#F3F4F6',
+            desc: 'Bad luck! You lose your turn.'
+        },
+        {
+            icon: '😊',
+            label: 'HAPPY FACE',
+            color: '#FDE047',
+            desc: 'Lucky you! Take another turn.'
+        },
+        {
+            icon: '🃏',
+            label: 'SWITCH CARDS',
+            color: '#9333EA',
+            desc: 'Switch cards with another player!'
+        }
+    ];
+
+    const segmentsGroup = document.getElementById('segments-group');
+    const ledContainer = document.getElementById('led-container');
+    const spinBtn = document.getElementById('spin-btn');
+    const modal = document.getElementById('modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    const totalSegments = prizes.length;
+    const anglePerSegment = 360 / totalSegments;
+
+    prizes.forEach((prize, i) => {
+        const startAngle = i * anglePerSegment;
+        const endAngle = (i + 1) * anglePerSegment;
+
+        const x1 = 50 + 50 * Math.cos(Math.PI * startAngle / 180);
+        const y1 = 50 + 50 * Math.sin(Math.PI * startAngle / 180);
+        const x2 = 50 + 50 * Math.cos(Math.PI * endAngle / 180);
+        const y2 = 50 + 50 * Math.sin(Math.PI * endAngle / 180);
+
+        const pathData = `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`;
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData);
+        path.setAttribute("fill", prize.color);
+        path.setAttribute("class", "segment-path");
+
+        const textAngle = startAngle + (anglePerSegment / 2);
+        const tx = 50 + 32 * Math.cos(Math.PI * textAngle / 180);
+        const ty = 50 + 32 * Math.sin(Math.PI * textAngle / 180);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", tx);
+        text.setAttribute("y", ty);
+        text.setAttribute("fill", "#000");
+        text.setAttribute("font-size", "8");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.setAttribute("transform", `rotate(${textAngle + 90}, ${tx}, ${ty})`);
+        text.textContent = prize.icon;
+
+        g.appendChild(path);
+        g.appendChild(text);
+        segmentsGroup.appendChild(g);
+    });
+
+    const ledCount = 21;
+    const leds = [];
+    for (let i = 0; i < ledCount; i++) {
+        const led = document.createElement('div');
+        led.className = 'led';
+        const angle = (i / ledCount) * 2 * Math.PI;
+        const radius = 168;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        led.style.left = `calc(50% + ${x}px)`;
+        led.style.top = `calc(50% + ${y}px)`;
+        ledContainer.appendChild(led);
+        leds.push(led);
+    }
+
+    let isSpinning = false;
+    let currentLed = 0;
+
+    function startSpin() {
+        if (isSpinning) return;
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        let speed = 20;
+        const totalSteps = 70 + Math.floor(Math.random() * 60);
+        let steps = 0;
+
+        function run() {
+            leds.forEach(l => l.classList.remove('active'));
+            currentLed = (currentLed + 1) % ledCount;
+            leds[currentLed].classList.add('active');
+            leds[(currentLed - 1 + ledCount) % ledCount].classList.add('active');
+
+            steps++;
+            if (steps < totalSteps) {
+                if (steps > totalSteps * 0.7) speed += 15;
+                else if (steps > totalSteps * 0.5) speed += 5;
+                setTimeout(run, speed);
+            } else {
+                finish();
+            }
+        }
+        run();
+    }
+
+    function finish() {
+        isSpinning = false;
+        spinBtn.disabled = false;
+
+        const offset = ledCount * 0.25;
+        const adjustedLed = (currentLed + offset) % ledCount;
+        const winnerIdx = Math.floor((adjustedLed / ledCount) * totalSegments);
+        const winner = prizes[winnerIdx];
+
+        document.getElementById('win-icon').innerText = winner.icon;
+        document.getElementById('win-title').innerText = winner.label;
+        document.getElementById('win-desc').innerText = winner.desc;
+        modal.classList.add('show');
+    }
+
+    function closeModal() {
+        modal.classList.remove('show');
+    }
+
+    spinBtn.addEventListener('click', startSpin);
+    modalCloseBtn.addEventListener('click', closeModal);
+</script>
+</body>
+</html>
