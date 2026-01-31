@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Fun!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Varela+Round&display=swap');
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #f0f9ff;
+            /* Allow scrolling on very small screens if needed, but hide usually */
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* Hebrew font support */
+        .hebrew-text {
+            font-family: 'Varela Round', sans-serif;
+        }
+
+        /* Responsive container that handles landscape nicely */
+        .game-layout {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Force side-by-side on landscape orientation for tablets/phones */
+        @media (orientation: landscape) {
+            .game-layout {
+                flex-direction: row;
+                align-items: center;
+                gap: 2rem;
+            }
+            .info-section {
+                width: 35%;
+                flex-shrink: 0;
+            }
+            .grid-section {
+                width: 65%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+            }
+            .cards-grid {
+                height: auto;
+                max-height: 90vh;
+                width: 100%;
+            }
+        }
+
+        .flag-btn {
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 0 #e2e8f0;
+            padding: 0;
+            overflow: hidden;
+            aspect-ratio: 3/2;
+            width: 100%;
+            position: relative; /* For absolute positioning of X overlay */
+        }
+
+        .flag-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .flag-img {
+            width: 100%;
+            height: 100%;
+            /* CHANGED: contain ensures the full flag is seen (e.g. Nepal, Switzerland) */
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* Animation classes */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pop {
+            animation: pop 0.3s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .correct-anim {
+            background-color: #86efac !important; /* Green-300 */
+            box-shadow: 0 4px 0 #22c55e !important;
+        }
+
+        .wrong-anim {
+            /* Background won't show behind image, but shadow will update */
+            box-shadow: 0 4px 0 #ef4444 !important;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center selection:bg-none select-none p-4">
+
+<!-- Main Game Container -->
+<div id="game-screen" class="game-layout w-full max-w-5xl h-full justify-between gap-4">
+
+    <!-- Left/Top Section: Info & Question -->
+    <div class="info-section flex flex-col gap-4 w-full">
+        <!-- Stats Header -->
+        <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border-b-4 border-blue-100 w-full">
+            <div class="text-3xl font-bold text-blue-500 flex items-center gap-2">
+                <span>⭐</span>
+                <span id="score">0</span>
+            </div>
+            <div class="flex gap-1" id="hearts-container">
+                <span class="text-3xl text-red-500">❤️</span>
+                <span class="text-3xl text-red-500">❤️</span>
+                <span class="text-3xl text-red-500">❤️</span>
+            </div>
+        </div>
+
+        <!-- Question Text -->
+        <div class="flex-grow flex flex-col items-center justify-center text-center py-4 bg-white/50 rounded-2xl md:bg-transparent">
+            <p class="text-gray-500 text-xl mb-2 font-semibold">Where is...</p>
+            <h1 id="country-name" class="text-4xl md:text-5xl font-bold text-gray-800 break-words w-full leading-tight">
+                Loading...
+            </h1>
+            <!-- Hebrew Name Container -->
+            <h2 id="country-name-he" dir="rtl"
+                class="hebrew-text text-3xl md:text-4xl font-bold text-blue-600 mt-2 break-words w-full animate-bounce-short">
+            </h2>
+        </div>
+    </div>
+
+    <!-- Right/Bottom Section: Flag Grid -->
+    <div class="grid-section w-full">
+        <div class="cards-grid grid grid-cols-2 gap-4 w-full">
+            <button onclick="handleGuess(0)" id="btn-0"
+                    class="flag-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
+            <button onclick="handleGuess(1)" id="btn-1"
+                    class="flag-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
+            <button onclick="handleGuess(2)" id="btn-2"
+                    class="flag-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
+            <button onclick="handleGuess(3)" id="btn-3"
+                    class="flag-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Game Over Modal -->
+<div id="game-over-screen"
+     class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl border-b-8 border-gray-200 animate-pop">
+        <div class="text-7xl mb-6">🏆</div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-2">Game Over!</h2>
+        <p class="text-2xl text-gray-600 mb-8">You found <span id="final-score" class="font-bold text-blue-600">0</span>
+            flags!</p>
+
+        <button onclick="restartGame()"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-5 px-6 rounded-2xl shadow-[0_4px_0_rgb(29,78,216)] active:shadow-none active:translate-y-1 transition-all transform hover:scale-105">
+            Play Again 🔄
+        </button>
+    </div>
+</div>
+
+<script>
+    const allCountries = [
+        { name: "Afghanistan", hebrew: "אַפְגָנִיסְטָן", code: "af" },
+        { name: "Albania", hebrew: "אַלְבַּנְיָה", code: "al" },
+        { name: "Algeria", hebrew: "אַלְגִ׳ירְיָה", code: "dz" },
+        { name: "Andorra", hebrew: "אַנְדּוֹרָה", code: "ad" },
+        { name: "Angola", hebrew: "אַנְגּוֹלָה", code: "ao" },
+        { name: "Antigua and Barbuda", hebrew: "אַנְטִיגְוָה וּבַרְבּוּדָה", code: "ag" },
+        { name: "Argentina", hebrew: "אַרְגֶּנְטִינָה", code: "ar" },
+        { name: "Armenia", hebrew: "אַרְמֶנְיָה", code: "am" },
+        { name: "Australia", hebrew: "אוֹסְטְרַלְיָה", code: "au" },
+        { name: "Austria", hebrew: "אוֹסְטְרִיָּה", code: "at" },
+        { name: "Azerbaijan", hebrew: "אַזֶרְבַּייגָ׳ן", code: "az" },
+        { name: "Bahamas", hebrew: "איי בַּהָאמָה", code: "bs" },
+        { name: "Bahrain", hebrew: "בַּחְרֵיין", code: "bh" },
+        { name: "Bangladesh", hebrew: "בַּנְגְּלָדֶשׁ", code: "bd" },
+        { name: "Barbados", hebrew: "בַּרְבֵּייְדוֹס", code: "bb" },
+        { name: "Belarus", hebrew: "בֶּלָארוּס", code: "by" },
+        { name: "Belgium", hebrew: "בֶּלְגִיָּה", code: "be" },
+        { name: "Belize", hebrew: "בְּלִיז", code: "bz" },
+        { name: "Benin", hebrew: "בֵּנִין", code: "bj" },
+        { name: "Bhutan", hebrew: "בְּהוּטָן", code: "bt" },
+        { name: "Bolivia", hebrew: "בּוֹלִיבְיָה", code: "bo" },
+        { name: "Bosnia and Herzegovina", hebrew: "בּוֹסְנִיָּה וְהֶרְצֶגוֹבִינָה", code: "ba" },
+        { name: "Botswana", hebrew: "בּוֹצְוָאנָה", code: "bw" },
+        { name: "Brazil", hebrew: "בְּרָזִיל", code: "br" },
+        { name: "Brunei", hebrew: "בְּרוּנֵיי", code: "bn" },
+        { name: "Bulgaria", hebrew: "בּוּלְגַרְיָה", code: "bg" },
+        { name: "Burkina Faso", hebrew: "בּוּרְקִינָה פָאסוֹ", code: "bf" },
+        { name: "Burundi", hebrew: "בּוּרוּנְדִי", code: "bi" },
+        { name: "Cabo Verde", hebrew: "כֵּף וֶרְדֶּה", code: "cv" },
+        { name: "Cambodia", hebrew: "קַמְבּוֹדְיָה", code: "kh" },
+        { name: "Cameroon", hebrew: "קָמֶרוּן", code: "cm" },
+        { name: "Canada", hebrew: "קָנָדָה", code: "ca" },
+        { name: "Central African Republic", hebrew: "הָרֶפּוּבְּלִיקָה שֶׁל מֶרְכַּז אַפְרִיקָה", code: "cf" },
+        { name: "Chad", hebrew: "צָ׳אד", code: "td" },
+        { name: "Chile", hebrew: "צִ׳ילֶה", code: "cl" },
+        { name: "China", hebrew: "סִין", code: "cn" },
+        { name: "Colombia", hebrew: "קוֹלוֹמְבְּיָה", code: "co" },
+        { name: "Comoros", hebrew: "קוֹמוֹרוֹ", code: "km" },
+        { name: "Congo (Democratic Republic)", hebrew: "הָרֶפּוּבְּלִיקָה הַדֶּמוֹקְרָטִית שֶׁל קוֹנְגוֹ", code: "cd" },
+        { name: "Congo (Republic)", hebrew: "הָרֶפּוּבְּלִיקָה שֶׁל קוֹנְגוֹ", code: "cg" },
+        { name: "Costa Rica", hebrew: "קוֹסְטָה רִיקָה", code: "cr" },
+        { name: "Croatia", hebrew: "קְרוֹאַטְיָה", code: "hr" },
+        { name: "Cuba", hebrew: "קוּבָה", code: "cu" },
+        { name: "Cyprus", hebrew: "קַפְרִיסִין", code: "cy" },
+        { name: "Czech Republic", hebrew: "צֶ׳כְיָה", code: "cz" },
+        { name: "Denmark", hebrew: "דֶּנְמַרְק", code: "dk" },
+        { name: "Djibouti", hebrew: "גִ׳יבּוּטִי", code: "dj" },
+        { name: "Dominica", hebrew: "דּוֹמִינִיקָה", code: "dm" },
+        { name: "Dominican Republic", hebrew: "הָרֶפּוּבְּלִיקָה הַדּוֹמִינִיקָנִית", code: "do" },
+        { name: "East Timor", hebrew: "מִזְרַח טִימוֹר", code: "tl" },
+        { name: "Ecuador", hebrew: "אֶקְוָדוֹר", code: "ec" },
+        { name: "Egypt", hebrew: "מִצְרַיִם", code: "eg" },
+        { name: "El Salvador", hebrew: "אֵל סַלְוָדוֹר", code: "sv" },
+        { name: "Equatorial Guinea", hebrew: "גִּינֵאָה הַמִּשְׁוָנִית", code: "gq" },
+        { name: "Eritrea", hebrew: "אֶרִיתְרֵאָה", code: "er" },
+        { name: "Estonia", hebrew: "אֶסְטוֹנְיָה", code: "ee" },
+        { name: "Eswatini", hebrew: "אֶסְוָוטִינִי", code: "sz" },
+        { name: "Ethiopia", hebrew: "אֶתְיוֹפְּיָה", code: "et" },
+        { name: "Fiji", hebrew: "פִיגִ׳י", code: "fj" },
+        { name: "Finland", hebrew: "פִינְלַנְד", code: "fi" },
+        { name: "France", hebrew: "צָרְפַת", code: "fr" },
+        { name: "Gabon", hebrew: "גָּבוֹן", code: "ga" },
+        { name: "Gambia", hebrew: "גַּמְבְּיָה", code: "gm" },
+        { name: "Georgia", hebrew: "גֵּאוֹרְגְּיָה", code: "ge" },
+        { name: "Germany", hebrew: "גֶּרְמַנְיָה", code: "de" },
+        { name: "Ghana", hebrew: "גָּאנָה", code: "gh" },
+        { name: "Greece", hebrew: "יָוָון", code: "gr" },
+        { name: "Grenada", hebrew: "גְּרֶנָדָה", code: "gd" },
+        { name: "Guatemala", hebrew: "גְּוָואטֶמָלָה", code: "gt" },
+        { name: "Guinea", hebrew: "גִּינֵאָה", code: "gn" },
+        { name: "Guinea-Bissau", hebrew: "גִּינֵאָה בִּיסָאוֹ", code: "gw" },
+        { name: "Guyana", hebrew: "גַּיְאָנָה", code: "gy" },
+        { name: "Haiti", hebrew: "הָאִיטִי", code: "ht" },
+        { name: "Honduras", hebrew: "הוֹנְדּוּרַס", code: "hn" },
+        { name: "Hungary", hebrew: "הוּנְגַרְיָה", code: "hu" },
+        { name: "Iceland", hebrew: "אִיסְלַנְד", code: "is" },
+        { name: "India", hebrew: "הוֹדוּ", code: "in" },
+        { name: "Indonesia", hebrew: "אִינְדּוֹנֶזְיָה", code: "id" },
+        { name: "Iran", hebrew: "אִירָאן", code: "ir" },
+        { name: "Iraq", hebrew: "עִירָאק", code: "iq" },
+        { name: "Ireland", hebrew: "אִירְלַנְד", code: "ie" },
+        { name: "Israel", hebrew: "יִשְׂרָאֵל", code: "il" },
+        { name: "Italy", hebrew: "אִיטַלְיָה", code: "it" },
+        { name: "Ivory Coast", hebrew: "חוֹף הַשֶּׁנְהָב", code: "ci" },
+        { name: "Jamaica", hebrew: "גָ׳מַייקָה", code: "jm" },
+        { name: "Japan", hebrew: "יַפָּן", code: "jp" },
+        { name: "Jordan", hebrew: "יַרְדֵּן", code: "jo" },
+        { name: "Kazakhstan", hebrew: "קָזַחְסְטָן", code: "kz" },
+        { name: "Kenya", hebrew: "קֶנְיָה", code: "ke" },
+        { name: "Kiribati", hebrew: "קִירִיבָּטִי", code: "ki" },
+        { name: "North Korea", hebrew: "קּוֹרֵיאָה הַצְּפוֹנִית", code: "kp" },
+        { name: "South Korea", hebrew: "קּוֹרֵיאָה הַדְּרוֹמִית", code: "kr" },
+        { name: "Kosovo", hebrew: "קוֹסוֹבוֹ", code: "xk" },
+        { name: "Kuwait", hebrew: "כְּוֵוית", code: "kw" },
+        { name: "Kyrgyzstan", hebrew: "קִירְגִיזְסְטָן", code: "kg" },
+        { name: "Laos", hebrew: "לָאוֹס", code: "la" },
+        { name: "Latvia", hebrew: "לַטְבִיָּה", code: "lv" },
+        { name: "Lebanon", hebrew: "לְבָנוֹן", code: "lb" },
+        { name: "Lesotho", hebrew: "לֶסוֹטוֹ", code: "ls" },
+        { name: "Liberia", hebrew: "לִיבֶּרְיָה", code: "lr" },
+        { name: "Libya", hebrew: "לוּב", code: "ly" },
+        { name: "Liechtenstein", hebrew: "לִיכְטֶנְשְׁטַיין", code: "li" },
+        { name: "Lithuania", hebrew: "לִיטָא", code: "lt" },
+        { name: "Luxembourg", hebrew: "לוּקְסֶמְבּוּרְג", code: "lu" },
+        { name: "Madagascar", hebrew: "מָדָגַסְקָר", code: "mg" },
+        { name: "Malawi", hebrew: "מָלָאוִוי", code: "mw" },
+        { name: "Malaysia", hebrew: "מָלֶזְיָה", code: "my" },
+        { name: "Maldives", hebrew: "הָאִיִּים הַמַּלְדִיבִיִּים", code: "mv" },
+        { name: "Mali", hebrew: "מָאלִי", code: "ml" },
+        { name: "Malta", hebrew: "מָלְטָה", code: "mt" },
+        { name: "Marshall Islands", hebrew: "איי מַרְשָׁאל", code: "mh" },
+        { name: "Mauritania", hebrew: "מָאוּרִיטַנְיָה", code: "mr" },
+        { name: "Mauritius", hebrew: "מָאוּרִיצְיוּס", code: "mu" },
+        { name: "Mexico", hebrew: "מֶקְסִיקוֹ", code: "mx" },
+        { name: "Micronesia", hebrew: "מִיקְרוֹנֶזְיָה", code: "fm" },
+        { name: "Moldova", hebrew: "מוֹלְדּוֹבָה", code: "md" },
+        { name: "Monaco", hebrew: "מוֹנָקוֹ", code: "mc" },
+        { name: "Mongolia", hebrew: "מוֹנְגּוֹלְיָה", code: "mn" },
+        { name: "Montenegro", hebrew: "מוֹנְטֶנֶגְרוֹ", code: "me" },
+        { name: "Morocco", hebrew: "מָרוֹקוֹ", code: "ma" },
+        { name: "Mozambique", hebrew: "מוֹזַמְבִּיק", code: "mz" },
+        { name: "Myanmar", hebrew: "מִיאַנְמָאר", code: "mm" },
+        { name: "Namibia", hebrew: "נָמִיבְּיָה", code: "na" },
+        { name: "Nauru", hebrew: "נָאוּרוּ", code: "nr" },
+        { name: "Nepal", hebrew: "נֶפָּאל", code: "np" },
+        { name: "Netherlands", hebrew: "הוֹלַנְד", code: "nl" },
+        { name: "New Zealand", hebrew: "נְיוּ זִילַנְד", code: "nz" },
+        { name: "Nicaragua", hebrew: "נִיקָרַגּוּאָה", code: "ni" },
+        { name: "Niger", hebrew: "נִיגֶ׳ר", code: "ne" },
+        { name: "Nigeria", hebrew: "נִיגֶרְיָה", code: "ng" },
+        { name: "North Macedonia", hebrew: "מָקֶדּוֹנְיָה הַצְּפוֹנִית", code: "mk" },
+        { name: "Norway", hebrew: "נֶורְבֶגְיָה", code: "no" },
+        { name: "Oman", hebrew: "עוֹמָאן", code: "om" },
+        { name: "Pakistan", hebrew: "פָּקִיסְטָן", code: "pk" },
+        { name: "Palau", hebrew: "פָּלָאוּ", code: "pw" },
+        { name: "Panama", hebrew: "פָּנָמָה", code: "pa" },
+        { name: "Papua New Guinea", hebrew: "פַּפּוּאָה גִּינֵאָה הַחֲדָשָׁה", code: "pg" },
+        { name: "Paraguay", hebrew: "פָּרָגְוַואי", code: "py" },
+        { name: "Peru", hebrew: "פֵּרוּ", code: "pe" },
+        { name: "Philippines", hebrew: "הַפִילִיפִּינִים", code: "ph" },
+        { name: "Poland", hebrew: "פּוֹלִין", code: "pl" },
+        { name: "Portugal", hebrew: "פּוֹרְטוּגָל", code: "pt" },
+        { name: "Qatar", hebrew: "קַטַר", code: "qa" },
+        { name: "Romania", hebrew: "רוֹמַנְיָה", code: "ro" },
+        { name: "Russia", hebrew: "רוּסְיָה", code: "ru" },
+        { name: "Rwanda", hebrew: "רוּאַנְדָּה", code: "rw" },
+        { name: "Saint Kitts and Nevis", hebrew: "סֵנְט קִיטְס וְנֵוִיס", code: "kn" },
+        { name: "Saint Lucia", hebrew: "סֵנְט לוּסִיָּה", code: "lc" },
+        { name: "Saint Vincent and the Grenadines", hebrew: "סֵנְט וִינְסֶנְט וְהַגְּרֶנָדִינִים", code: "vc" },
+        { name: "Samoa", hebrew: "סָמוֹאָה", code: "ws" },
+        { name: "San Marino", hebrew: "סַן מָרִינוֹ", code: "sm" },
+        { name: "Sao Tome and Principe", hebrew: "סָאוֹ טוֹמֶה וּפְרִינְסִיפֶּה", code: "st" },
+        { name: "Saudi Arabia", hebrew: "עֲרַב הַסַּעוּדִית", code: "sa" },
+        { name: "Senegal", hebrew: "סֶנֶגָל", code: "sn" },
+        { name: "Serbia", hebrew: "סֶרְבְּיָה", code: "rs" },
+        { name: "Seychelles", hebrew: "סֵייְשֶׁל", code: "sc" },
+        { name: "Sierra Leone", hebrew: "סִיֶירָה לֵאוֹנֶה", code: "sl" },
+        { name: "Singapore", hebrew: "סִינְגָּפּוּר", code: "sg" },
+        { name: "Slovakia", hebrew: "סְלוֹבַקְיָה", code: "sk" },
+        { name: "Slovenia", hebrew: "סְלוֹבֶנְיָה", code: "si" },
+        { name: "Solomon Islands", hebrew: "איי שְׁלֹמֹה", code: "sb" },
+        { name: "Somalia", hebrew: "סוֹמַלְיָה", code: "so" },
+        { name: "South Africa", hebrew: "דְּרוֹם אַפְרִיקָה", code: "za" },
+        { name: "South Sudan", hebrew: "דְּרוֹם סוּדָאן", code: "ss" },
+        { name: "Spain", hebrew: "סְפָרַד", code: "es" },
+        { name: "Sri Lanka", hebrew: "סְרִי לַנְקָה", code: "lk" },
+        { name: "Sudan", hebrew: "סוּדָאן", code: "sd" },
+        { name: "Suriname", hebrew: "סוּרִינָאם", code: "sr" },
+        { name: "Sweden", hebrew: "שְׁבֶדְיָה", code: "se" },
+        { name: "Switzerland", hebrew: "שְׁוַיְיץ", code: "ch" },
+        { name: "Syria", hebrew: "סוּרְיָה", code: "sy" },
+        { name: "Taiwan", hebrew: "טָאיוְואן", code: "tw" },
+        { name: "Tajikistan", hebrew: "טָגִ׳יקִיסְטָן", code: "tj" },
+        { name: "Tanzania", hebrew: "טַנְזַנְיָה", code: "tz" },
+        { name: "Thailand", hebrew: "תַּאיְלַנְד", code: "th" },
+        { name: "Togo", hebrew: "טוֹגוֹ", code: "tg" },
+        { name: "Tonga", hebrew: "טוֹנְגָה", code: "to" },
+        { name: "Trinidad and Tobago", hebrew: "טְרִינִידָד וְטוֹבָּגוֹ", code: "tt" },
+        { name: "Tunisia", hebrew: "תוּנִיסְיָה", code: "tn" },
+        { name: "Turkey", hebrew: "טוּרְקִיָּה", code: "tr" },
+        { name: "Turkmenistan", hebrew: "טוּרְקְמֶנִיסְטָן", code: "tm" },
+        { name: "Tuvalu", hebrew: "טוּבָאלוּ", code: "tv" },
+        { name: "Uganda", hebrew: "אוּגַנְדָה", code: "ug" },
+        { name: "Ukraine", hebrew: "אוּקְרָאִינָה", code: "ua" },
+        { name: "United Arab Emirates", hebrew: "אִיחוּד הָאֱמִירוּיוֹת הָעֲרָבִיּוֹת", code: "ae" },
+        { name: "United Kingdom", hebrew: "הַמַּמְלָכָה הַמְּאוּחֶדֶת", code: "gb" },
+        { name: "United States", hebrew: "אַרְצוֹת הַבְּרִית", code: "us" },
+        { name: "Uruguay", hebrew: "אוּרוּגְוַואי", code: "uy" },
+        { name: "Uzbekistan", hebrew: "אוּזְבֶּקִיסְטָן", code: "uz" },
+        { name: "Vanuatu", hebrew: "וָנוּאָטוּ", code: "vu" },
+        { name: "Vatican City", hebrew: "הַוָּתִיקָן", code: "va" },
+        { name: "Venezuela", hebrew: "וֶנֶצוּאֶלָה", code: "ve" },
+        { name: "Vietnam", hebrew: "וִיֶיטְנָאם", code: "vn" },
+        { name: "Yemen", hebrew: "תֵּימָן", code: "ye" },
+        { name: "Zambia", hebrew: "זַמְבִּיָה", code: "zm" },
+        { name: "Zimbabwe", hebrew: "זִימְבַּאבְּוֶוה", code: "zw" }
+    ];
+
+    let score = 0;
+    let strikes = 0;
+    const maxStrikes = 3;
+    let currentOptions = [];
+    let correctIndex = 0;
+    let gameActive = false;
+    let countryQueue = [];
+
+    // DOM Elements
+    const scoreEl = document.getElementById('score');
+    const heartsContainer = document.getElementById('hearts-container');
+    const countryNameEl = document.getElementById('country-name');
+    const countryNameHeEl = document.getElementById('country-name-he');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreEl = document.getElementById('final-score');
+    const buttons = [
+        document.getElementById('btn-0'),
+        document.getElementById('btn-1'),
+        document.getElementById('btn-2'),
+        document.getElementById('btn-3')
+    ];
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function updateHearts() {
+        let heartsHTML = '';
+        for(let i=0; i<maxStrikes; i++) {
+            if (i < (maxStrikes - strikes)) {
+                heartsHTML += '<span class="text-3xl text-red-500 animate-pop">❤️</span>';
+            } else {
+                heartsHTML += '<span class="text-3xl text-gray-300">🖤</span>';
+            }
+        }
+        heartsContainer.innerHTML = heartsHTML;
+    }
+
+    function generateRound() {
+        if (!gameActive) return;
+
+        buttons.forEach(btn => {
+            // Reset styles, remove previous X overlays
+            btn.className = "flag-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none cursor-pointer";
+            btn.disabled = false;
+        });
+
+        if (countryQueue.length === 0) {
+            countryQueue = shuffleArray([...allCountries]);
+        }
+
+        const correctCountry = countryQueue.pop();
+
+        let distractors = [];
+        while (distractors.length < 3) {
+            const randomC = allCountries[Math.floor(Math.random() * allCountries.length)];
+            if (randomC.name !== correctCountry.name && !distractors.includes(randomC)) {
+                distractors.push(randomC);
+            }
+        }
+
+        currentOptions = shuffleArray([correctCountry, ...distractors]);
+        correctIndex = currentOptions.indexOf(correctCountry);
+
+        // Update Name Elements
+        countryNameEl.textContent = correctCountry.name;
+        countryNameHeEl.textContent = correctCountry.hebrew;
+
+        buttons.forEach((btn, index) => {
+            const country = currentOptions[index];
+            // Reset content cleanly
+            btn.innerHTML = `<img src="https://flagcdn.com/${country.code}.svg" alt="${country.name}" class="flag-img rounded-lg shadow-sm">`;
+        });
+    }
+
+    function handleGuess(btnIndex) {
+        if (!gameActive) return;
+
+        const selectedBtn = buttons[btnIndex];
+        const isCorrect = btnIndex === correctIndex;
+
+        if (isCorrect) {
+            // Correct Logic
+            buttons.forEach(btn => btn.disabled = true); // Lock all buttons
+            score++;
+            scoreEl.textContent = score;
+            selectedBtn.classList.add('correct-anim');
+
+            // Play sound effect (optional/browser policy dependent) or visual flair
+            setTimeout(() => {
+                generateRound();
+            }, 800);
+        } else {
+            // Wrong Logic
+            strikes++;
+            updateHearts();
+
+            // Visuals for wrong guess: Enable relative positioning for the overlay
+            selectedBtn.classList.add('shake', 'wrong-anim', 'relative');
+            selectedBtn.disabled = true; // Disable ONLY the wrong button
+
+            // Add big red X overlay
+            const xOverlay = document.createElement('div');
+            xOverlay.className = 'absolute inset-0 flex items-center justify-center bg-white/40 rounded-2xl z-10';
+            xOverlay.innerHTML = '<span class="text-red-600 font-extrabold text-7xl md:text-8xl drop-shadow-md animate-pop select-none">X</span>';
+            selectedBtn.appendChild(xOverlay);
+
+            if (strikes >= maxStrikes) {
+                buttons.forEach(btn => btn.disabled = true); // Lock all buttons on Game Over
+                setTimeout(endGame, 1500);
+            }
+            // Do NOT advance round, allow user to try again
+        }
+    }
+
+    function endGame() {
+        gameActive = false;
+        finalScoreEl.textContent = score;
+        gameOverScreen.classList.remove('hidden');
+    }
+
+    function restartGame() {
+        score = 0;
+        strikes = 0;
+        countryQueue = shuffleArray([...allCountries]);
+
+        scoreEl.textContent = score;
+        updateHearts();
+        gameOverScreen.classList.add('hidden');
+        gameActive = true;
+
+        generateRound();
+    }
+
+    // Initialize
+    restartGame();
+
+</script>
+</body>
+</html>
