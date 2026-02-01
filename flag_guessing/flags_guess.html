@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Explorer!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>World Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Varela+Round&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Varela+Round&display=swap');
+
+        :root {
+            --primary: #4f46e5; /* Indigo 600 */
+            --bg-color: #f8fafc; /* Slate 50 */
+        }
 
         body {
-            font-family: 'Fredoka', sans-serif;
-            background-color: #f0f9ff;
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
             overflow: hidden;
+            /* Prevent pull-to-refresh on mobile */
+            overscroll-behavior: none;
             touch-action: manipulation;
         }
 
@@ -20,202 +27,215 @@
             font-family: 'Varela Round', sans-serif;
         }
 
-        /* Layout Handles */
-        .game-layout {
-            display: flex;
-            flex-direction: column;
-        }
-
-        @media (orientation: landscape) {
-            .game-layout {
-                flex-direction: row;
-                align-items: center;
-                gap: 2rem;
-            }
-            .info-section {
-                width: 25%; /* Reduced from 35% */
-                flex-shrink: 0;
-            }
-            .grid-section {
-                width: 75%; /* Increased from 65% */
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center; /* Center the grid horizontally */
-            }
-            .cards-grid {
-                height: auto;
-                max-height: 90vh;
-                width: 100%;
-                max-width: 800px; /* Constrain width on large screens */
-                margin: 0 auto; /* Ensure centering */
-            }
-        }
-
-        /* Buttons */
-        .option-btn {
-            transition: transform 0.1s, background-color 0.2s;
-            box-shadow: 0 4px 0 #e2e8f0;
-            padding: 0;
-            overflow: hidden;
-            aspect-ratio: 3/2;
-            width: 100%;
+        /* --- 3D Button Effect --- */
+        .game-btn {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            transform: translateY(0);
+            box-shadow: 0 6px 0 #cbd5e1; /* Slate 300 shadow */
         }
 
-        .option-btn:active {
-            transform: translateY(4px);
-            box-shadow: none;
+        .game-btn:active:not(:disabled) {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #cbd5e1;
         }
 
-        /* Image/Content Styling */
-        .flag-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            pointer-events: none;
-        }
-
-        .globe-svg {
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        /* Animations */
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .pop { animation: pop 0.3s ease-out; }
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .correct-anim {
-            background-color: #86efac !important;
-            box-shadow: 0 4px 0 #22c55e !important;
-        }
-
-        .wrong-anim {
-            box-shadow: 0 4px 0 #ef4444 !important;
+        .game-btn:disabled {
+            cursor: default;
+            opacity: 0.9;
         }
 
         /* Mode Selection Cards */
         .mode-card {
-            transition: transform 0.2s;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .mode-card:hover {
-            transform: scale(1.05);
+        .mode-card:hover { transform: scale(1.05); }
+        .mode-card:active { transform: scale(0.95); }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            70% { transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* States */
+        .correct-state {
+            background-color: #86efac !important; /* Green 300 */
+            border-color: #22c55e !important; /* Green 500 */
+            box-shadow: 0 6px 0 #15803d !important; /* Green 700 */
+        }
+
+        .wrong-state {
+            border-color: #fca5a5 !important;
+            box-shadow: 0 6px 0 #ef4444 !important;
+        }
+
+        /* Map styling */
+        .globe-svg { width: 100%; height: 100%; pointer-events: none; }
+
+        /* Grid Layout Logic */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Landscape adjustments for tablets/desktop */
+        @media (min-width: 768px) and (orientation: landscape) {
+            .game-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 2rem;
+                padding: 2rem;
+            }
+            .top-deck {
+                flex: 1;
+                height: 100%;
+                justify-content: center;
+            }
+            .bottom-deck {
+                flex: 1.5;
+                height: 100%;
+            }
         }
     </style>
 </head>
-<body class="h-screen w-full flex items-center justify-center selection:bg-none select-none p-4 relative">
+<body class="text-slate-800">
 
-<!-- Loading Overlay -->
-<div id="loading-screen" class="fixed inset-0 bg-blue-50 z-[60] flex items-center justify-center">
-    <div class="text-center animate-pulse">
-        <div class="text-6xl mb-4">🌍</div>
-        <h2 class="text-2xl font-bold text-blue-500">Loading World...</h2>
+<!-- Loading Screen -->
+<div id="loading-screen" class="fixed inset-0 z-50 bg-indigo-50 flex flex-col items-center justify-center">
+    <div class="text-8xl animate-bounce mb-4">🌍</div>
+    <div class="w-48 h-3 bg-indigo-200 rounded-full overflow-hidden">
+        <div class="h-full bg-indigo-500 animate-pulse w-full origin-left"></div>
     </div>
+    <p class="mt-4 text-indigo-400 font-bold tracking-widest uppercase text-sm">Loading World Data...</p>
 </div>
 
-<!-- Main Menu (Mode Selection) -->
-<div id="menu-screen" class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-4">
-    <h1 class="text-5xl font-bold text-blue-600 mb-2 text-center">World Explorer</h1>
-    <p class="text-xl text-gray-500 mb-10 text-center">Choose your game!</p>
+<!-- Main Menu -->
+<div id="menu-screen" class="hidden fixed inset-0 z-40 bg-slate-50 flex flex-col items-center justify-center p-6">
+    <header class="text-center mb-10 animate-pop">
+        <h1 class="text-5xl md:text-7xl font-extrabold text-indigo-600 tracking-tight mb-2">World<br/>Explorer</h1>
+        <p class="text-slate-400 font-semibold text-lg">Learn geography the fun way!</p>
+    </header>
 
-    <div class="flex flex-col md:flex-row gap-6 w-full max-w-2xl">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-lg">
         <button onclick="startGame('flags')"
-                class="mode-card flex-1 bg-blue-100 rounded-3xl p-8 border-4 border-blue-200 flex flex-col items-center gap-4 hover:bg-blue-200">
-            <span class="text-8xl">🏳️</span>
-            <span class="text-3xl font-bold text-blue-700">Flags</span>
+                class="mode-card group bg-white p-6 rounded-3xl shadow-xl border-4 border-white hover:border-indigo-100 text-center">
+            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">🏳️</div>
+            <div class="text-2xl font-bold text-slate-700">Flags Mode</div>
+            <div class="text-slate-400 text-sm font-semibold mt-1">Guess the country</div>
         </button>
+
         <button onclick="startGame('globes')"
-                class="mode-card flex-1 bg-green-100 rounded-3xl p-8 border-4 border-green-200 flex flex-col items-center gap-4 hover:bg-green-200">
-            <span class="text-8xl">🌍</span>
-            <span class="text-3xl font-bold text-green-700">Globes</span>
+                class="mode-card group bg-white p-6 rounded-3xl shadow-xl border-4 border-white hover:border-indigo-100 text-center">
+            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">🌏</div>
+            <div class="text-2xl font-bold text-slate-700">Maps Mode</div>
+            <div class="text-slate-400 text-sm font-semibold mt-1">Find the location</div>
         </button>
     </div>
 </div>
 
-<!-- Game Screen -->
-<!-- Increased max-w to 7xl to allow buttons to get bigger -->
-<div id="game-screen" class="hidden game-layout w-full max-w-7xl h-full justify-between gap-4">
+<!-- Gameplay Screen -->
+<div id="game-screen" class="hidden game-container">
 
-    <!-- Info Section -->
-    <div class="info-section flex flex-col gap-4 w-full h-full justify-start md:justify-center">
-        <!-- Header -->
-        <div class="flex justify-between items-center bg-white p-3 rounded-2xl shadow-sm border-b-4 border-blue-100 w-full">
+    <!-- TOP DECK: Stats & Question -->
+    <div class="top-deck flex flex-col w-full shrink-0 relative z-10">
+        <!-- Header Bar -->
+        <div class="flex items-center justify-between mb-2 md:mb-6">
             <button onclick="showMenu()"
-                    class="text-sm bg-gray-100 px-3 py-1 rounded-lg hover:bg-gray-200 font-bold text-gray-500">⬅ Menu
+                    class="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 transition-colors text-slate-600 font-bold text-sm">
+                ✕ QUIT
             </button>
-            <div class="text-2xl font-bold text-blue-500 flex items-center gap-2">
-                <span>⭐</span>
-                <span id="score">0</span>
-            </div>
-            <div class="flex gap-1" id="hearts-container">
-                <span class="text-2xl text-red-500">❤️</span>
-                <span class="text-2xl text-red-500">❤️</span>
-                <span class="text-2xl text-red-500">❤️</span>
+
+            <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+                <div class="flex items-center gap-1">
+                    <span class="text-amber-400 text-xl">⭐</span>
+                    <span id="score" class="font-extrabold text-slate-700 text-xl">0</span>
+                </div>
+                <div class="w-px h-6 bg-slate-200"></div>
+                <div id="hearts-container" class="flex gap-1 text-xl"></div>
             </div>
         </div>
 
-        <!-- Question & Hint Area -->
-        <div class="flex-grow flex flex-col items-center justify-center text-center py-2 bg-white/50 rounded-2xl md:bg-transparent min-h-[150px]">
-            <h1 id="country-name" class="text-3xl md:text-5xl font-bold text-gray-800 break-words w-full leading-tight">
-                Loading...</h1>
-            <h1 id="country-name-he" dir="rtl"
-                class="hebrew-text text-2xl md:text-4xl font-bold text-blue-600 mt-1 mb-2 break-words w-full"></h1>
+        <!-- Question Area -->
+        <div class="flex-grow flex flex-col items-center justify-center text-center p-2 relative">
+            <!-- Hint floating background -->
+            <div class="absolute inset-0 bg-indigo-50/50 rounded-3xl -z-10 scale-95 md:scale-100 transform origin-top"></div>
 
-            <!-- Hint Container -->
+            <h2 class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-1">Where is</h2>
+
+            <!-- Updated Layout: Hebrew First, Same Size -->
+            <h1 id="country-name-he"
+                class="hebrew-text text-3xl md:text-5xl text-indigo-600 font-extrabold leading-tight mb-1"
+                dir="rtl"></h1>
+            <h3 id="country-name" class="text-3xl md:text-5xl font-extrabold text-slate-800 leading-tight mb-4">
+                Loading...</h3>
+
+            <!-- Dynamic Hint (Globe/Flag) -->
             <div id="hint-container"
-                 class="w-32 h-24 md:w-48 md:h-36 flex items-center justify-center mt-2 bg-white rounded-xl shadow-sm border-2 border-slate-100 p-2">
-                <!-- Hint Content (Flag or Globe) Injected Here -->
+                 class="h-24 w-24 md:h-32 md:w-32 rounded-2xl overflow-hidden shadow-sm bg-white border-4 border-white flex items-center justify-center">
+                <!-- Hint content injected here -->
             </div>
         </div>
     </div>
 
-    <!-- Grid Section -->
-    <div class="grid-section w-full">
-        <div class="cards-grid grid grid-cols-2 gap-4 w-full">
-            <button onclick="handleGuess(0)" id="btn-0"
-                    class="option-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
-            <button onclick="handleGuess(1)" id="btn-1"
-                    class="option-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
-            <button onclick="handleGuess(2)" id="btn-2"
-                    class="option-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
-            <button onclick="handleGuess(3)" id="btn-3"
-                    class="option-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none"></button>
+    <!-- BOTTOM DECK: The Grid -->
+    <div class="bottom-deck w-full flex-grow mt-4 md:mt-0">
+        <div class="grid grid-cols-2 grid-rows-2 gap-3 md:gap-6 h-full w-full">
+            <!-- Button template, JS will fill these -->
+            <button id="btn-0" onclick="handleGuess(0)"
+                    class="game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2"></button>
+            <button id="btn-1" onclick="handleGuess(1)"
+                    class="game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2"></button>
+            <button id="btn-2" onclick="handleGuess(2)"
+                    class="game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2"></button>
+            <button id="btn-3" onclick="handleGuess(3)"
+                    class="game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2"></button>
         </div>
     </div>
 </div>
 
 <!-- Game Over Modal -->
 <div id="game-over-screen"
-     class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl border-b-8 border-gray-200 animate-pop">
-        <div class="text-7xl mb-6">🏆</div>
-        <h2 class="text-4xl font-bold text-gray-800 mb-2">Game Over!</h2>
-        <p class="text-2xl text-gray-600 mb-8">You found <span id="final-score" class="font-bold text-blue-600">0</span>
-            countries!</p>
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <!-- Changed max-w-sm to max-w-lg for a bigger modal -->
+    <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-10 text-center shadow-2xl animate-pop relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-indigo-400 to-purple-400"></div>
+
+        <div class="text-7xl mb-4 drop-shadow-md">🏆</div>
+        <h2 class="text-4xl font-extrabold text-slate-800 mb-6">Game Over!</h2>
+
+        <!-- Added container for correct answer -->
+        <div id="last-answer-display" class="mb-8 hidden"></div>
+
+        <p class="text-slate-500 mb-8 font-semibold text-xl">You got <span id="final-score"
+                                                                           class="text-indigo-600 text-3xl font-bold">0</span>
+            countries.</p>
+
         <button onclick="restartGame()"
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-5 px-6 rounded-2xl shadow-[0_4px_0_rgb(29,78,216)] active:shadow-none active:translate-y-1 transition-all transform hover:scale-105">
-            Play Again 🔄
+                class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-2xl font-bold py-5 rounded-2xl shadow-[0_4px_0_rgb(67,56,202)] active:shadow-none active:translate-y-1 transition-all mb-4">
+            Play Again
         </button>
-        <button onclick="showMenu()" class="mt-4 text-gray-400 font-bold hover:text-gray-600">Back to Menu</button>
+        <button onclick="showMenu()" class="text-slate-400 font-bold hover:text-slate-600 text-base">Back to Main Menu
+        </button>
     </div>
 </div>
 
 <script>
-    // --- Data ---
-    // Includes 2-letter code (for flags) and 3-letter code (for GeoJSON map matching)
+    /* --- DATASET --- */
     const allCountries = [
         { name: "Afghanistan", hebrew: "אַפְגָנִיסְטָן", code: "af", iso3: "AFG" },
         { name: "Albania", hebrew: "אַלְבַּנְיָה", code: "al", iso3: "ALB" },
@@ -415,54 +435,61 @@
         { name: "Zimbabwe", hebrew: "זִימְבַּאבְּוֶוה", code: "zw", iso3: "ZWE" }
     ];
 
-    // --- Game State ---
+    /* --- GAME STATE --- */
     let score = 0;
     let strikes = 0;
     const maxStrikes = 3;
-    let currentMode = 'flags'; // 'flags' or 'globes'
+    let currentMode = 'flags';
     let currentOptions = [];
     let correctIndex = 0;
     let gameActive = false;
     let countryQueue = [];
     let worldGeoJson = null;
+    let zoomStates = [false, false, false, false];
 
-    // --- DOM Elements ---
-    const menuScreen = document.getElementById('menu-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const loadingScreen = document.getElementById('loading-screen');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const scoreEl = document.getElementById('score');
-    const heartsContainer = document.getElementById('hearts-container');
-    const countryNameEl = document.getElementById('country-name');
-    const countryNameHeEl = document.getElementById('country-name-he');
-    const finalScoreEl = document.getElementById('final-score');
-    const hintContainer = document.getElementById('hint-container');
-    const buttons = [
-        document.getElementById('btn-0'),
-        document.getElementById('btn-1'),
-        document.getElementById('btn-2'),
-        document.getElementById('btn-3')
-    ];
+    /* --- DOM ELEMENTS --- */
+    const screens = {
+        loading: document.getElementById('loading-screen'),
+        menu: document.getElementById('menu-screen'),
+        game: document.getElementById('game-screen'),
+        over: document.getElementById('game-over-screen')
+    };
 
-    // --- Initialization ---
+    const ui = {
+        score: document.getElementById('score'),
+        hearts: document.getElementById('hearts-container'),
+        cName: document.getElementById('country-name'),
+        cNameHe: document.getElementById('country-name-he'),
+        hint: document.getElementById('hint-container'),
+        finalScore: document.getElementById('final-score'),
+        buttons: [
+            document.getElementById('btn-0'),
+            document.getElementById('btn-1'),
+            document.getElementById('btn-2'),
+            document.getElementById('btn-3')
+        ]
+    };
+
+    /* --- INITIALIZATION --- */
     window.onload = async () => {
-        // Load Map Data immediately
         try {
-            const response = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
-            worldGeoJson = await response.json();
-            loadingScreen.classList.add('hidden');
-            menuScreen.classList.remove('hidden');
+            const res = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+            worldGeoJson = await res.json();
+            screens.loading.classList.add('hidden');
+            screens.menu.classList.remove('hidden');
+            screens.menu.classList.add('flex');
         } catch (e) {
-            console.error("Failed to load map data", e);
-            loadingScreen.innerHTML = "<h2 class='text-red-500'>Error loading map data. Please refresh.</h2>";
+            console.error(e);
+            screens.loading.innerHTML = "<h2 class='text-red-500 font-bold'>Failed to load map data.<br>Check connection.</h2>";
         }
     };
 
     function showMenu() {
         gameActive = false;
-        gameScreen.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        menuScreen.classList.remove('hidden');
+        screens.game.classList.add('hidden');
+        screens.over.classList.add('hidden');
+        screens.menu.classList.remove('hidden');
+        screens.menu.classList.add('flex');
     }
 
     function startGame(mode) {
@@ -471,13 +498,13 @@
         strikes = 0;
         countryQueue = shuffleArray([...allCountries]);
 
-        scoreEl.textContent = score;
-        updateHearts();
+        updateUI();
 
-        menuScreen.classList.add('hidden');
-        gameOverScreen.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
-        gameScreen.classList.add('flex'); // Ensure flex is on
+        screens.menu.classList.add('hidden');
+        screens.menu.classList.remove('flex');
+        screens.over.classList.add('hidden');
+        screens.game.classList.remove('hidden');
+        screens.game.classList.add('flex');
 
         gameActive = true;
         generateRound();
@@ -487,6 +514,7 @@
         startGame(currentMode);
     }
 
+    /* --- LOGIC --- */
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -495,27 +523,57 @@
         return array;
     }
 
-    function updateHearts() {
+    function updateUI() {
+        ui.score.textContent = score;
         let heartsHTML = '';
         for(let i=0; i<maxStrikes; i++) {
             if (i < (maxStrikes - strikes)) {
-                heartsHTML += '<span class="text-3xl text-red-500 animate-pop">❤️</span>';
+                heartsHTML += '<span class="text-rose-500 animate-pop">❤</span>';
             } else {
-                heartsHTML += '<span class="text-3xl text-gray-300">🖤</span>';
+                heartsHTML += '<span class="text-slate-300">❤</span>';
             }
         }
-        heartsContainer.innerHTML = heartsHTML;
+        ui.hearts.innerHTML = heartsHTML;
+    }
+
+    function toggleZoom(e, index, iso3) {
+        e.stopPropagation(); // Prevent triggering the guess
+
+        // Don't toggle if game inactive or button disabled
+        if (!gameActive || ui.buttons[index].disabled) return;
+
+        zoomStates[index] = !zoomStates[index];
+        const btn = ui.buttons[index];
+        const container = btn.querySelector('.globe-container');
+
+        // Redraw
+        drawGlobe(container, iso3, false, zoomStates[index]);
+
+        // Update Icon
+        const svg = e.currentTarget.querySelector('svg');
+        if (zoomStates[index]) {
+            // Zoom Out icon (minus)
+            svg.innerHTML = '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line>';
+            e.currentTarget.classList.add('bg-indigo-100', 'text-indigo-700');
+            e.currentTarget.classList.remove('bg-white/90', 'text-indigo-600');
+        } else {
+            // Zoom In icon (plus)
+            svg.innerHTML = '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line>';
+            e.currentTarget.classList.remove('bg-indigo-100', 'text-indigo-700');
+            e.currentTarget.classList.add('bg-white/90', 'text-indigo-600');
+        }
     }
 
     function generateRound() {
         if (!gameActive) return;
 
-        buttons.forEach(btn => {
-            btn.className = "option-btn bg-white rounded-2xl flex items-center justify-center border-4 border-white hover:border-blue-100 focus:outline-none cursor-pointer";
+        zoomStates = [false, false, false, false];
+
+        // Reset Buttons
+        ui.buttons.forEach(btn => {
+            btn.className = "game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2 relative";
             btn.disabled = false;
-            // Clear overlays
-            const overlay = btn.querySelector('.absolute.inset-0');
-            if (overlay) overlay.remove();
+            btn.innerHTML = '';
         });
 
         if (countryQueue.length === 0) {
@@ -535,41 +593,125 @@
         currentOptions = shuffleArray([correctCountry, ...distractors]);
         correctIndex = currentOptions.indexOf(correctCountry);
 
-        // Update Text
-        countryNameEl.textContent = correctCountry.name;
-        countryNameHeEl.textContent = correctCountry.hebrew;
+        // Update Header
+        ui.cName.textContent = correctCountry.name;
+        ui.cNameHe.textContent = correctCountry.hebrew;
 
-        // --- HINT LOGIC ---
-        hintContainer.innerHTML = ''; // Clear hint
+        // Hint Logic
+        ui.hint.innerHTML = '';
         if (currentMode === 'flags') {
-            // In Flag mode, show Globe hint
-            drawGlobe(hintContainer, correctCountry.iso3, true);
+            // Hint is Map (non-interactive)
+            drawGlobe(ui.hint, correctCountry.iso3, true, false);
         } else {
-            // In Globe mode, show Flag hint
-            hintContainer.innerHTML = `<img src="https://flagcdn.com/${correctCountry.code}.svg" alt="Flag Hint" class="w-full h-full object-contain">`;
+            // Hint is Flag (Maps Mode)
+            // Fix: Use object-contain to prevent cropping
+            ui.hint.innerHTML = `<img src="https://flagcdn.com/${correctCountry.code}.svg" alt="Flag Hint" class="w-full h-full object-contain">`;
         }
 
-        // --- BUTTONS LOGIC ---
-        buttons.forEach((btn, index) => {
+        // Button Content Logic
+        ui.buttons.forEach((btn, index) => {
             const country = currentOptions[index];
-            btn.innerHTML = ''; // Clear previous
-
             if (currentMode === 'flags') {
-                btn.innerHTML = `<img src="https://flagcdn.com/${country.code}.svg" alt="${country.name}" class="flag-img rounded-lg shadow-sm">`;
+                btn.innerHTML = `<img src="https://flagcdn.com/${country.code}.svg" alt="Flag" class="w-full h-full object-contain pointer-events-none drop-shadow-sm">`;
             } else {
-                // Globe Mode
+                // Add Zoom Button
+                const zoomBtn = document.createElement('button');
+                zoomBtn.className = 'absolute top-2 right-2 z-30 bg-white/90 hover:bg-white text-indigo-600 p-2 rounded-full shadow-md transition-transform active:scale-95 border border-indigo-100';
+                zoomBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
+                zoomBtn.onclick = (e) => toggleZoom(e, index, country.iso3);
+                btn.appendChild(zoomBtn);
+
+                // Wrap D3 in a container that fills the button
                 const container = document.createElement('div');
-                container.className = 'w-full h-full';
+                container.className = 'globe-container w-full h-full flex items-center justify-center';
                 btn.appendChild(container);
-                drawGlobe(container, country.iso3, false);
+
+                requestAnimationFrame(() => drawGlobe(container, country.iso3, false, false));
             }
         });
     }
 
-    // --- Globe Rendering (D3.js) ---
-    function drawGlobe(container, targetIso3, isHint) {
-        const width = container.clientWidth || 300;
-        const height = container.clientHeight || 200;
+    function handleGuess(btnIndex) {
+        if (!gameActive) return;
+
+        const selectedBtn = ui.buttons[btnIndex];
+        const isCorrect = btnIndex === correctIndex;
+
+        // Disable Zoom buttons on all cards
+        ui.buttons.forEach(btn => {
+            const zoomBtn = btn.querySelector('button');
+            if(zoomBtn) zoomBtn.disabled = true;
+        });
+
+        if (isCorrect) {
+            ui.buttons.forEach(btn => btn.disabled = true);
+            score++;
+            selectedBtn.classList.add('correct-state');
+
+            // Add checkmark overlay
+            const check = document.createElement('div');
+            check.className = 'absolute inset-0 flex items-center justify-center bg-green-400/20 z-20 animate-pop';
+            check.innerHTML = '<span class="text-green-600 text-6xl font-black drop-shadow-md">✓</span>';
+            selectedBtn.appendChild(check);
+
+            setTimeout(() => {
+                updateUI();
+                generateRound();
+            }, 800);
+        } else {
+            strikes++;
+            updateUI();
+
+            selectedBtn.classList.add('shake', 'wrong-state');
+            selectedBtn.disabled = true;
+
+            // Add X overlay
+            const x = document.createElement('div');
+            x.className = 'absolute inset-0 flex items-center justify-center bg-red-400/20 z-20 animate-pop';
+            x.innerHTML = '<span class="text-red-500 text-6xl font-black drop-shadow-md">✕</span>';
+            selectedBtn.appendChild(x);
+
+            if (strikes >= maxStrikes) {
+                ui.buttons.forEach(btn => btn.disabled = true);
+                setTimeout(() => {
+                    // Pass the correct answer to endGame
+                    endGame(currentOptions[correctIndex]);
+                }, 1000);
+            }
+        }
+    }
+
+    function endGame(lastCorrectCountry) {
+        gameActive = false;
+        ui.finalScore.textContent = score;
+
+        const lastAnswerEl = document.getElementById('last-answer-display');
+        if (lastCorrectCountry) {
+             lastAnswerEl.innerHTML = `
+                <p class="text-lg text-slate-400 mb-4 font-bold uppercase tracking-wider">The correct answer was</p>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 text-3xl font-bold text-slate-700 bg-slate-50 p-6 rounded-3xl border-4 border-slate-100">
+                    <img src="https://flagcdn.com/${lastCorrectCountry.code}.svg" class="w-24 h-auto object-cover rounded-lg shadow-md">
+                    <div class="flex flex-col">
+                        <span>${lastCorrectCountry.name}</span>
+                        <span class="hebrew-text text-2xl text-indigo-500 mt-1" dir="rtl">${lastCorrectCountry.hebrew}</span>
+                    </div>
+                </div>
+             `;
+             lastAnswerEl.classList.remove('hidden');
+        } else {
+             lastAnswerEl.classList.add('hidden');
+        }
+
+        screens.over.classList.remove('hidden');
+    }
+
+    /* --- D3 MAP RENDERING --- */
+    function drawGlobe(container, targetIso3, isHint, isZoomed) {
+        // Clear previous
+        container.innerHTML = '';
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
 
         const svg = d3.select(container).append("svg")
             .attr("width", "100%")
@@ -577,95 +719,69 @@
             .attr("viewBox", `0 0 ${width} ${height}`)
             .attr("class", "globe-svg");
 
-        // Find feature
         const feature = worldGeoJson.features.find(f => f.id === targetIso3);
 
-        // Projection
         const projection = d3.geoOrthographic()
-            .scale(Math.min(width, height) / 2 - 10)
-            .translate([width / 2, height / 2])
             .clipAngle(90);
 
-        // Center on country if found, else 0,0
+        // 1. Initial Scale/Rotation
+        const defaultScale = Math.min(width, height) / 2 - (isHint ? 5 : 10);
+
+        projection.scale(defaultScale).translate([width/2, height/2]);
+
         if (feature) {
             const centroid = d3.geoCentroid(feature);
             projection.rotate([-centroid[0], -centroid[1]]);
+        } else {
+            projection.rotate([0, 0]);
+        }
+
+        // 2. Apply Zoom if active
+        if (isZoomed && feature) {
+            // fitExtent adjusts scale and translate to fit the bounding box
+            // We give it some padding so it doesn't touch the edges
+            const padding = 20;
+            projection.fitExtent([[padding, padding], [width - padding, height - padding]], feature);
+
+            // Note: fitExtent works on the projected feature.
+            // Since we already rotated the globe to center the feature,
+            // fitExtent essentially "zooms in" on that centered aspect.
         }
 
         const path = d3.geoPath().projection(projection);
 
-        // 1. Water
+        // 1. Ocean (Only visible if not zoomed in too much, or it becomes background)
         svg.append("path")
             .datum({type: "Sphere"})
             .attr("d", path)
-            .attr("fill", "#e0f2fe"); // Light blue water
+            .attr("fill", "#e0f2fe"); // Sky 100
 
-        // 2. All Land
+        // 2. Land
         svg.selectAll("path.land")
             .data(worldGeoJson.features)
             .enter().append("path")
             .attr("d", path)
-            .attr("fill", "#ffffff") // White land
-            .attr("stroke", "#94a3b8")
-            .attr("stroke-width", 0.5);
+            .attr("fill", "#ffffff")
+            .attr("stroke", "#94a3b8") // Slate 400
+            .attr("stroke-width", isZoomed ? 0.2 : 0.5); // Thinner strokes when zoomed
 
-        // 3. Target Country
+        // 3. Highlight
         if (feature) {
             svg.append("path")
                 .datum(feature)
                 .attr("d", path)
-                .attr("fill", "#f59e0b") // Amber-500 highlight
-                .attr("stroke", "#b45309")
-                .attr("stroke-width", 1);
+                .attr("fill", "#fbbf24") // Amber 400
+                .attr("stroke", "#d97706") // Amber 600
+                .attr("stroke-width", isZoomed ? 1.5 : 1);
         }
 
-        // 4. Globe border
+        // 4. Border (Sphere outline)
          svg.append("path")
             .datum({type: "Sphere"})
             .attr("d", path)
             .attr("fill", "none")
             .attr("stroke", "#cbd5e1")
             .attr("stroke-width", 2);
-    }
-
-    function handleGuess(btnIndex) {
-        if (!gameActive) return;
-
-        const selectedBtn = buttons[btnIndex];
-        const isCorrect = btnIndex === correctIndex;
-
-        if (isCorrect) {
-            buttons.forEach(btn => btn.disabled = true);
-            score++;
-            scoreEl.textContent = score;
-            selectedBtn.classList.add('correct-anim');
-
-            setTimeout(() => {
-                generateRound();
-            }, 800);
-        } else {
-            strikes++;
-            updateHearts();
-
-            selectedBtn.classList.add('shake', 'wrong-anim', 'relative');
-            selectedBtn.disabled = true;
-
-            const xOverlay = document.createElement('div');
-            xOverlay.className = 'absolute inset-0 flex items-center justify-center bg-white/40 rounded-2xl z-10';
-            xOverlay.innerHTML = '<span class="text-red-600 font-extrabold text-7xl md:text-8xl drop-shadow-md animate-pop select-none">X</span>';
-            selectedBtn.appendChild(xOverlay);
-
-            if (strikes >= maxStrikes) {
-                buttons.forEach(btn => btn.disabled = true);
-                setTimeout(endGame, 1500);
-            }
-        }
-    }
-
-    function endGame() {
-        gameActive = false;
-        finalScoreEl.textContent = score;
-        gameOverScreen.classList.remove('hidden');
     }
 </script>
 </body>
