@@ -18,7 +18,6 @@
             font-family: 'Nunito', sans-serif;
             background-color: var(--bg-color);
             overflow: hidden;
-            /* Prevent pull-to-refresh on mobile */
             overscroll-behavior: none;
             touch-action: manipulation;
         }
@@ -32,7 +31,7 @@
             transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             transform: translateY(0);
-            box-shadow: 0 6px 0 #cbd5e1; /* Slate 300 shadow */
+            box-shadow: 0 6px 0 #cbd5e1;
         }
 
         .game-btn:active:not(:disabled) {
@@ -70,9 +69,9 @@
 
         /* States */
         .correct-state {
-            background-color: #86efac !important; /* Green 300 */
-            border-color: #22c55e !important; /* Green 500 */
-            box-shadow: 0 6px 0 #15803d !important; /* Green 700 */
+            background-color: #86efac !important;
+            border-color: #22c55e !important;
+            box-shadow: 0 6px 0 #15803d !important;
         }
 
         .wrong-state {
@@ -87,13 +86,12 @@
         .game-container {
             display: flex;
             flex-direction: column;
-            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            height: 100dvh;
             padding: 1rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Landscape adjustments for tablets/desktop */
         @media (min-width: 768px) and (orientation: landscape) {
             .game-container {
                 flex-direction: row;
@@ -121,7 +119,8 @@
     <div class="w-48 h-3 bg-indigo-200 rounded-full overflow-hidden">
         <div class="h-full bg-indigo-500 animate-pulse w-full origin-left"></div>
     </div>
-    <p class="mt-4 text-indigo-400 font-bold tracking-widest uppercase text-sm">Loading World Data...</p>
+    <p id="loading-text" class="mt-4 text-indigo-400 font-bold tracking-widest uppercase text-sm">Loading World
+        Data...</p>
 </div>
 
 <!-- Main Menu -->
@@ -150,8 +149,7 @@
 
 <!-- Gameplay Screen -->
 <div id="game-screen" class="hidden game-container">
-
-    <!-- TOP DECK: Stats & Question -->
+    <!-- TOP DECK -->
     <div class="top-deck flex flex-col w-full shrink-0 relative z-10">
         <!-- Header Bar -->
         <div class="flex items-center justify-between mb-2 md:mb-6">
@@ -159,7 +157,6 @@
                     class="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 transition-colors text-slate-600 font-bold text-sm">
                 ✕ QUIT
             </button>
-
             <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
                 <div class="flex items-center gap-1">
                     <span class="text-amber-400 text-xl">⭐</span>
@@ -172,30 +169,27 @@
 
         <!-- Question Area -->
         <div class="flex-grow flex flex-col items-center justify-center text-center p-2 relative">
-            <!-- Hint floating background -->
             <div class="absolute inset-0 bg-indigo-50/50 rounded-3xl -z-10 scale-95 md:scale-100 transform origin-top"></div>
 
             <h2 class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-1">Where is</h2>
 
-            <!-- Updated Layout: Hebrew First, Same Size -->
+            <!-- Hebrew First -->
             <h1 id="country-name-he"
                 class="hebrew-text text-3xl md:text-5xl text-indigo-600 font-extrabold leading-tight mb-1"
                 dir="rtl"></h1>
+            <!-- English Name -->
             <h3 id="country-name" class="text-3xl md:text-5xl font-extrabold text-slate-800 leading-tight mb-4">
                 Loading...</h3>
 
-            <!-- Dynamic Hint (Globe/Flag) -->
+            <!-- Dynamic Hint -->
             <div id="hint-container"
-                 class="h-24 w-24 md:h-32 md:w-32 rounded-2xl overflow-hidden shadow-sm bg-white border-4 border-white flex items-center justify-center">
-                <!-- Hint content injected here -->
-            </div>
+                 class="h-24 w-24 md:h-32 md:w-32 rounded-2xl overflow-hidden shadow-sm bg-white border-4 border-white flex items-center justify-center"></div>
         </div>
     </div>
 
-    <!-- BOTTOM DECK: The Grid -->
+    <!-- BOTTOM DECK -->
     <div class="bottom-deck w-full flex-grow mt-4 md:mt-0">
         <div class="grid grid-cols-2 grid-rows-2 gap-3 md:gap-6 h-full w-full">
-            <!-- Button template, JS will fill these -->
             <button id="btn-0" onclick="handleGuess(0)"
                     class="game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2"></button>
             <button id="btn-1" onclick="handleGuess(1)"
@@ -211,18 +205,16 @@
 <!-- Game Over Modal -->
 <div id="game-over-screen"
      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <!-- Changed max-w-sm to max-w-lg for a bigger modal -->
     <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-10 text-center shadow-2xl animate-pop relative overflow-hidden">
         <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-indigo-400 to-purple-400"></div>
 
         <div class="text-7xl mb-4 drop-shadow-md">🏆</div>
         <h2 class="text-4xl font-extrabold text-slate-800 mb-6">Game Over!</h2>
 
-        <!-- Added container for correct answer -->
         <div id="last-answer-display" class="mb-8 hidden"></div>
 
-        <p class="text-slate-500 mb-8 font-semibold text-xl">You got <span id="final-score"
-                                                                           class="text-indigo-600 text-3xl font-bold">0</span>
+        <p class="text-slate-500 mb-8 font-semibold text-xl">You discovered <span id="final-score"
+                                                                                  class="text-indigo-600 text-3xl font-bold">0</span>
             countries.</p>
 
         <button onclick="restartGame()"
@@ -235,207 +227,50 @@
 </div>
 
 <script>
-    /* --- DATASET --- */
-    const allCountries = [
-        { name: "Afghanistan", hebrew: "אַפְגָנִיסְטָן", code: "af", iso3: "AFG" },
-        { name: "Albania", hebrew: "אַלְבַּנְיָה", code: "al", iso3: "ALB" },
-        { name: "Algeria", hebrew: "אַלְגִ׳ירְיָה", code: "dz", iso3: "DZA" },
-        { name: "Andorra", hebrew: "אַנְדּוֹרָה", code: "ad", iso3: "AND" },
-        { name: "Angola", hebrew: "אַנְגּוֹלָה", code: "ao", iso3: "AGO" },
-        { name: "Antigua and Barbuda", hebrew: "אַנְטִיגּוּאָה וּבַרְבּוּדָה", code: "ag", iso3: "ATG" },
-        { name: "Argentina", hebrew: "אַרְגֶּנְטִינָה", code: "ar", iso3: "ARG" },
-        { name: "Armenia", hebrew: "אַרְמֶנְיָה", code: "am", iso3: "ARM" },
-        { name: "Australia", hebrew: "אוֹסְטְרַלְיָה", code: "au", iso3: "AUS" },
-        { name: "Austria", hebrew: "אוֹסְטְרִיָּה", code: "at", iso3: "AUT" },
-        { name: "Azerbaijan", hebrew: "אַזֶרְבַּייגָ׳ן", code: "az", iso3: "AZE" },
-        { name: "Bahamas", hebrew: "אַיי בָּהָאמָה", code: "bs", iso3: "BHS" },
-        { name: "Bahrain", hebrew: "בַּחְרֵיין", code: "bh", iso3: "BHR" },
-        { name: "Bangladesh", hebrew: "בַּנְגְּלָדֶשׁ", code: "bd", iso3: "BGD" },
-        { name: "Barbados", hebrew: "בַּרְבֵּיידּוֹס", code: "bb", iso3: "BRB" },
-        { name: "Belarus", hebrew: "בֶּלָארוּס", code: "by", iso3: "BLR" },
-        { name: "Belgium", hebrew: "בֶּלְגִיָּה", code: "be", iso3: "BEL" },
-        { name: "Belize", hebrew: "בְּלִיז", code: "bz", iso3: "BLZ" },
-        { name: "Benin", hebrew: "בֵּנִין", code: "bj", iso3: "BEN" },
-        { name: "Bhutan", hebrew: "בְּהוּטָן", code: "bt", iso3: "BTN" },
-        { name: "Bolivia", hebrew: "בּוֹלִיבְיָה", code: "bo", iso3: "BOL" },
-        { name: "Bosnia and Herzegovina", hebrew: "בּוֹסְנִיָּה וְהֶרְצֶגוֹבִינָה", code: "ba", iso3: "BIH" },
-        { name: "Botswana", hebrew: "בּוֹצְוָאנָה", code: "bw", iso3: "BWA" },
-        { name: "Brazil", hebrew: "בְּרָזִיל", code: "br", iso3: "BRA" },
-        { name: "Brunei", hebrew: "בְּרוּנֵיי", code: "bn", iso3: "BRN" },
-        { name: "Bulgaria", hebrew: "בּוּלְגַרְיָה", code: "bg", iso3: "BGR" },
-        { name: "Burkina Faso", hebrew: "בּוּרְקִינָה פָאסוֹ", code: "bf", iso3: "BFA" },
-        { name: "Burundi", hebrew: "בּוּרוּנְדִי", code: "bi", iso3: "BDI" },
-        { name: "Cabo Verde", hebrew: "כֵּף וֶרְדֶּה", code: "cv", iso3: "CPV" },
-        { name: "Cambodia", hebrew: "קַמְבּוֹדְיָה", code: "kh", iso3: "KHM" },
-        { name: "Cameroon", hebrew: "קָמֶרוּן", code: "cm", iso3: "CMR" },
-        { name: "Canada", hebrew: "קָנָדָה", code: "ca", iso3: "CAN" },
-        { name: "Central African Republic", hebrew: "הָרֶפּוּבְּלִיקָה הַמֶּרְכָּז-אַפְרִיקָאִית", code: "cf", iso3: "CAF" },
-        { name: "Chad", hebrew: "צָ׳אד", code: "td", iso3: "TCD" },
-        { name: "Chile", hebrew: "צִ׳ילֶה", code: "cl", iso3: "CHL" },
-        { name: "China", hebrew: "סִין", code: "cn", iso3: "CHN" },
-        { name: "Colombia", hebrew: "קוֹלוֹמְבְּיָה", code: "co", iso3: "COL" },
-        { name: "Comoros", hebrew: "קוֹמוֹרוֹ", code: "km", iso3: "COM" },
-        { name: "Congo, Democratic Republic of the", hebrew: "הָרֶפּוּבְּלִיקָה הַדֵּמוֹקְרָטִית שֶׁל קוֹנְגּוֹ", code: "cd", iso3: "COD" },
-        { name: "Congo, Republic of the", hebrew: "הָרֶפּוּבְּלִיקָה שֶׁל קוֹנְגּוֹ", code: "cg", iso3: "COG" },
-        { name: "Costa Rica", hebrew: "קוֹסְטָה רִיקָה", code: "cr", iso3: "CRI" },
-        { name: "Croatia", hebrew: "קְרוֹאַטְיָה", code: "hr", iso3: "HRV" },
-        { name: "Cuba", hebrew: "קוּבָה", code: "cu", iso3: "CUB" },
-        { name: "Cyprus", hebrew: "קַפְרִיסִין", code: "cy", iso3: "CYP" },
-        { name: "Czech Republic", hebrew: "צֶ׳כְיָה", code: "cz", iso3: "CZE" },
-        { name: "Denmark", hebrew: "דֶּנְמַרְק", code: "dk", iso3: "DNK" },
-        { name: "Djibouti", hebrew: "גִ׳יבּוּטִי", code: "dj", iso3: "DJI" },
-        { name: "Dominica", hebrew: "דּוֹמִינִיקָה", code: "dm", iso3: "DMA" },
-        { name: "Dominican Republic", hebrew: "הָרֶפּוּבְּלִיקָה הַדּוֹמִינִיקָנִית", code: "do", iso3: "DOM" },
-        { name: "East Timor", hebrew: "מִזְרַח טִימוֹר", code: "tl", iso3: "TLS" },
-        { name: "Ecuador", hebrew: "אֶקְוָדוֹר", code: "ec", iso3: "ECU" },
-        { name: "Egypt", hebrew: "מִצְרַיִם", code: "eg", iso3: "EGY" },
-        { name: "El Salvador", hebrew: "אֵל סַלְוָדוֹר", code: "sv", iso3: "SLV" },
-        { name: "Equatorial Guinea", hebrew: "גִּינֵאָה הַמַּשְׁוָנִית", code: "gq", iso3: "GNQ" },
-        { name: "Eritrea", hebrew: "אֶרִיתְרֵאָה", code: "er", iso3: "ERI" },
-        { name: "Estonia", hebrew: "אֶסְטוֹנְיָה", code: "ee", iso3: "EST" },
-        { name: "Eswatini", hebrew: "אֶסְוָואטִינִי", code: "sz", iso3: "SWZ" },
-        { name: "Ethiopia", hebrew: "אֶתְיוֹפְּיָה", code: "et", iso3: "ETH" },
-        { name: "Fiji", hebrew: "פִיגִ׳י", code: "fj", iso3: "FJI" },
-        { name: "Finland", hebrew: "פִינְלַנְד", code: "fi", iso3: "FIN" },
-        { name: "France", hebrew: "צָרְפַת", code: "fr", iso3: "FRA" },
-        { name: "Gabon", hebrew: "גָּבוֹן", code: "ga", iso3: "GAB" },
-        { name: "Gambia", hebrew: "גַּמְבִּיָּה", code: "gm", iso3: "GMB" },
-        { name: "Georgia", hebrew: "גֵּאוֹרְגְּיָה", code: "ge", iso3: "GEO" },
-        { name: "Germany", hebrew: "גֶּרְמַנְיָה", code: "de", iso3: "DEU" },
-        { name: "Ghana", hebrew: "גָּאנָה", code: "gh", iso3: "GHA" },
-        { name: "Greece", hebrew: "יָוָון", code: "gr", iso3: "GRC" },
-        { name: "Grenada", hebrew: "גְּרֶנָדָה", code: "gd", iso3: "GRD" },
-        { name: "Guatemala", hebrew: "גְּוָואטֶמָלָה", code: "gt", iso3: "GTM" },
-        { name: "Guinea", hebrew: "גִּינֵאָה", code: "gn", iso3: "GIN" },
-        { name: "Guinea-Bissau", hebrew: "גִּינֵאָה בִּיסָאוֹ", code: "gw", iso3: "GNB" },
-        { name: "Guyana", hebrew: "גַּיְאָנָה", code: "gy", iso3: "GUY" },
-        { name: "Haiti", hebrew: "הָאִיטִי", code: "ht", iso3: "HTI" },
-        { name: "Honduras", hebrew: "הוֹנְדּוּרַס", code: "hn", iso3: "HND" },
-        { name: "Hungary", hebrew: "הוּנְגַרְיָה", code: "hu", iso3: "HUN" },
-        { name: "Iceland", hebrew: "אִיסְלַנְד", code: "is", iso3: "ISL" },
-        { name: "India", hebrew: "הוֹדוּ", code: "in", iso3: "IND" },
-        { name: "Indonesia", hebrew: "אִינְדּוֹנֶזְיָה", code: "id", iso3: "IDN" },
-        { name: "Iran", hebrew: "אִירָאן", code: "ir", iso3: "IRN" },
-        { name: "Iraq", hebrew: "עִירָאק", code: "iq", iso3: "IRQ" },
-        { name: "Ireland", hebrew: "אִירְלַנְד", code: "ie", iso3: "IRL" },
-        { name: "Israel", hebrew: "יִשְׂרָאֵל", code: "il", iso3: "ISR" },
-        { name: "Italy", hebrew: "אִיטַלְיָה", code: "it", iso3: "ITA" },
-        { name: "Ivory Coast", hebrew: "חוֹף הַשֶּׁנְהָב", code: "ci", iso3: "CIV" },
-        { name: "Jamaica", hebrew: "גָ׳מַייקָה", code: "jm", iso3: "JAM" },
-        { name: "Japan", hebrew: "יַפָּן", code: "jp", iso3: "JPN" },
-        { name: "Jordan", hebrew: "יַרְדֵּן", code: "jo", iso3: "JOR" },
-        { name: "Kazakhstan", hebrew: "קָזַחְסְטָן", code: "kz", iso3: "KAZ" },
-        { name: "Kenya", hebrew: "קֶנְיָה", code: "ke", iso3: "KEN" },
-        { name: "Kiribati", hebrew: "קִירִיבָּטִי", code: "ki", iso3: "KIR" },
-        { name: "Kuwait", hebrew: "כְּוֵוית", code: "kw", iso3: "KWT" },
-        { name: "Kyrgyzstan", hebrew: "קִירְגִיזְסְטָן", code: "kg", iso3: "KGZ" },
-        { name: "Laos", hebrew: "לָאוֹס", code: "la", iso3: "LAO" },
-        { name: "Latvia", hebrew: "לַטְבִיָּה", code: "lv", iso3: "LVA" },
-        { name: "Lebanon", hebrew: "לְבָנוֹן", code: "lb", iso3: "LBN" },
-        { name: "Lesotho", hebrew: "לֶסוֹטוֹ", code: "ls", iso3: "LSO" },
-        { name: "Liberia", hebrew: "לִיבֶּרְיָה", code: "lr", iso3: "LBR" },
-        { name: "Libya", hebrew: "לוּב", code: "ly", iso3: "LBY" },
-        { name: "Liechtenstein", hebrew: "לִיכְטֶנְשְׁטַיין", code: "li", iso3: "LIE" },
-        { name: "Lithuania", hebrew: "לִיטָא", code: "lt", iso3: "LTU" },
-        { name: "Luxembourg", hebrew: "לוּקְסֶמְבּוּרְג", code: "lu", iso3: "LUX" },
-        { name: "Madagascar", hebrew: "מָדָגַסְקָר", code: "mg", iso3: "MDG" },
-        { name: "Malawi", hebrew: "מָלָאוִוי", code: "mw", iso3: "MWI" },
-        { name: "Malaysia", hebrew: "מָלֶזְיָה", code: "my", iso3: "MYS" },
-        { name: "Maldives", hebrew: "הָאִיִּים הַמַּלְדִּיבִיִּים", code: "mv", iso3: "MDV" },
-        { name: "Mali", hebrew: "מָאלִי", code: "ml", iso3: "MLI" },
-        { name: "Malta", hebrew: "מַלְטָה", code: "mt", iso3: "MLT" },
-        { name: "Marshall Islands", hebrew: "אַיי מַרְשָׁאל", code: "mh", iso3: "MHL" },
-        { name: "Mauritania", hebrew: "מָאוּרִיטַנְיָה", code: "mr", iso3: "MRT" },
-        { name: "Mauritius", hebrew: "מָאוּרִיצְיוּס", code: "mu", iso3: "MUS" },
-        { name: "Mexico", hebrew: "מֶקְסִיקוֹ", code: "mx", iso3: "MEX" },
-        { name: "Micronesia", hebrew: "מִיקְרוֹנֶזְיָה", code: "fm", iso3: "FSM" },
-        { name: "Moldova", hebrew: "מוֹלְדּוֹבָה", code: "md", iso3: "MDA" },
-        { name: "Monaco", hebrew: "מוֹנָקוֹ", code: "mc", iso3: "MCO" },
-        { name: "Mongolia", hebrew: "מוֹנְגּוֹלְיָה", code: "mn", iso3: "MNG" },
-        { name: "Montenegro", hebrew: "מוֹנְטֶנֶגְרוֹ", code: "me", iso3: "MNE" },
-        { name: "Morocco", hebrew: "מָרוֹקוֹ", code: "ma", iso3: "MAR" },
-        { name: "Mozambique", hebrew: "מוֹזַמְבִּיק", code: "mz", iso3: "MOZ" },
-        { name: "Myanmar", hebrew: "מִיאַנְמָאר", code: "mm", iso3: "MMR" },
-        { name: "Namibia", hebrew: "נָמִיבְּיָה", code: "na", iso3: "NAM" },
-        { name: "Nauru", hebrew: "נָאוּרוּ", code: "nr", iso3: "NRU" },
-        { name: "Nepal", hebrew: "נֶפָּאל", code: "np", iso3: "NPL" },
-        { name: "Netherlands", hebrew: "הוֹלַנְד", code: "nl", iso3: "NLD" },
-        { name: "New Zealand", hebrew: "נְיוּ זִילַנְד", code: "nz", iso3: "NZL" },
-        { name: "Nicaragua", hebrew: "נִיקָרַגּוּאָה", code: "ni", iso3: "NIC" },
-        { name: "Niger", hebrew: "נִיגֶ׳ר", code: "ne", iso3: "NER" },
-        { name: "Nigeria", hebrew: "נִיגֶרְיָה", code: "ng", iso3: "NGA" },
-        { name: "North Korea", hebrew: "קּוֹרֵיאָה הַצְּפוֹנִית", code: "kp", iso3: "PRK" },
-        { name: "North Macedonia", hebrew: "צְפוֹן מָקֶדּוֹנְיָה", code: "mk", iso3: "MKD" },
-        { name: "Norway", hebrew: "נֶורְבֶגְיָה", code: "no", iso3: "NOR" },
-        { name: "Oman", hebrew: "עוֹמָאן", code: "om", iso3: "OMN" },
-        { name: "Pakistan", hebrew: "פָּקִיסְטָן", code: "pk", iso3: "PAK" },
-        { name: "Palau", hebrew: "פָּלָאוּ", code: "pw", iso3: "PLW" },
-        { name: "Palestine", hebrew: "הָרָשׁוּת הַפָלַסְטִינִית", code: "ps", iso3: "PSE" },
-        { name: "Panama", hebrew: "פָּנָמָה", code: "pa", iso3: "PAN" },
-        { name: "Papua New Guinea", hebrew: "פַּפּוּאָה גִּינֵאָה הַחֲדָשָׁה", code: "pg", iso3: "PNG" },
-        { name: "Paraguay", hebrew: "פָּרָגְוַואי", code: "py", iso3: "PRY" },
-        { name: "Peru", hebrew: "פֵּרוּ", code: "pe", iso3: "PER" },
-        { name: "Philippines", hebrew: "הַפִילִיפִּינִים", code: "ph", iso3: "PHL" },
-        { name: "Poland", hebrew: "פּוֹלִין", code: "pl", iso3: "POL" },
-        { name: "Portugal", hebrew: "פּוֹרְטוּגָל", code: "pt", iso3: "PRT" },
-        { name: "Qatar", hebrew: "קַטַר", code: "qa", iso3: "QAT" },
-        { name: "Romania", hebrew: "רוֹמַנְיָה", code: "ro", iso3: "ROU" },
-        { name: "Russia", hebrew: "רוּסְיָה", code: "ru", iso3: "RUS" },
-        { name: "Rwanda", hebrew: "רוּאַנְדָּה", code: "rw", iso3: "RWA" },
-        { name: "Saint Kitts and Nevis", hebrew: "סֵנְט קִיטְס וְנֵיוִויס", code: "kn", iso3: "KNA" },
-        { name: "Saint Lucia", hebrew: "סֵנְט לוּסִיָה", code: "lc", iso3: "LCA" },
-        { name: "Saint Vincent and the Grenadines", hebrew: "סֵנְט וִינְסֶנְט וְהַגְּרֵנָדִינִים", code: "vc", iso3: "VCT" },
-        { name: "Samoa", hebrew: "סָמוֹאָה", code: "ws", iso3: "WSM" },
-        { name: "San Marino", hebrew: "סַן מָרִינוֹ", code: "sm", iso3: "SMR" },
-        { name: "Sao Tome and Principe", hebrew: "סָאוֹ טוֹמֶה וּפְרִינְסִיפֶּה", code: "st", iso3: "STP" },
-        { name: "Saudi Arabia", hebrew: "עֲרַב הַסַּעוּדִית", code: "sa", iso3: "SAU" },
-        { name: "Senegal", hebrew: "סֶנֶגָל", code: "sn", iso3: "SEN" },
-        { name: "Serbia", hebrew: "סֶרְבְּיָה", code: "rs", iso3: "SRB" },
-        { name: "Seychelles", hebrew: "סֵייְשֶׁל", code: "sc", iso3: "SYC" },
-        { name: "Sierra Leone", hebrew: "סִיֶירָה לֵאוֹנֶה", code: "sl", iso3: "SLE" },
-        { name: "Singapore", hebrew: "סִינְגָּפּוּר", code: "sg", iso3: "SGP" },
-        { name: "Slovakia", hebrew: "סְלוֹבַקְיָה", code: "sk", iso3: "SVK" },
-        { name: "Slovenia", hebrew: "סְלוֹבֶנְיָה", code: "si", iso3: "SVN" },
-        { name: "Solomon Islands", hebrew: "אַיי שְׁלֹמֹה", code: "sb", iso3: "SLB" },
-        { name: "Somalia", hebrew: "סוֹמַלְיָה", code: "so", iso3: "SOM" },
-        { name: "South Africa", hebrew: "דְּרוֹם אַפְרִיקָה", code: "za", iso3: "ZAF" },
-        { name: "South Korea", hebrew: "קּוֹרֵיאָה הַדְּרוֹמִית", code: "kr", iso3: "KOR" },
-        { name: "South Sudan", hebrew: "דְּרוֹם סוּדָאן", code: "ss", iso3: "SSD" },
-        { name: "Spain", hebrew: "סְפָרַד", code: "es", iso3: "ESP" },
-        { name: "Sri Lanka", hebrew: "סְרִי לַנְקָה", code: "lk", iso3: "LKA" },
-        { name: "Sudan", hebrew: "סוּדָאן", code: "sd", iso3: "SDN" },
-        { name: "Suriname", hebrew: "סוּרִינָאם", code: "sr", iso3: "SUR" },
-        { name: "Sweden", hebrew: "שְׁבֶדְיָה", code: "se", iso3: "SWE" },
-        { name: "Switzerland", hebrew: "שְׁוַיְיץ", code: "ch", iso3: "CHE" },
-        { name: "Syria", hebrew: "סוּרְיָה", code: "sy", iso3: "SYR" },
-        { name: "Taiwan", hebrew: "טָאיוְואן", code: "tw", iso3: "TWN" },
-        { name: "Tajikistan", hebrew: "טָגִ׳יקִיסְטָן", code: "tj", iso3: "TJK" },
-        { name: "Tanzania", hebrew: "טַנְזַנְיָה", code: "tz", iso3: "TZA" },
-        { name: "Thailand", hebrew: "תַּאיְלַנְד", code: "th", iso3: "THA" },
-        { name: "Togo", hebrew: "טוֹגוֹ", code: "tg", iso3: "TGO" },
-        { name: "Tonga", hebrew: "טוֹנְגָה", code: "to", iso3: "TON" },
-        { name: "Trinidad and Tobago", hebrew: "טְרִינִידָד וְטוֹבָּגוֹ", code: "tt", iso3: "TTO" },
-        { name: "Tunisia", hebrew: "תוּנִיסְיָה", code: "tn", iso3: "TUN" },
-        { name: "Turkey", hebrew: "טוּרְקִיָּה", code: "tr", iso3: "TUR" },
-        { name: "Turkmenistan", hebrew: "טוּרְקְמֶנִיסְטָן", code: "tm", iso3: "TKM" },
-        { name: "Tuvalu", hebrew: "טוּבָאלוּ", code: "tv", iso3: "TUV" },
-        { name: "Uganda", hebrew: "אוּגַנְדָה", code: "ug", iso3: "UGA" },
-        { name: "Ukraine", hebrew: "אוּקְרָאִינָה", code: "ua", iso3: "UKR" },
-        { name: "United Arab Emirates", hebrew: "אִיחוּד הָאֱמִירוּיוֹת הָעֲרָבִיּוֹת", code: "ae", iso3: "ARE" },
-        { name: "United Kingdom", hebrew: "הַמַּמְלָכָה הַמְּאוּחֶדֶת", code: "gb", iso3: "GBR" },
-        { name: "United States", hebrew: "אַרְצוֹת הַבְּרִית", code: "us", iso3: "USA" },
-        { name: "Uruguay", hebrew: "אוּרוּגְוַואי", code: "uy", iso3: "URY" },
-        { name: "Uzbekistan", hebrew: "אוּזְבֶּקִיסְטָן", code: "uz", iso3: "UZB" },
-        { name: "Vanuatu", hebrew: "וָנוּאָטוּ", code: "vu", iso3: "VUT" },
-        { name: "Vatican City", hebrew: "קִרְיַת הַוָּתִיקָן", code: "va", iso3: "VAT" },
-        { name: "Venezuela", hebrew: "וֶנֶצוּאֶלָה", code: "ve", iso3: "VEN" },
-        { name: "Vietnam", hebrew: "וִיֶיטְנָאם", code: "vn", iso3: "VNM" },
-        { name: "Yemen", hebrew: "תֵּימָן", code: "ye", iso3: "YEM" },
-        { name: "Zambia", hebrew: "זַמְבִּיָה", code: "zm", iso3: "ZMB" },
-        { name: "Zimbabwe", hebrew: "זִימְבַּאבְּוֶוה", code: "zw", iso3: "ZWE" }
-    ];
+    /* --- DATASETS --- */
+
+    // Hebrew Translations Map (Key = 2-letter ISO code uppercase)
+    const hebrewMap = {
+        "AF": "אַפְגָנִיסְטָן", "AL": "אַלְבַּנְיָה", "DZ": "אַלְגִ׳ירְיָה", "AD": "אַנְדּוֹרָה", "AO": "אַנְגּוֹלָה",
+        "AG": "אַנְטִיגּוּאָה וּבַרְבּוּדָה", "AR": "אַרְגֶּנְטִינָה", "AM": "אַרְמֶנְיָה", "AU": "אוֹסְטְרַלְיָה", "AT": "אוֹסְטְרִיָּה",
+        "AZ": "אַזֶרְבַּייגָ׳ן", "BS": "אַיי בָּהָאמָה", "BH": "בַּחְרֵיין", "BD": "בַּנְגְּלָדֶשׁ", "BB": "בַּרְבֵּיידּוֹס",
+        "BY": "בֶּלָארוּס", "BE": "בֶּלְגִיָּה", "BZ": "בְּלִיז", "BJ": "בֵּנִין", "BT": "בְּהוּטָן", "BO": "בּוֹלִיבְיָה",
+        "BA": "בּוֹסְנִיָּה וְהֶרְצֶגוֹבִינָה", "BW": "בּוֹצְוָאנָה", "BR": "בְּרָזִיל", "BN": "בְּרוּנֵיי", "BG": "בּוּלְגַרְיָה",
+        "BF": "בּוּרְקִינָה פָאסוֹ", "BI": "בּוּרוּנְדִי", "CV": "כֵּף וֶרְדֶּה", "KH": "קַמְבּוֹדְיָה", "CM": "קָמֶרוּן",
+        "CA": "קָנָדָה", "CF": "הָרֶפּוּבְּלִיקָה הַמֶּרְכָּז-אַפְרִיקָאִית", "TD": "צָ׳אד", "CL": "צִ׳ילֶה", "CN": "סִין",
+        "CO": "קוֹלוֹמְבְּיָה", "KM": "קוֹמוֹרוֹ", "CD": "הָרֶפּוּבְּלִיקָה הַדֵּמוֹקְרָטִית שֶׁל קוֹנְגּוֹ", "CG": "הָרֶפּוּבְּלִיקָה שֶׁל קוֹנְגּוֹ",
+        "CR": "קוֹסְטָה רִיקָה", "HR": "קְרוֹאַטְיָה", "CU": "קוּבָה", "CY": "קַפְרִיסִין", "CZ": "צֶ׳כְיָה", "DK": "דֶּנְמַרְק",
+        "DJ": "גִ׳יבּוּטִי", "DM": "דּוֹמִינִיקָה", "DO": "הָרֶפּוּבְּלִיקָה הַדּוֹמִינִיקָנִית", "TL": "מִזְרַח טִימוֹר", "EC": "אֶקְוָדוֹר",
+        "EG": "מִצְרַיִם", "SV": "אֵל סַלְוָדוֹר", "GQ": "גִּינֵאָה הַמַּשְׁוָנִית", "ER": "אֶרִיתְרֵאָה", "EE": "אֶסְטוֹנְיָה",
+        "SZ": "אֶסְוָואטִינִי", "ET": "אֶתְיוֹפְּיָה", "FJ": "פִיגִ׳י", "FI": "פִינְלַנְד", "FR": "צָרְפַת", "GA": "גָּבוֹן",
+        "GM": "גַּמְבִּיָּה", "GE": "גֵּאוֹרְגְּיָה", "DE": "גֶּרְמַנְיָה", "GH": "גָּאנָה", "GR": "יָוָון", "GD": "גְּרֶנָדָה",
+        "GT": "גְּוָואטֶמָלָה", "GN": "גִּינֵאָה", "GW": "גִּינֵאָה בִּיסָאוֹ", "GY": "גַּיְאָנָה", "HT": "הָאִיטִי", "HN": "הוֹנְדּוּרַס",
+        "HU": "הוּנְגַרְיָה", "IS": "אִיסְלַנְד", "IN": "הוֹדוּ", "ID": "אִינְדּוֹנֶזְיָה", "IR": "אִירָאן", "IQ": "עִירָאק",
+        "IE": "אִירְלַנְד", "IL": "יִשְׂרָאֵל", "IT": "אִיטַלְיָה", "CI": "חוֹף הַשֶּׁנְהָב", "JM": "גָ׳מַייקָה", "JP": "יַפָּן",
+        "JO": "יַרְדֵּן", "KZ": "קָזַחְסְטָן", "KE": "קֶנְיָה", "KI": "קִירִיבָּטִי", "KW": "כְּוֵוית", "KG": "קִירְגִיזְסְטָן",
+        "LA": "לָאוֹס", "LV": "לַטְבִיָּה", "LB": "לְבָנוֹן", "LS": "לֶסוֹטוֹ", "LR": "לִיבֶּרְיָה", "LY": "לוּב", "LI": "לִיכְטֶנְשְׁטַיין",
+        "LT": "לִיטָא", "LU": "לוּקְסֶמְבּוּרְג", "MG": "מָדָגַסְקָר", "MW": "מָלָאוִוי", "MY": "מָלֶזְיָה", "MV": "הָאִיִּים הַמַּלְדִּיבִיִּים",
+        "ML": "מָאלִי", "MT": "מַלְטָה", "MH": "אַיי מַרְשָׁאל", "MR": "מָאוּרִיטַנְיָה", "MU": "מָאוּרִיצְיוּס", "MX": "מֶקְסִיקוֹ",
+        "FM": "מִיקְרוֹנֶזְיָה", "MD": "מוֹלְדּוֹבָה", "MC": "מוֹנָקוֹ", "MN": "מוֹנְגּוֹלְיָה", "ME": "מוֹנְטֶנֶגְרוֹ", "MA": "מָרוֹקוֹ",
+        "MZ": "מוֹזַמְבִּיק", "MM": "מִיאַנְמָאר", "NA": "נָמִיבְּיָה", "NR": "נָאוּרוּ", "NP": "נֶפָּאל", "NL": "הוֹלַנְד",
+        "NZ": "נְיוּ זִילַנְד", "NI": "נִיקָרַגּוּאָה", "NE": "נִיגֶ׳ר", "NG": "נִיגֶרְיָה", "KP": "קּוֹרֵיאָה הַצְּפוֹנִית",
+        "MK": "צְפוֹן מָקֶדּוֹנְיָה", "NO": "נֶורְבֶגְיָה", "OM": "עוֹמָאן", "PK": "פָּקִיסְטָן", "PW": "פָּלָאוּ", "PS": "הָרָשׁוּת הַפָלַסְטִינִית",
+        "PA": "פָּנָמָה", "PG": "פַּפּוּאָה גִּינֵאָה הַחֲדָשָׁה", "PY": "פָּרָגְוַואי", "PE": "פֵּרוּ", "PH": "הַפִילִיפִּינִים",
+        "PL": "פּוֹלִין", "PT": "פּוֹרְטוּגָל", "QA": "קַטַר", "RO": "רוֹמַנְיָה", "RU": "רוּסְיָה", "RW": "רוּאַנְדָּה",
+        "KN": "סֵנְט קִיטְס וְנֵיוִויס", "LC": "סֵנְט לוּסִיָה", "VC": "סֵנְט וִינְסֶנְט וְהַגְּרֵנָדִינִים", "WS": "סָמוֹאָה", "SM": "סַן מָרִינוֹ",
+        "ST": "סָאוֹ טוֹמֶה וּפְרִינְסִיפֶּה", "SA": "עֲרַב הַסַּעוּדִית", "SN": "סֶנֶגָל", "RS": "סֶרְבְּיָה", "SC": "סֵייְשֶׁל",
+        "SL": "סִיֶירָה לֵאוֹנֶה", "SG": "סִינְגָּפּוּר", "SK": "סְלוֹבַקְיָה", "SI": "סְלוֹבֶנְיָה", "SB": "אַיי שְׁלֹמֹה",
+        "SO": "סוֹמַלְיָה", "ZA": "דְּרוֹם אַפְרִיקָה", "KR": "קּוֹרֵיאָה הַדְּרוֹמִית", "SS": "דְּרוֹם סוּדָאן", "ES": "סְפָרַד",
+        "LK": "סְרִי לַנְקָה", "SD": "סוּדָאן", "SR": "סוּרִינָאם", "SE": "שְׁבֶדְיָה", "CH": "שְׁוַיְיץ", "SY": "סוּרְיָה",
+        "TW": "טָאיוְואן", "TJ": "טָגִ׳יקִיסְטָן", "TZ": "טַנְזַנְיָה", "TH": "תַּאיְלַנְד", "TG": "טוֹגוֹ", "TO": "טוֹנְגָה",
+        "TT": "טְרִינִידָד וְטוֹבָּגוֹ", "TN": "תוּנִיסְיָה", "TR": "טוּרְקִיָּה", "TM": "טוּרְקְמֶנִיסְטָן", "TV": "טוּבָאלוּ",
+        "UG": "אוּגַנְדָה", "UA": "אוּקְרָאִינָה", "AE": "אִיחוּד הָאֱמִירוּיוֹת הָעֲרָבִיּוֹת", "GB": "הַמַּמְלָכָה הַמְּאוּחֶדֶת",
+        "US": "אַרְצוֹת הַבְּרִית", "UY": "אוּרוּגְוַואי", "UZ": "אוּזְבֶּקִיסְטָן", "VU": "וָנוּאָטוּ", "VA": "קִרְיַת הַוָּתִיקָן",
+        "VE": "וֶנֶצוּאֶלָה", "VN": "וִיֶיטְנָאם", "YE": "תֵּימָן", "ZM": "זַמְבִּיָה", "ZW": "זִימְבַּאבְּוֶוה"
+    };
 
     /* --- GAME STATE --- */
+    let allCountries = []; // Will be populated from API
     let score = 0;
     let strikes = 0;
     const maxStrikes = 3;
@@ -473,14 +308,46 @@
     /* --- INITIALIZATION --- */
     window.onload = async () => {
         try {
-            const res = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
-            worldGeoJson = await res.json();
+            document.getElementById('loading-text').textContent = "Fetching Atlas Data...";
+
+            // Fetch both Map Data and Authoritative Country Data in parallel
+            const [geoRes, countriesRes] = await Promise.all([
+                fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'),
+                fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3')
+            ]);
+
+            worldGeoJson = await geoRes.json();
+            const rawCountries = await countriesRes.json();
+
+            // Process Data:
+            // 1. Create standardized country objects
+            // 2. Map Hebrew names if available
+            // 3. Filter to ensure we have map data (ISO3 match)
+
+            allCountries = rawCountries.map(c => {
+                const codeUpper = c.cca2.toUpperCase();
+                return {
+                    name: c.name.common,
+                    code: c.cca2.toLowerCase(), // for flagcdn
+                    iso3: c.cca3, // for d3 map
+                    hebrew: hebrewMap[codeUpper] || null // Map or null
+                };
+            }).filter(c => {
+                // Only keep countries that exist in the GeoJSON map to avoid blank globes
+                return worldGeoJson.features.some(f => f.id === c.iso3);
+            });
+
+            // Ensure we have a decent number of countries
+            if (allCountries.length < 50) throw new Error("Not enough data");
+
             screens.loading.classList.add('hidden');
             screens.menu.classList.remove('hidden');
             screens.menu.classList.add('flex');
+
         } catch (e) {
             console.error(e);
-            screens.loading.innerHTML = "<h2 class='text-red-500 font-bold'>Failed to load map data.<br>Check connection.</h2>";
+            document.getElementById('loading-text').innerHTML =
+                `<span class="text-red-500">Error loading data.<br>Please check connection and refresh.</span><br><span class="text-xs text-slate-400">${e.message}</span>`;
         }
     };
 
@@ -537,27 +404,21 @@
     }
 
     function toggleZoom(e, index, iso3) {
-        e.stopPropagation(); // Prevent triggering the guess
-
-        // Don't toggle if game inactive or button disabled
+        e.stopPropagation();
         if (!gameActive || ui.buttons[index].disabled) return;
 
         zoomStates[index] = !zoomStates[index];
         const btn = ui.buttons[index];
         const container = btn.querySelector('.globe-container');
 
-        // Redraw
         drawGlobe(container, iso3, false, zoomStates[index]);
 
-        // Update Icon
         const svg = e.currentTarget.querySelector('svg');
         if (zoomStates[index]) {
-            // Zoom Out icon (minus)
             svg.innerHTML = '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line>';
             e.currentTarget.classList.add('bg-indigo-100', 'text-indigo-700');
             e.currentTarget.classList.remove('bg-white/90', 'text-indigo-600');
         } else {
-            // Zoom In icon (plus)
             svg.innerHTML = '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line>';
             e.currentTarget.classList.remove('bg-indigo-100', 'text-indigo-700');
             e.currentTarget.classList.add('bg-white/90', 'text-indigo-600');
@@ -569,7 +430,6 @@
 
         zoomStates = [false, false, false, false];
 
-        // Reset Buttons
         ui.buttons.forEach(btn => {
             btn.className = "game-btn bg-white rounded-3xl border-4 border-white flex items-center justify-center overflow-hidden p-2 relative";
             btn.disabled = false;
@@ -593,18 +453,20 @@
         currentOptions = shuffleArray([correctCountry, ...distractors]);
         correctIndex = currentOptions.indexOf(correctCountry);
 
-        // Update Header
+        // Update Header (Visibility logic)
         ui.cName.textContent = correctCountry.name;
-        ui.cNameHe.textContent = correctCountry.hebrew;
+        if (correctCountry.hebrew) {
+            ui.cNameHe.textContent = correctCountry.hebrew;
+            ui.cNameHe.style.display = 'block';
+        } else {
+            ui.cNameHe.style.display = 'none';
+        }
 
         // Hint Logic
         ui.hint.innerHTML = '';
         if (currentMode === 'flags') {
-            // Hint is Map (non-interactive)
             drawGlobe(ui.hint, correctCountry.iso3, true, false);
         } else {
-            // Hint is Flag (Maps Mode)
-            // Fix: Use object-contain to prevent cropping
             ui.hint.innerHTML = `<img src="https://flagcdn.com/${correctCountry.code}.svg" alt="Flag Hint" class="w-full h-full object-contain">`;
         }
 
@@ -614,14 +476,12 @@
             if (currentMode === 'flags') {
                 btn.innerHTML = `<img src="https://flagcdn.com/${country.code}.svg" alt="Flag" class="w-full h-full object-contain pointer-events-none drop-shadow-sm">`;
             } else {
-                // Add Zoom Button
                 const zoomBtn = document.createElement('button');
                 zoomBtn.className = 'absolute top-2 right-2 z-30 bg-white/90 hover:bg-white text-indigo-600 p-2 rounded-full shadow-md transition-transform active:scale-95 border border-indigo-100';
                 zoomBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
                 zoomBtn.onclick = (e) => toggleZoom(e, index, country.iso3);
                 btn.appendChild(zoomBtn);
 
-                // Wrap D3 in a container that fills the button
                 const container = document.createElement('div');
                 container.className = 'globe-container w-full h-full flex items-center justify-center';
                 btn.appendChild(container);
@@ -637,7 +497,6 @@
         const selectedBtn = ui.buttons[btnIndex];
         const isCorrect = btnIndex === correctIndex;
 
-        // Disable Zoom buttons on all cards
         ui.buttons.forEach(btn => {
             const zoomBtn = btn.querySelector('button');
             if(zoomBtn) zoomBtn.disabled = true;
@@ -648,7 +507,6 @@
             score++;
             selectedBtn.classList.add('correct-state');
 
-            // Add checkmark overlay
             const check = document.createElement('div');
             check.className = 'absolute inset-0 flex items-center justify-center bg-green-400/20 z-20 animate-pop';
             check.innerHTML = '<span class="text-green-600 text-6xl font-black drop-shadow-md">✓</span>';
@@ -665,7 +523,6 @@
             selectedBtn.classList.add('shake', 'wrong-state');
             selectedBtn.disabled = true;
 
-            // Add X overlay
             const x = document.createElement('div');
             x.className = 'absolute inset-0 flex items-center justify-center bg-red-400/20 z-20 animate-pop';
             x.innerHTML = '<span class="text-red-500 text-6xl font-black drop-shadow-md">✕</span>';
@@ -674,7 +531,6 @@
             if (strikes >= maxStrikes) {
                 ui.buttons.forEach(btn => btn.disabled = true);
                 setTimeout(() => {
-                    // Pass the correct answer to endGame
                     endGame(currentOptions[correctIndex]);
                 }, 1000);
             }
@@ -687,13 +543,15 @@
 
         const lastAnswerEl = document.getElementById('last-answer-display');
         if (lastCorrectCountry) {
+             const hebrewHtml = lastCorrectCountry.hebrew ? `<span class="hebrew-text text-2xl text-indigo-500 mt-1" dir="rtl">${lastCorrectCountry.hebrew}</span>` : '';
+
              lastAnswerEl.innerHTML = `
                 <p class="text-lg text-slate-400 mb-4 font-bold uppercase tracking-wider">The correct answer was</p>
                 <div class="flex flex-col md:flex-row items-center justify-center gap-6 text-3xl font-bold text-slate-700 bg-slate-50 p-6 rounded-3xl border-4 border-slate-100">
-                    <img src="https://flagcdn.com/${lastCorrectCountry.code}.svg" class="w-24 h-auto object-cover rounded-lg shadow-md">
+                    <img src="https://flagcdn.com/${lastCorrectCountry.code}.svg" class="w-24 h-auto object-contain rounded-lg shadow-md bg-white">
                     <div class="flex flex-col">
                         <span>${lastCorrectCountry.name}</span>
-                        <span class="hebrew-text text-2xl text-indigo-500 mt-1" dir="rtl">${lastCorrectCountry.hebrew}</span>
+                        ${hebrewHtml}
                     </div>
                 </div>
              `;
@@ -707,7 +565,6 @@
 
     /* --- D3 MAP RENDERING --- */
     function drawGlobe(container, targetIso3, isHint, isZoomed) {
-        // Clear previous
         container.innerHTML = '';
 
         const width = container.clientWidth;
@@ -721,12 +578,9 @@
 
         const feature = worldGeoJson.features.find(f => f.id === targetIso3);
 
-        const projection = d3.geoOrthographic()
-            .clipAngle(90);
+        const projection = d3.geoOrthographic().clipAngle(90);
 
-        // 1. Initial Scale/Rotation
         const defaultScale = Math.min(width, height) / 2 - (isHint ? 5 : 10);
-
         projection.scale(defaultScale).translate([width/2, height/2]);
 
         if (feature) {
@@ -736,47 +590,36 @@
             projection.rotate([0, 0]);
         }
 
-        // 2. Apply Zoom if active
         if (isZoomed && feature) {
-            // fitExtent adjusts scale and translate to fit the bounding box
-            // We give it some padding so it doesn't touch the edges
             const padding = 20;
             projection.fitExtent([[padding, padding], [width - padding, height - padding]], feature);
-
-            // Note: fitExtent works on the projected feature.
-            // Since we already rotated the globe to center the feature,
-            // fitExtent essentially "zooms in" on that centered aspect.
         }
 
         const path = d3.geoPath().projection(projection);
 
-        // 1. Ocean (Only visible if not zoomed in too much, or it becomes background)
         svg.append("path")
             .datum({type: "Sphere"})
             .attr("d", path)
-            .attr("fill", "#e0f2fe"); // Sky 100
+            .attr("fill", "#e0f2fe");
 
-        // 2. Land
         svg.selectAll("path.land")
             .data(worldGeoJson.features)
             .enter().append("path")
             .attr("d", path)
             .attr("fill", "#ffffff")
-            .attr("stroke", "#94a3b8") // Slate 400
-            .attr("stroke-width", isZoomed ? 0.2 : 0.5); // Thinner strokes when zoomed
+            .attr("stroke", "#94a3b8")
+            .attr("stroke-width", isZoomed ? 0.2 : 0.5);
 
-        // 3. Highlight
         if (feature) {
             svg.append("path")
                 .datum(feature)
                 .attr("d", path)
-                .attr("fill", "#fbbf24") // Amber 400
-                .attr("stroke", "#d97706") // Amber 600
+                .attr("fill", "#fbbf24")
+                .attr("stroke", "#d97706")
                 .attr("stroke-width", isZoomed ? 1.5 : 1);
         }
 
-        // 4. Border (Sphere outline)
-         svg.append("path")
+        svg.append("path")
             .datum({type: "Sphere"})
             .attr("d", path)
             .attr("fill", "none")
