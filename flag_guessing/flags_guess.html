@@ -313,7 +313,7 @@
             // Fetch both Map Data and Authoritative Country Data in parallel
             const [geoRes, countriesRes] = await Promise.all([
                 fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'),
-                fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3')
+                fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,independent,unMember')
             ]);
 
             worldGeoJson = await geoRes.json();
@@ -330,11 +330,17 @@
                     name: c.name.common,
                     code: c.cca2.toLowerCase(), // for flagcdn
                     iso3: c.cca3, // for d3 map
-                    hebrew: hebrewMap[codeUpper] || null // Map or null
+                    hebrew: hebrewMap[codeUpper] || null, // Map or null
+                    independent: c.independent,
+                    unMember: c.unMember
                 };
             }).filter(c => {
+                // Filter logic: Must be independent OR UN member
+                const isValidCountry = c.independent || c.unMember;
                 // Only keep countries that exist in the GeoJSON map to avoid blank globes
-                return worldGeoJson.features.some(f => f.id === c.iso3);
+                const hasMapData = worldGeoJson.features.some(f => f.id === c.iso3);
+
+                return isValidCountry && hasMapData;
             });
 
             // Ensure we have a decent number of countries
@@ -497,13 +503,14 @@
         const selectedBtn = ui.buttons[btnIndex];
         const isCorrect = btnIndex === correctIndex;
 
+        // Disable interaction immediately
         ui.buttons.forEach(btn => {
+            btn.disabled = true;
             const zoomBtn = btn.querySelector('button');
             if(zoomBtn) zoomBtn.disabled = true;
         });
 
         if (isCorrect) {
-            ui.buttons.forEach(btn => btn.disabled = true);
             score++;
             selectedBtn.classList.add('correct-state');
 
@@ -515,24 +522,36 @@
             setTimeout(() => {
                 updateUI();
                 generateRound();
-            }, 800);
+            }, 1000);
         } else {
             strikes++;
             updateUI();
 
             selectedBtn.classList.add('shake', 'wrong-state');
-            selectedBtn.disabled = true;
 
+            // X on wrong guess
             const x = document.createElement('div');
             x.className = 'absolute inset-0 flex items-center justify-center bg-red-400/20 z-20 animate-pop';
             x.innerHTML = '<span class="text-red-500 text-6xl font-black drop-shadow-md">✕</span>';
             selectedBtn.appendChild(x);
 
+            // Show Correct Answer
+            const correctBtn = ui.buttons[correctIndex];
+            correctBtn.classList.add('correct-state');
+            const check = document.createElement('div');
+            check.className = 'absolute inset-0 flex items-center justify-center bg-green-400/20 z-20 animate-pop';
+            check.innerHTML = '<span class="text-green-600 text-6xl font-black drop-shadow-md">✓</span>';
+            correctBtn.appendChild(check);
+
             if (strikes >= maxStrikes) {
-                ui.buttons.forEach(btn => btn.disabled = true);
                 setTimeout(() => {
                     endGame(currentOptions[correctIndex]);
-                }, 1000);
+                }, 1500);
+            } else {
+                // Wait longer so user can see correct answer, then proceed to NEXT question
+                setTimeout(() => {
+                    generateRound();
+                }, 2000);
             }
         }
     }
