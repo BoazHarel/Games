@@ -33,11 +33,11 @@
                 gap: 2rem;
             }
             .info-section {
-                width: 35%;
+                width: 25%; /* Reduced from 35% */
                 flex-shrink: 0;
             }
             .grid-section {
-                width: 65%;
+                width: 75%; /* Increased from 65% */
                 height: 100%;
                 display: flex;
                 align-items: center;
@@ -143,10 +143,11 @@
 </div>
 
 <!-- Game Screen -->
-<div id="game-screen" class="hidden game-layout w-full max-w-5xl h-full justify-between gap-4">
+<!-- Increased max-w to 7xl to allow buttons to get bigger -->
+<div id="game-screen" class="hidden game-layout w-full max-w-7xl h-full justify-between gap-4">
 
     <!-- Info Section -->
-    <div class="info-section flex flex-col gap-4 w-full h-full justify-start">
+    <div class="info-section flex flex-col gap-4 w-full h-full justify-start md:justify-center">
         <!-- Header -->
         <div class="flex justify-between items-center bg-white p-3 rounded-2xl shadow-sm border-b-4 border-blue-100 w-full">
             <button onclick="showMenu()"
@@ -164,8 +165,8 @@
         </div>
 
         <!-- Question & Hint Area -->
-        <div class="flex-grow flex flex-col items-center justify-center text-center py-2 bg-white/50 rounded-2xl md:bg-transparent min-h-[250px]">
-            <p class="text-gray-500 text-lg mb-1 font-semibold">Where is...</p>
+        <!-- Removed "Where is..." text, reduced min-height -->
+        <div class="flex-grow flex flex-col items-center justify-center text-center py-2 bg-white/50 rounded-2xl md:bg-transparent min-h-[150px]">
             <h1 id="country-name" class="text-3xl md:text-5xl font-bold text-gray-800 break-words w-full leading-tight">
                 Loading...</h1>
             <h2 id="country-name-he" dir="rtl"
@@ -173,7 +174,7 @@
 
             <!-- Hint Container -->
             <div id="hint-container"
-                 class="w-40 h-28 md:w-56 md:h-40 flex items-center justify-center mt-2 bg-white rounded-xl shadow-sm border-2 border-slate-100 p-2">
+                 class="w-32 h-24 md:w-48 md:h-36 flex items-center justify-center mt-2 bg-white rounded-xl shadow-sm border-2 border-slate-100 p-2">
                 <!-- Hint Content (Flag or Globe) Injected Here -->
             </div>
         </div>
@@ -328,7 +329,7 @@
         { name: "Qatar", hebrew: "קַטַר", code: "qa", iso3: "QAT" },
         { name: "Romania", hebrew: "רוֹמַנְיָה", code: "ro", iso3: "ROU" },
         { name: "Russia", hebrew: "רוּסְיָה", code: "ru", iso3: "RUS" },
-        { name: "Rwanda", hebrew: "רוּאַנְדָּה", code: "rw", iso3: "RWA" },
+        { name: "Rwanda", hebrew: "רוּאַנְדָּה", code: "rw", iso3: "RWA" },
         { name: "Saudi Arabia", hebrew: "עֲרַב הַסַּעוּדִית", code: "sa", iso3: "SAU" },
         { name: "Senegal", hebrew: "סֶנֶגָל", code: "sn", iso3: "SEN" },
         { name: "Serbia", hebrew: "סֶרְבְּיָה", code: "rs", iso3: "SRB" },
