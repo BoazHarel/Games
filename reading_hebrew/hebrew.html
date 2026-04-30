@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hebrew Words Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&family=Rubik:wght@400;500;700;900&display=swap');
+
+        :root {
+            --primary: #0ea5e9; /* Sky 500 */
+            --primary-dark: #0284c7; /* Sky 600 */
+            --bg-color: #f0f9ff; /* Sky 50 */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+
+        /* Essential for beautiful Hebrew rendering with Nikud */
+        .hebrew-text {
+            font-family: 'Rubik', sans-serif;
+            line-height: 1.4; /* Prevents nikud from being cut off */
+        }
+
+        /* --- 3D Playful Button Effect --- */
+        .game-btn {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform: translateY(0);
+            box-shadow: 0 8px 0 #cbd5e1;
+        }
+
+        .game-btn:active:not(:disabled) {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #cbd5e1;
+        }
+
+        .game-btn:disabled {
+            cursor: default;
+        }
+
+        /* Mode Selection Cards */
+        .mode-card {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 0 #cbd5e1;
+        }
+        .mode-card:hover { transform: translateY(-4px); box-shadow: 0 12px 0 #94a3b8; }
+        .mode-card:active { transform: translateY(8px); box-shadow: 0 0 0 #cbd5e1; }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            70% { transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* States */
+        .correct-state {
+            background-color: #86efac !important; /* Green 300 */
+            border-color: #22c55e !important;
+            box-shadow: 0 8px 0 #15803d !important;
+            color: #14532d;
+        }
+
+        .wrong-state {
+            background-color: #fca5a5 !important; /* Red 300 */
+            border-color: #ef4444 !important;
+            box-shadow: 0 8px 0 #b91c1c !important;
+        }
+
+        /* Grid Layout Logic */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            padding: 1rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            .game-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 2rem;
+                padding: 2rem;
+            }
+            .top-deck {
+                flex: 1;
+                height: 100%;
+                justify-content: center;
+            }
+            .bottom-deck {
+                flex: 1.2;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+<div id="menu-screen" class="fixed inset-0 z-40 flex flex-col items-center justify-center p-6 bg-sky-50">
+    <header class="text-center mb-10 animate-pop">
+        <div class="text-6xl mb-4 animate-float">🦉</div>
+        <h1 class="text-5xl md:text-7xl font-black text-sky-500 tracking-tight mb-2 drop-shadow-sm">Hebrew<br/>Playtime
+        </h1>
+        <p class="text-slate-500 font-bold text-xl">Learn words and read with Nikud!</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+        <button onclick="startGame('read_hebrew')"
+                class="mode-card group bg-white p-8 rounded-[2.5rem] border-4 border-slate-100 flex flex-col items-center">
+            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300 hebrew-text text-sky-500 font-bold"
+                 dir="rtl">א
+            </div>
+            <div class="text-3xl font-extrabold text-slate-700 mb-2">Read Hebrew</div>
+            <div class="text-slate-500 text-lg font-semibold text-center">See the Hebrew word, pick the right picture!
+            </div>
+        </button>
+
+        <button onclick="startGame('find_hebrew')"
+                class="mode-card group bg-white p-8 rounded-[2.5rem] border-4 border-slate-100 flex flex-col items-center">
+            <div class="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">🍎</div>
+            <div class="text-3xl font-extrabold text-slate-700 mb-2">Find Hebrew</div>
+            <div class="text-slate-500 text-lg font-semibold text-center">See the picture, pick the right Hebrew word!
+            </div>
+        </button>
+    </div>
+</div>
+
+<div id="game-screen" class="hidden game-container">
+    <!-- TOP DECK (Question Area) -->
+    <div class="top-deck flex flex-col w-full shrink-0 relative z-10">
+        <!-- Header Bar -->
+        <div class="flex items-center justify-between mb-4 md:mb-8">
+            <button onclick="showMenu()"
+                    class="p-3 rounded-2xl bg-white shadow-sm border-2 border-slate-200 hover:bg-slate-50 active:scale-95 transition-all text-slate-500 font-black text-sm">
+                ✕ QUIT
+            </button>
+            <div class="flex items-center gap-4 bg-white px-5 py-2 rounded-3xl shadow-sm border-2 border-slate-200">
+                <div class="flex items-center gap-2">
+                    <span class="text-amber-400 text-2xl">⭐</span>
+                    <span id="score" class="font-black text-slate-700 text-2xl">0</span>
+                </div>
+                <div class="w-1 h-8 bg-slate-100 rounded-full"></div>
+                <div id="hearts-container" class="flex gap-1 text-2xl"></div>
+            </div>
+        </div>
+
+        <!-- Question Box -->
+        <div class="flex-grow flex flex-col items-center justify-center text-center p-6 bg-white rounded-[3rem] shadow-lg border-4 border-slate-100 relative w-full mb-4 md:mb-0">
+            <h2 id="instruction-label" class="text-base font-black text-sky-400 uppercase tracking-widest mb-4">Choose
+                the matching picture</h2>
+
+            <div id="question-display" class="flex flex-col items-center justify-center min-h-[160px] w-full">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM DECK (Answers Area) -->
+    <div class="bottom-deck w-full flex-grow">
+        <div class="grid grid-cols-2 grid-rows-2 gap-4 md:gap-6 h-full w-full pb-4">
+            <button id="btn-0" onclick="handleGuess(0)"
+                    class="game-btn bg-white rounded-[2.5rem] border-4 border-slate-100 flex items-center justify-center p-4 overflow-hidden"></button>
+            <button id="btn-1" onclick="handleGuess(1)"
+                    class="game-btn bg-white rounded-[2.5rem] border-4 border-slate-100 flex items-center justify-center p-4 overflow-hidden"></button>
+            <button id="btn-2" onclick="handleGuess(2)"
+                    class="game-btn bg-white rounded-[2.5rem] border-4 border-slate-100 flex items-center justify-center p-4 overflow-hidden"></button>
+            <button id="btn-3" onclick="handleGuess(3)"
+                    class="game-btn bg-white rounded-[2.5rem] border-4 border-slate-100 flex items-center justify-center p-4 overflow-hidden"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Game Over Screen -->
+<div id="game-over-screen"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 text-center shadow-2xl animate-pop relative overflow-hidden border-8 border-sky-100">
+        <div class="text-8xl mb-6 drop-shadow-md animate-bounce">🏆</div>
+        <h2 class="text-5xl font-black text-slate-800 mb-2">Great Job!</h2>
+
+        <p class="text-slate-500 mb-8 font-bold text-2xl">You scored <span id="final-score"
+                                                                           class="text-sky-500 text-4xl font-black">0</span>
+            stars!</p>
+
+        <div id="last-answer-display"
+             class="mb-8 hidden w-full bg-slate-50 rounded-3xl p-4 border-4 border-slate-100"></div>
+
+        <button onclick="restartGame()"
+                class="w-full bg-sky-400 hover:bg-sky-500 text-white text-3xl font-black py-6 rounded-[2rem] shadow-[0_8px_0_rgb(2,132,199)] active:shadow-none active:translate-y-2 transition-all mb-6">
+            Play Again!
+        </button>
+        <button onclick="showMenu()" class="text-slate-400 font-bold hover:text-slate-600 text-lg">Back to Menu</button>
+    </div>
+</div>
+
+<script>
+    /* --- VOCABULARY DATA --- */
+    const hebrewVocabulary = [
+        // Original 30
+        { emoji: "🍎", hebrew: "תַּפּוּחַ", english: "Apple" },
+        { emoji: "🐶", hebrew: "כֶּלֶב", english: "Dog" },
+        { emoji: "🐱", hebrew: "חָתוּל", english: "Cat" },
+        { emoji: "🏠", hebrew: "בַּיִת", english: "House" },
+        { emoji: "☀️", hebrew: "שֶׁמֶשׁ", english: "Sun" },
+        { emoji: "🚗", hebrew: "מְכוֹנִית", english: "Car" },
+        { emoji: "🍌", hebrew: "בָּנָנָה", english: "Banana" },
+        { emoji: "📖", hebrew: "סֵפֶר", english: "Book" },
+        { emoji: "🌳", hebrew: "עֵץ", english: "Tree" },
+        { emoji: "💧", hebrew: "מַיִם", english: "Water" },
+        { emoji: "👦", hebrew: "יֶלֶד", english: "Boy" },
+        { emoji: "👧", hebrew: "יַלְדָּה", english: "Girl" },
+        { emoji: "⚽", hebrew: "כַּדּוּר", english: "Ball" },
+        { emoji: "🐦", hebrew: "צִפּוֹר", english: "Bird" },
+        { emoji: "🐟", hebrew: "דָּג", english: "Fish" },
+        { emoji: "🚂", hebrew: "רַכֶּבֶת", english: "Train" },
+        { emoji: "🐴", hebrew: "סוּס", english: "Horse" },
+        { emoji: "🐮", hebrew: "פָּרָה", english: "Cow" },
+        { emoji: "🌙", hebrew: "יָרֵחַ", english: "Moon" },
+        { emoji: "⭐", hebrew: "כּוֹכָב", english: "Star" },
+        { emoji: "❤️", hebrew: "לֵב", english: "Heart" },
+        { emoji: "🌻", hebrew: "פֶּרַח", english: "Flower" },
+        { emoji: "🔥", hebrew: "אֵשׁ", english: "Fire" },
+        { emoji: "🪑", hebrew: "כִּסֵּא", english: "Chair" },
+        { emoji: "🚪", hebrew: "דֶּלֶת", english: "Door" },
+        { emoji: "👁️", hebrew: "עַיִן", english: "Eye" },
+        { emoji: "👂", hebrew: "אוֹזֶן", english: "Ear" },
+        { emoji: "👄", hebrew: "פֶּה", english: "Mouth" },
+        { emoji: "👃", hebrew: "אַף", english: "Nose" },
+        { emoji: "✋", hebrew: "יָד", english: "Hand" },
+
+        // Animals
+        { emoji: "🦁", hebrew: "אַרְיֵה", english: "Lion" },
+        { emoji: "🐯", hebrew: "נָמֵר", english: "Tiger" },
+        { emoji: "🐻", hebrew: "דּוֹב", english: "Bear" },
+        { emoji: "🐘", hebrew: "פִּיל", english: "Elephant" },
+        { emoji: "🐒", hebrew: "קוֹף", english: "Monkey" },
+        { emoji: "🐍", hebrew: "נָחָשׁ", english: "Snake" },
+        { emoji: "🐸", hebrew: "צְפַרְדֵּעַ", english: "Frog" },
+        { emoji: "🐢", hebrew: "צָב", english: "Turtle" },
+        { emoji: "🐰", hebrew: "אַרְנָב", english: "Rabbit" },
+        { emoji: "🐭", hebrew: "עַכְבָּר", english: "Mouse" },
+        { emoji: "🐷", hebrew: "חֲזִיר", english: "Pig" },
+        { emoji: "🐑", hebrew: "כֶּבֶשׂ", english: "Sheep" },
+        { emoji: "🐐", hebrew: "עֵז", english: "Goat" },
+        { emoji: "🐔", hebrew: "תַּרְנְגוֹל", english: "Rooster" },
+        { emoji: "🦆", hebrew: "בַּרְוָז", english: "Duck" },
+        { emoji: "🐧", hebrew: "פִּינְגְוִין", english: "Penguin" },
+        { emoji: "🦉", hebrew: "יַנְשׁוּף", english: "Owl" },
+        { emoji: "🐝", hebrew: "דְּבוֹרָה", english: "Bee" },
+        { emoji: "🦋", hebrew: "פַּרְפַּר", english: "Butterfly" },
+        { emoji: "🐞", hebrew: "חִפּוּשִׁית", english: "Ladybug" },
+        { emoji: "🐜", hebrew: "נְמָלָה", english: "Ant" },
+        { emoji: "🕷️", hebrew: "עַכָּבִישׁ", english: "Spider" },
+        { emoji: "🐬", hebrew: "דּוֹלְפִין", english: "Dolphin" },
+        { emoji: "🐳", hebrew: "לִוְיָתָן", english: "Whale" },
+        { emoji: "🦈", hebrew: "כָּרִישׁ", english: "Shark" },
+        { emoji: "🐙", hebrew: "תְּמָנוּן", english: "Octopus" },
+        { emoji: "🦀", hebrew: "סַרְטָן", english: "Crab" },
+        { emoji: "🐌", hebrew: "חִלָּזוֹן", english: "Snail" },
+        { emoji: "🦇", hebrew: "עֲטַלֵּף", english: "Bat" },
+        { emoji: "🐺", hebrew: "זְאֵב", english: "Wolf" },
+
+        // Food
+        { emoji: "🍞", hebrew: "לֶחֶם", english: "Bread" },
+        { emoji: "🧀", hebrew: "גְּבִינָה", english: "Cheese" },
+        { emoji: "🥚", hebrew: "בֵּיצָה", english: "Egg" },
+        { emoji: "🥩", hebrew: "בָּשָׂר", english: "Meat" },
+        { emoji: "🍗", hebrew: "עוֹף", english: "Chicken" },
+        { emoji: "🍔", hebrew: "הַמְבּוּרְגֶּר", english: "Hamburger" },
+        { emoji: "🍕", hebrew: "פִּיצָה", english: "Pizza" },
+        { emoji: "🍟", hebrew: "צִ'יפְּס", english: "Fries" },
+        { emoji: "🥗", hebrew: "סָלָט", english: "Salad" },
+        { emoji: "🍲", hebrew: "מָרָק", english: "Soup" },
+        { emoji: "🍉", hebrew: "אֲבַטִּיחַ", english: "Watermelon" },
+        { emoji: "🍇", hebrew: "עֲנָבִים", english: "Grapes" },
+        { emoji: "🍓", hebrew: "תּוּת", english: "Strawberry" },
+        { emoji: "🍒", hebrew: "דֻּבְדְּבָן", english: "Cherry" },
+        { emoji: "🍑", hebrew: "אֲפַרְסֵק", english: "Peach" },
+        { emoji: "🍍", hebrew: "אֲנָנָס", english: "Pineapple" },
+        { emoji: "🥝", hebrew: "קִיוִי", english: "Kiwi" },
+        { emoji: "🍅", hebrew: "עַגְבָנִיָּה", english: "Tomato" },
+        { emoji: "🥒", hebrew: "מְלָפְפוֹן", english: "Cucumber" },
+        { emoji: "🥕", hebrew: "גֶּזֶר", english: "Carrot" },
+        { emoji: "🌽", hebrew: "תִּירָס", english: "Corn" },
+        { emoji: "🥔", hebrew: "תַּפּוּחַ אֲדָמָה", english: "Potato" },
+        { emoji: "🧅", hebrew: "בָּצָל", english: "Onion" },
+        { emoji: "🥜", hebrew: "בּוֹטֶן", english: "Peanut" },
+        { emoji: "🍯", hebrew: "דְּבַשׁ", english: "Honey" },
+        { emoji: "🥛", hebrew: "חָלָב", english: "Milk" },
+        { emoji: "🧃", hebrew: "מִיץ", english: "Juice" },
+        { emoji: "🍰", hebrew: "עוּגָה", english: "Cake" },
+        { emoji: "🍪", hebrew: "עוּגִיָּה", english: "Cookie" },
+        { emoji: "🍫", hebrew: "שׁוֹקוֹלָד", english: "Chocolate" },
+        { emoji: "🍬", hebrew: "סֻכָּרִיָּה", english: "Candy" },
+        { emoji: "🍦", hebrew: "גְּלִידָה", english: "Ice Cream" },
+
+        // Body & People
+        { emoji: "🦶", hebrew: "רֶגֶל", english: "Foot" },
+        { emoji: "🦷", hebrew: "שֵׁן", english: "Tooth" },
+        { emoji: "👅", hebrew: "לָשׁוֹן", english: "Tongue" },
+        { emoji: "🧠", hebrew: "מוֹחַ", english: "Brain" },
+        { emoji: "🦴", hebrew: "עֶצֶם", english: "Bone" },
+        { emoji: "👶", hebrew: "תִּינוֹק", english: "Baby" },
+        { emoji: "👨", hebrew: "אִישׁ", english: "Man" },
+        { emoji: "👩", hebrew: "אִשָּׁה", english: "Woman" },
+        { emoji: "👴", hebrew: "סַבָּא", english: "Grandpa" },
+        { emoji: "👵", hebrew: "סָבְתָא", english: "Grandma" },
+        { emoji: "👑", hebrew: "מֶלֶךְ", english: "King" },
+        { emoji: "👸", hebrew: "מַלְכָּה", english: "Queen" },
+        { emoji: "👮", hebrew: "שׁוֹטֵר", english: "Police" },
+        { emoji: "👨‍🚒", hebrew: "כַּבַּאי", english: "Firefighter" },
+        { emoji: "👨‍⚕️", hebrew: "רוֹפֵא", english: "Doctor" },
+        { emoji: "👩‍🏫", hebrew: "מוֹרָה", english: "Teacher" },
+
+        // Home & Objects
+        { emoji: "🛏️", hebrew: "מִטָּה", english: "Bed" },
+        { emoji: "🛋️", hebrew: "סַפָּה", english: "Couch" },
+        { emoji: "🪟", hebrew: "חַלּוֹן", english: "Window" },
+        { emoji: "🔑", hebrew: "מַפְתֵּחַ", english: "Key" },
+        { emoji: "🛁", hebrew: "אַמְבַּטְיָה", english: "Bathtub" },
+        { emoji: "🧼", hebrew: "סַבּוֹן", english: "Soap" },
+        { emoji: "🪥", hebrew: "מִבְרֶשֶׁת", english: "Brush" },
+        { emoji: "📺", hebrew: "טֶלֶוִיזְיָה", english: "Television" },
+        { emoji: "💻", hebrew: "מַחְשֵׁב", english: "Computer" },
+        { emoji: "📱", hebrew: "טֶלֶפוֹן", english: "Phone" },
+        { emoji: "💡", hebrew: "מְנוֹרָה", english: "Lamp" },
+        { emoji: "📸", hebrew: "מַצְלֵמָה", english: "Camera" },
+        { emoji: "🕰️", hebrew: "שָׁעוֹן", english: "Clock" },
+        { emoji: "🗑️", hebrew: "פַּח", english: "Trash can" },
+        { emoji: "✂️", hebrew: "מִסְפָּרַיִם", english: "Scissors" },
+        { emoji: "✏️", hebrew: "עִפָּרוֹן", english: "Pencil" },
+        { emoji: "🖍️", hebrew: "צֶבַע", english: "Crayon" },
+        { emoji: "🎒", hebrew: "תִּיק", english: "Backpack" },
+        { emoji: "🎁", hebrew: "מַתָּנָה", english: "Gift" },
+        { emoji: "🎈", hebrew: "בָּלוֹן", english: "Balloon" },
+        { emoji: "🧸", hebrew: "דֻּבִּי", english: "Teddy Bear" },
+        { emoji: "🪁", hebrew: "עֲפִיפוֹן", english: "Kite" },
+
+        // Transport & Places
+        { emoji: "🚲", hebrew: "אוֹפַנַּיִם", english: "Bicycle" },
+        { emoji: "🛵", hebrew: "קַטְנוֹעַ", english: "Scooter" },
+        { emoji: "🏍️", hebrew: "אוֹפַנּוֹעַ", english: "Motorcycle" },
+        { emoji: "🚌", hebrew: "אוֹטוֹבּוּס", english: "Bus" },
+        { emoji: "🚑", hebrew: "אַמְבּוּלַנְס", english: "Ambulance" },
+        { emoji: "🚜", hebrew: "טְרַקְטוֹר", english: "Tractor" },
+        { emoji: "🚢", hebrew: "אֳנִיָּה", english: "Ship" },
+        { emoji: "⛵", hebrew: "סִירָה", english: "Boat" },
+        { emoji: "✈️", hebrew: "מָטוֹס", english: "Airplane" },
+        { emoji: "🚁", hebrew: "מַסּוֹק", english: "Helicopter" },
+        { emoji: "🚀", hebrew: "טִיל", english: "Rocket" },
+        { emoji: "⛺", hebrew: "אֹהֶל", english: "Tent" },
+        { emoji: "🏰", hebrew: "טִירָה", english: "Castle" },
+        { emoji: "🏫", hebrew: "בֵּית סֵפֶר", english: "School" },
+        { emoji: "🏪", hebrew: "חֲנוּת", english: "Store" },
+
+        // Nature & Weather
+        { emoji: "☁️", hebrew: "עָנָן", english: "Cloud" },
+        { emoji: "🌧️", hebrew: "גֶּשֶׁם", english: "Rain" },
+        { emoji: "❄️", hebrew: "שֶׁלֶג", english: "Snow" },
+        { emoji: "⚡", hebrew: "בָּרָק", english: "Lightning" },
+        { emoji: "🌈", hebrew: "קֶשֶׁת", english: "Rainbow" },
+        { emoji: "🌊", hebrew: "גַּל", english: "Wave" },
+        { emoji: "🌎", hebrew: "כַּדּוּר הָאָרֶץ", english: "Earth" },
+        { emoji: "⛰️", hebrew: "הַר", english: "Mountain" },
+        { emoji: "🏝️", hebrew: "אִי", english: "Island" },
+        { emoji: "🌿", hebrew: "עָלֶה", english: "Leaf" },
+        { emoji: "🐚", hebrew: "קוֹנְכִיָּה", english: "Shell" },
+        { emoji: "🪨", hebrew: "אֶבֶן", english: "Stone" },
+
+        // Clothes
+        { emoji: "👕", hebrew: "חֻלְצָה", english: "Shirt" },
+        { emoji: "👖", hebrew: "מִכְנָסַיִם", english: "Pants" },
+        { emoji: "👗", hebrew: "שִׂמְלָה", english: "Dress" },
+        { emoji: "🧥", hebrew: "מְעִיל", english: "Coat" },
+        { emoji: "🧦", hebrew: "גֶּרֶב", english: "Sock" },
+        { emoji: "👟", hebrew: "נַעַל", english: "Shoe" },
+        { emoji: "👒", hebrew: "כּוֹבַע", english: "Hat" },
+        { emoji: "🧣", hebrew: "צָעִיף", english: "Scarf" },
+        { emoji: "🧤", hebrew: "כְּפָפָה", english: "Glove" },
+        { emoji: "👓", hebrew: "מִשְׁקָפַיִם", english: "Glasses" },
+        { emoji: "☂️", hebrew: "מִטְרִיָּה", english: "Umbrella" },
+
+        // Colors
+        { emoji: "🔴", hebrew: "אָדֹם", english: "Red" },
+        { emoji: "🔵", hebrew: "כָּחֹל", english: "Blue" },
+        { emoji: "🟢", hebrew: "יָרוֹק", english: "Green" },
+        { emoji: "🟡", hebrew: "צָהוֹב", english: "Yellow" },
+        { emoji: "⚫", hebrew: "שָׁחוֹר", english: "Black" },
+        { emoji: "⚪", hebrew: "לָבָן", english: "White" },
+        { emoji: "🟠", hebrew: "כָּתֹם", english: "Orange" },
+        { emoji: "🟣", hebrew: "סָגוֹל", english: "Purple" },
+        { emoji: "🌸", hebrew: "וָרוֹד", english: "Pink" },
+        { emoji: "🟤", hebrew: "חוּם", english: "Brown" },
+        { emoji: "🔘", hebrew: "אָפוֹר", english: "Gray" },
+
+        // Numbers
+        { emoji: "1️⃣", hebrew: "אֶחָד", english: "One" },
+        { emoji: "2️⃣", hebrew: "שְׁנַיִם", english: "Two" },
+        { emoji: "3️⃣", hebrew: "שָׁלוֹשׁ", english: "Three" },
+        { emoji: "4️⃣", hebrew: "אַרְבַּע", english: "Four" },
+        { emoji: "5️⃣", hebrew: "חָמֵשׁ", english: "Five" },
+        { emoji: "6️⃣", hebrew: "שֵׁשׁ", english: "Six" },
+        { emoji: "7️⃣", hebrew: "שֶׁבַע", english: "Seven" },
+        { emoji: "8️⃣", hebrew: "שְׁמוֹנֶה", english: "Eight" },
+        { emoji: "9️⃣", hebrew: "תֵּשַׁע", english: "Nine" },
+        { emoji: "🔟", hebrew: "עֶשֶׂר", english: "Ten" },
+
+        // More Animals
+        { emoji: "🦕", hebrew: "דִּינוֹזָאוּר", english: "Dinosaur" },
+        { emoji: "🐪", hebrew: "גָּמָל", english: "Camel" },
+        { emoji: "🦓", hebrew: "זֶבְּרָה", english: "Zebra" },
+        { emoji: "🦒", hebrew: "גִּ'ירָפָה", english: "Giraffe" },
+        { emoji: "🦘", hebrew: "קֶנְגּוּרוּ", english: "Kangaroo" },
+        { emoji: "🦛", hebrew: "הִיפּוֹפּוֹטָם", english: "Hippo" },
+        { emoji: "🦏", hebrew: "קַרְנַף", english: "Rhino" },
+        { emoji: "🐊", hebrew: "תַּנִּין", english: "Crocodile" },
+        { emoji: "🦩", hebrew: "פְלָמִינְגּוֹ", english: "Flamingo" },
+        { emoji: "🦚", hebrew: "טַוָּס", english: "Peacock" },
+        { emoji: "🦢", hebrew: "בַּרְבּוּר", english: "Swan" },
+        { emoji: "🦜", hebrew: "תֻּכִּי", english: "Parrot" },
+        { emoji: "🐿️", hebrew: "סְנָאִי", english: "Squirrel" },
+        { emoji: "🦔", hebrew: "קִפּוֹד", english: "Hedgehog" },
+
+        // More Food
+        { emoji: "🌭", hebrew: "נַקְנִיקִיָּה", english: "Hotdog" },
+        { emoji: "🥪", hebrew: "כָּרִיךְ", english: "Sandwich" },
+        { emoji: "🍿", hebrew: "פּוֹפְּקוֹרְן", english: "Popcorn" },
+        { emoji: "🍩", hebrew: "סֻפְגָּנִיָּה", english: "Donut" },
+        { emoji: "🥞", hebrew: "חֲבִיתִיּוֹת", english: "Pancakes" },
+        { emoji: "🧇", hebrew: "וָפֶל", english: "Waffle" },
+        { emoji: "🍣", hebrew: "סוּשִׁי", english: "Sushi" },
+        { emoji: "🥑", hebrew: "אֲבוֹקָדוֹ", english: "Avocado" },
+        { emoji: "🍋", hebrew: "לִימוֹן", english: "Lemon" },
+        { emoji: "🥭", hebrew: "מַנְגּוֹ", english: "Mango" },
+        { emoji: "🥥", hebrew: "קוֹקוּס", english: "Coconut" },
+        { emoji: "🧄", hebrew: "שׁוּם", english: "Garlic" },
+        { emoji: "🥦", hebrew: "בְּרוֹקוֹלִי", english: "Broccoli" },
+        { emoji: "🍄", hebrew: "פִּטְרִיָּה", english: "Mushroom" },
+        { emoji: "🧂", hebrew: "מֶלַח", english: "Salt" },
+        { emoji: "☕", hebrew: "קָפֶה", english: "Coffee" },
+        { emoji: "🍵", hebrew: "תֵּה", english: "Tea" },
+
+        // Toys & Music
+        { emoji: "🪀", hebrew: "יוֹ־יוֹ", english: "Yo-yo" },
+        { emoji: "🧩", hebrew: "פַּאזֶל", english: "Puzzle" },
+        { emoji: "🎸", hebrew: "גִּיטָרָה", english: "Guitar" },
+        { emoji: "🎨", hebrew: "צְבָעִים", english: "Paints" },
+        { emoji: "🥁", hebrew: "תֹּף", english: "Drum" },
+        { emoji: "🎮", hebrew: "מִשְׂחָק", english: "Video Game" },
+        { emoji: "🛹", hebrew: "סְקֵייטְבּוֹרְד", english: "Skateboard" },
+        { emoji: "🎹", hebrew: "פְּסַנְתֵּר", english: "Piano" },
+        { emoji: "🎻", hebrew: "כִּנּוֹר", english: "Violin" },
+        { emoji: "🎺", hebrew: "חֲצוֹצְרָה", english: "Trumpet" },
+        { emoji: "🎤", hebrew: "מִיקְרוֹפוֹן", english: "Microphone" },
+        { emoji: "🎧", hebrew: "אָזְנִיּוֹת", english: "Headphones" },
+
+        // Tools & Objects
+        { emoji: "🚰", hebrew: "בֶּרֶז", english: "Faucet" },
+        { emoji: "🧻", hebrew: "נְיָר", english: "Paper" },
+        { emoji: "🧺", hebrew: "סַל", english: "Basket" },
+        { emoji: "🧹", hebrew: "מַטְאֲטֵא", english: "Broom" },
+        { emoji: "🧽", hebrew: "סְפוֹג", english: "Sponge" },
+        { emoji: "🕯️", hebrew: "נֵר", english: "Candle" },
+        { emoji: "🔨", hebrew: "פַּטִּישׁ", english: "Hammer" },
+        { emoji: "🪚", hebrew: "מַסּוֹר", english: "Saw" },
+        { emoji: "🧲", hebrew: "מַגְנֵט", english: "Magnet" },
+        { emoji: "🔍", hebrew: "זְכוּכִית מַגְדֶּלֶת", english: "Magnifying Glass" },
+        { emoji: "🔋", hebrew: "סוֹלְלָה", english: "Battery" },
+
+        // Emotions
+        { emoji: "😀", hebrew: "שָׂמֵחַ", english: "Happy" },
+        { emoji: "😢", hebrew: "עָצוּב", english: "Sad" },
+        { emoji: "😡", hebrew: "כּוֹעֵס", english: "Angry" },
+        { emoji: "😴", hebrew: "עָיֵף", english: "Tired" },
+        { emoji: "😱", hebrew: "מוּפְתָּע", english: "Surprised" },
+
+        // Places
+        { emoji: "🏥", hebrew: "בֵּית חוֹלִים", english: "Hospital" },
+        { emoji: "🏦", hebrew: "בַּנְק", english: "Bank" },
+        { emoji: "🏞️", hebrew: "פָּארְק", english: "Park" },
+        { emoji: "🎪", hebrew: "קִרְקָס", english: "Circus" },
+
+        // Accessories
+        { emoji: "👔", hebrew: "עֲנִיבָה", english: "Tie" },
+        { emoji: "🩳", hebrew: "מִכְנָסַיִם קְצָרִים", english: "Shorts" },
+        { emoji: "👢", hebrew: "מַגָּפַיִם", english: "Boots" },
+        { emoji: "👑", hebrew: "כֶּתֶר", english: "Crown" },
+        { emoji: "💍", hebrew: "טַבַּעַת", english: "Ring" },
+        { emoji: "💎", hebrew: "יַהֲלוֹם", english: "Diamond" },
+
+        // More Nature
+        { emoji: "🪐", hebrew: "כּוֹכַב לֶכֶת", english: "Planet" },
+        { emoji: "☄️", hebrew: "שָׁבִיט", english: "Comet" },
+        { emoji: "🏜️", hebrew: "מִדְבָּר", english: "Desert" },
+        { emoji: "🌋", hebrew: "הַר גַּעַשׁ", english: "Volcano" },
+        { emoji: "🌲", hebrew: "יַעַר", english: "Forest" },
+        { emoji: "🌵", hebrew: "קַקְטוּס", english: "Cactus" },
+        { emoji: "🌻", hebrew: "חַמָּנִיָּה", english: "Sunflower" }
+    ];
+
+    /* --- STREAMING_CHUNK:Game State and Elements --- */
+    let score = 0;
+    let strikes = 0;
+    const maxStrikes = 3;
+    let currentMode = 'read_hebrew';
+    let currentOptions = [];
+    let correctIndex = 0;
+    let gameActive = false;
+    let wordQueue = [];
+
+    const screens = {
+        menu: document.getElementById('menu-screen'),
+        game: document.getElementById('game-screen'),
+        over: document.getElementById('game-over-screen')
+    };
+
+    const ui = {
+        score: document.getElementById('score'),
+        hearts: document.getElementById('hearts-container'),
+        instruction: document.getElementById('instruction-label'),
+        questionDisplay: document.getElementById('question-display'),
+        finalScore: document.getElementById('final-score'),
+        buttons: [
+            document.getElementById('btn-0'),
+            document.getElementById('btn-1'),
+            document.getElementById('btn-2'),
+            document.getElementById('btn-3')
+        ]
+    };
+
+    /* --- STREAMING_CHUNK:Core Game Logic --- */
+    function shuffleArray(array) {
+        let newArr = [...array];
+        for (let i = newArr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+        }
+        return newArr;
+    }
+
+    function showMenu() {
+        gameActive = false;
+        screens.game.classList.add('hidden');
+        screens.over.classList.add('hidden');
+        screens.menu.classList.remove('hidden');
+        screens.menu.classList.add('flex');
+    }
+
+    function startGame(mode) {
+        currentMode = mode;
+        score = 0;
+        strikes = 0;
+        wordQueue = shuffleArray(hebrewVocabulary);
+
+        updateUI();
+
+        screens.menu.classList.add('hidden');
+        screens.menu.classList.remove('flex');
+        screens.over.classList.add('hidden');
+        screens.game.classList.remove('hidden');
+        screens.game.classList.add('flex');
+
+        gameActive = true;
+        generateRound();
+    }
+
+    function restartGame() {
+        startGame(currentMode);
+    }
+
+    function updateUI() {
+        ui.score.textContent = score;
+        let heartsHTML = '';
+        for(let i=0; i<maxStrikes; i++) {
+            if (i < (maxStrikes - strikes)) {
+                heartsHTML += '<span class="text-rose-500 animate-pop">❤️</span>';
+            } else {
+                heartsHTML += '<span class="text-slate-200 grayscale opacity-50">❤️</span>';
+            }
+        }
+        ui.hearts.innerHTML = heartsHTML;
+    }
+
+    /* --- STREAMING_CHUNK:Question Generation --- */
+    function generateRound() {
+        if (!gameActive) return;
+
+        // Reset Buttons
+        ui.buttons.forEach(btn => {
+            btn.className = "game-btn bg-white rounded-[2.5rem] border-4 border-slate-100 flex items-center justify-center p-4 overflow-hidden relative group hover:border-sky-200";
+            btn.disabled = false;
+            btn.innerHTML = '';
+        });
+
+        if (wordQueue.length === 0) {
+            wordQueue = shuffleArray(hebrewVocabulary);
+        }
+
+        const correctWord = wordQueue.pop();
+
+        // Get 3 distractors
+        let distractors = [];
+        let pool = hebrewVocabulary.filter(w => w.english !== correctWord.english);
+        pool = shuffleArray(pool);
+        distractors = pool.slice(0, 3);
+
+        currentOptions = shuffleArray([correctWord, ...distractors]);
+        correctIndex = currentOptions.indexOf(correctWord);
+
+        // Render based on mode
+        if (currentMode === 'read_hebrew') {
+            ui.instruction.textContent = "What does this mean?";
+
+            ui.questionDisplay.innerHTML = `
+                <div class="hebrew-text text-6xl md:text-8xl text-sky-500 font-black mb-2 animate-pop" dir="rtl">${correctWord.hebrew}</div>
+            `;
+
+            ui.buttons.forEach((btn, index) => {
+                const item = currentOptions[index];
+                btn.innerHTML = `
+                    <div class="flex flex-col items-center justify-center gap-1 md:gap-2">
+                        <span class="text-5xl md:text-6xl group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">${item.emoji}</span>
+                        <span class="text-lg md:text-xl font-bold text-slate-500">${item.english}</span>
+                    </div>
+                `;
+            });
+
+        } else {
+            ui.instruction.textContent = "Find the matching word";
+
+            ui.questionDisplay.innerHTML = `
+                <div class="text-7xl md:text-9xl mb-2 animate-pop drop-shadow-md">${correctWord.emoji}</div>
+                <div class="text-2xl font-bold text-slate-400 mt-4 bg-slate-50 px-6 py-2 rounded-full border-2 border-slate-100">${correctWord.english}</div>
+            `;
+
+            ui.buttons.forEach((btn, index) => {
+                const item = currentOptions[index];
+                btn.innerHTML = `<span class="hebrew-text text-3xl md:text-5xl font-bold text-slate-700 group-hover:text-sky-500 transition-colors" dir="rtl">${item.hebrew}</span>`;
+            });
+        }
+    }
+
+    /* --- STREAMING_CHUNK:Interaction Handling --- */
+    function handleGuess(btnIndex) {
+        if (!gameActive) return;
+
+        const selectedBtn = ui.buttons[btnIndex];
+        const isCorrect = btnIndex === correctIndex;
+
+        // Lock buttons
+        ui.buttons.forEach(btn => btn.disabled = true);
+
+        if (isCorrect) {
+            score++;
+            selectedBtn.classList.add('correct-state');
+
+            const check = document.createElement('div');
+            check.className = 'absolute inset-0 flex items-center justify-center bg-green-400/20 z-20 animate-pop rounded-[2.2rem]';
+            check.innerHTML = '<span class="text-green-600 text-7xl font-black drop-shadow-lg">✓</span>';
+            selectedBtn.appendChild(check);
+
+            setTimeout(() => {
+                updateUI();
+                generateRound();
+            }, 1000);
+
+        } else {
+            strikes++;
+            updateUI();
+
+            selectedBtn.classList.add('shake', 'wrong-state');
+
+            const x = document.createElement('div');
+            x.className = 'absolute inset-0 flex items-center justify-center bg-red-400/20 z-20 animate-pop rounded-[2.2rem]';
+            x.innerHTML = '<span class="text-red-500 text-7xl font-black drop-shadow-lg">✕</span>';
+            selectedBtn.appendChild(x);
+
+            // Highlight Correct Answer
+            const correctBtn = ui.buttons[correctIndex];
+            correctBtn.classList.add('correct-state');
+            const check = document.createElement('div');
+            check.className = 'absolute inset-0 flex items-center justify-center bg-green-400/20 z-20 animate-pop rounded-[2.2rem]';
+            check.innerHTML = '<span class="text-green-600 text-7xl font-black drop-shadow-lg">✓</span>';
+            correctBtn.appendChild(check);
+
+            if (strikes >= maxStrikes) {
+                setTimeout(() => {
+                    endGame(currentOptions[correctIndex]);
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    generateRound();
+                }, 2000);
+            }
+        }
+    }
+
+    /* --- STREAMING_CHUNK:Game Over Logic --- */
+    function endGame(lastCorrectWord) {
+        gameActive = false;
+        ui.finalScore.textContent = score;
+
+        const lastAnswerEl = document.getElementById('last-answer-display');
+        if (lastCorrectWord) {
+             lastAnswerEl.innerHTML = `
+                <p class="text-sm text-slate-400 mb-2 font-black uppercase tracking-widest">You missed</p>
+                <div class="flex items-center justify-center gap-4 text-slate-700">
+                    <span class="text-5xl drop-shadow-sm">${lastCorrectWord.emoji}</span>
+                    <div class="flex flex-col text-left">
+                        <span class="hebrew-text text-3xl text-sky-500 font-bold" dir="rtl">${lastCorrectWord.hebrew}</span>
+                        <span class="text-lg font-bold text-slate-400">${lastCorrectWord.english}</span>
+                    </div>
+                </div>
+             `;
+             lastAnswerEl.classList.remove('hidden');
+        } else {
+             lastAnswerEl.classList.add('hidden');
+        }
+
+        screens.over.classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
