@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Connect Four</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            touch-action: manipulation; /* Prevents double-tap zooming on mobile */
+        }
+
+        /* Custom bouncy drop animation for the chips */
+        @keyframes dropBounce {
+            0% { transform: translateY(var(--drop-start, -500%)); animation-timing-function: ease-in; }
+            70% { transform: translateY(0); animation-timing-function: ease-out; }
+            85% { transform: translateY(-15%); animation-timing-function: ease-in; }
+            100% { transform: translateY(0); }
+        }
+
+        .chip-drop {
+            animation: dropBounce 0.5s forwards;
+        }
+
+        /* Pop animation for the win modal */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .bounce-in {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+    </style>
+</head>
+
+<body class="bg-gradient-to-b from-sky-300 to-indigo-500 min-h-[100dvh] flex flex-col items-center justify-center p-2 sm:p-4 md:p-8 selection:bg-none overflow-x-hidden">
+
+<!-- Main Game Container: Scales beautifully across phone, tablet, and desktop -->
+<div class="w-full max-w-[95vw] sm:max-w-lg md:max-w-2xl lg:max-w-3xl bg-white/20 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] p-3 sm:p-6 md:p-8 shadow-2xl border-2 sm:border-4 border-white/40 max-h-[96dvh] flex flex-col mx-auto">
+
+    <!-- Header -->
+    <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-center text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)] mb-3 sm:mb-5 md:mb-6 tracking-wide shrink-0">
+        CONNECT 4
+    </h1>
+
+    <!-- Mode Toggles -->
+    <div class="flex gap-2 sm:gap-4 mb-3 sm:mb-5 md:mb-6 shrink-0">
+        <button id="btn-1p" onclick="setMode('1P')"
+                class="flex-1 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold transition-all flex items-center justify-center gap-1 sm:gap-2">
+            <span class="text-lg sm:text-2xl md:text-3xl">👤</span> <span
+                class="text-xs sm:text-base md:text-lg">vs</span> <span class="text-lg sm:text-2xl md:text-3xl">🤖</span>
+        </button>
+        <button id="btn-2p" onclick="setMode('2P')"
+                class="flex-1 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold transition-all flex items-center justify-center gap-1 sm:gap-2">
+            <span class="text-lg sm:text-2xl md:text-3xl">👤</span> <span
+                class="text-xs sm:text-base md:text-lg">vs</span> <span class="text-lg sm:text-2xl md:text-3xl">👤</span>
+        </button>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="flex justify-between items-center w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] mx-auto px-2 sm:px-4 mb-3 sm:mb-5 shrink-0">
+        <div class="flex flex-col items-center bg-white shadow-sm px-6 sm:px-8 py-1 sm:py-2 rounded-xl sm:rounded-2xl border-b-4 border-red-500 min-w-[80px] sm:min-w-[100px]">
+            <span class="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider">Red</span>
+            <span id="score-p1" class="text-2xl sm:text-4xl font-black text-red-600">0</span>
+        </div>
+        <div class="text-white font-black text-xl sm:text-2xl drop-shadow-md px-2">
+            VS
+        </div>
+        <div class="flex flex-col items-center bg-white shadow-sm px-6 sm:px-8 py-1 sm:py-2 rounded-xl sm:rounded-2xl border-b-4 border-yellow-500 min-w-[80px] sm:min-w-[100px]">
+            <span id="score-p2-label" class="text-xs sm:text-sm font-black text-yellow-500 uppercase tracking-wider">Robot</span>
+            <span id="score-p2" class="text-2xl sm:text-4xl font-black text-yellow-600">0</span>
+        </div>
+    </div>
+
+    <!-- Status Indicator -->
+    <div class="flex items-center justify-center gap-2 sm:gap-3 md:gap-4 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-inner mb-3 sm:mb-5 md:mb-6 transition-colors shrink-0"
+         id="status-card">
+        <span id="turn-avatar" class="text-2xl sm:text-4xl md:text-5xl">🔴</span>
+        <span id="status-text" class="text-xl sm:text-3xl md:text-4xl font-black text-red-500 drop-shadow-sm">Red's Turn!</span>
+    </div>
+
+    <!-- Game Area: Uses min() and relative sizing to fit the board perfectly on all screens -->
+    <div class="relative w-full select-none flex-grow flex flex-col justify-center items-center min-h-0">
+
+        <div class="w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] relative flex flex-col">
+            <!-- Indicator Layer (Shows where piece will fall) -->
+            <div id="indicators"
+                 class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 px-2 sm:px-3 md:px-4 mb-1 sm:mb-2 pointer-events-none w-full"></div>
+
+            <!-- Main Board Background (The blue plastic rack) -->
+            <div class="bg-blue-600 p-1.5 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-[0_4px_0_0_#1e3a8a,0_8px_10px_rgba(0,0,0,0.3)] sm:shadow-[0_8px_0_0_#1e3a8a,0_15px_20px_rgba(0,0,0,0.4)] border-2 sm:border-4 border-blue-400 relative">
+
+                <!-- Slots Container (The empty holes) -->
+                <div id="board" class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 relative z-0"></div>
+
+                <!-- Interaction Overlay (Captures clicks and touches for entire columns) -->
+                <div id="overlay"
+                     class="absolute inset-0 grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 p-1.5 sm:p-3 md:p-4 z-20"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- On-Screen Controls -->
+    <div class="flex justify-center items-center gap-3 sm:gap-6 mt-2 sm:mt-4 w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] mx-auto shrink-0 z-10 px-2">
+        <button onclick="moveLeft()"
+                class="bg-blue-500 hover:bg-blue-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] active:translate-y-[4px] active:shadow-none text-xl sm:text-3xl font-black w-16 sm:w-24 transition-all flex items-center justify-center">
+            ◀
+        </button>
+        <button onclick="dropPeg()"
+                class="bg-green-500 hover:bg-green-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#166534] active:translate-y-[4px] active:shadow-none text-lg sm:text-2xl font-black flex-1 transition-all">
+            DROP
+        </button>
+        <button onclick="moveRight()"
+                class="bg-blue-500 hover:bg-blue-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] active:translate-y-[4px] active:shadow-none text-xl sm:text-3xl font-black w-16 sm:w-24 transition-all flex items-center justify-center">
+            ▶
+        </button>
+    </div>
+
+    <!-- Reset Button -->
+    <div class="mt-4 sm:mt-6 md:mt-8 text-center shrink-0">
+        <button onclick="resetGame()"
+                class="bg-red-500 hover:bg-red-400 text-white px-6 sm:px-8 md:px-12 py-2 sm:py-3 md:py-4 rounded-full font-black text-lg sm:text-xl md:text-3xl shadow-[0_4px_0_0_#991b1b] sm:shadow-[0_6px_0_0_#991b1b] md:shadow-[0_8px_0_0_#991b1b] active:shadow-[0_0px_0_0_#991b1b] active:translate-y-[4px] sm:active:translate-y-[6px] md:active:translate-y-[8px] transition-all">
+            🔄 Restart
+        </button>
+    </div>
+</div>
+
+<!-- Win Modal Popup -->
+<div id="win-modal"
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4">
+    <div class="bg-white p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] text-center max-w-sm md:max-w-lg w-full bounce-in border-4 sm:border-8 border-white/50 bg-clip-padding">
+        <div id="win-icon" class="text-6xl sm:text-7xl md:text-8xl mb-2 sm:mb-4 drop-shadow-md">🎉🔴🎉</div>
+        <h2 id="win-title" class="text-3xl sm:text-4xl md:text-5xl font-black text-red-500 mb-6 sm:mb-8 drop-shadow-sm">
+            Red Wins!</h2>
+        <button onclick="resetGame()"
+                class="w-full bg-green-500 hover:bg-green-400 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full font-black text-xl sm:text-2xl md:text-3xl shadow-[0_4px_0_0_#166534] sm:shadow-[0_6px_0_0_#166534] active:shadow-[0_0px_0_0_#166534] active:translate-y-[4px] sm:active:translate-y-[6px] transition-all">
+            Play Again!
+        </button>
+    </div>
+</div>
+
+<script>
+    // --- Game Constants & State ---
+    const ROWS = 6;
+    const COLS = 7;
+    let board = [];
+    let currentPlayer = 1; // 1 = Red, 2 = Yellow
+    let gameMode = '1P';   // '1P' or '2P'
+    let isAnimating = false;
+    let gameOver = false;
+    let selectedCol = 3;   // Track selected column for controls
+    let winTimeout = null;
+    let currentWinningCells = null;
+    let scores = { 1: 0, 2: 0 };
+    const WINNING_SCORE = 10;
+    let matchOver = false;
+
+    // Audio Context for simple fun sound effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // --- Styling for the chips ---
+    function getChipStyle(player) {
+        if (player === 1) {
+            // Red Player Chip
+            return "bg-gradient-to-br from-red-400 via-red-500 to-red-700 shadow-[inset_0_3px_6px_rgba(255,255,255,0.4),0_4px_5px_rgba(0,0,0,0.5)] border-[1px] border-red-800";
+        } else {
+            // Yellow Player Chip
+            return "bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-600 shadow-[inset_0_3px_6px_rgba(255,255,255,0.6),0_4px_5px_rgba(0,0,0,0.5)] border-[1px] border-yellow-700";
+        }
+    }
+
+    function setupBoard() {
+        const boardEl = document.getElementById('board');
+        const overlayEl = document.getElementById('overlay');
+        const indicatorsEl = document.getElementById('indicators');
+
+        boardEl.innerHTML = '';
+        overlayEl.innerHTML = '';
+        indicatorsEl.innerHTML = '';
+
+        for (let c = 0; c < COLS; c++) {
+            // 1. Create Top Indicators (Shows hovering ghost chip)
+            const ind = document.createElement('div');
+            ind.id = `ind-${c}`;
+            ind.className = 'w-full aspect-square transition-opacity duration-200 opacity-0 flex items-center justify-center';
+            ind.innerHTML = `<div class="w-[85%] h-[85%] rounded-full opacity-60"></div>`;
+            indicatorsEl.appendChild(ind);
+
+            // 2. Create invisible Interaction Overlay columns (for easy clicking/tapping)
+            const colOverlay = document.createElement('div');
+            colOverlay.className = 'h-full w-full cursor-pointer rounded-full hover:bg-white/10 transition-colors z-20';
+            colOverlay.dataset.col = c;
+
+            // Add event listeners to update selected column and drop
+            colOverlay.addEventListener('mouseenter', () => { selectedCol = c; updateIndicator(); });
+            colOverlay.addEventListener('click', () => { selectedCol = c; dropPeg(); });
+
+            overlayEl.appendChild(colOverlay);
+        }
+
+        // 3. Create the dark empty holes of the board
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const slot = document.createElement('div');
+                slot.id = `slot-${r}-${c}`;
+                // The dark blue hole
+                slot.className = 'w-full aspect-square rounded-full bg-[#0a192f] shadow-[inset_0_4px_8px_rgba(0,0,0,0.8)] flex items-center justify-center relative z-0';
+                boardEl.appendChild(slot);
+            }
+        }
+    }
+
+    function updateIndicator() {
+        // Hide indicators during animation, game over, or AI's turn
+        if (gameOver || isAnimating || (gameMode === '1P' && currentPlayer === 2)) {
+            for (let c = 0; c < COLS; c++) {
+                const ind = document.getElementById(`ind-${c}`);
+                if (ind) ind.classList.add('opacity-0');
+            }
+            return;
+        }
+
+        for (let c = 0; c < COLS; c++) {
+            const ind = document.getElementById(`ind-${c}`);
+            if (!ind) continue;
+            if (c === selectedCol) {
+                ind.classList.remove('opacity-0');
+                ind.firstElementChild.className = `w-[85%] h-[85%] rounded-full opacity-70 ${getChipStyle(currentPlayer)}`;
+            } else {
+                ind.classList.add('opacity-0');
+            }
+        }
+    }
+
+    function moveLeft() {
+        if (gameOver || isAnimating || (gameMode === '1P' && currentPlayer === 2)) return;
+        if (selectedCol > 0) {
+            selectedCol--;
+            playSound('move');
+            updateIndicator();
+        }
+    }
+
+    function moveRight() {
+        if (gameOver || isAnimating || (gameMode === '1P' && currentPlayer === 2)) return;
+        if (selectedCol < COLS - 1) {
+            selectedCol++;
+            playSound('move');
+            updateIndicator();
+        }
+    }
+
+    function dropPeg() {
+        if (gameOver || isAnimating || (gameMode === '1P' && currentPlayer === 2)) return;
+        playCol(selectedCol);
+    }
+
+    function playCol(col) {
+        const row = getLowestEmptyRow(col);
+
+        // Column is completely full
+        if (row === -1) {
+            playSound('error');
+            return;
+        }
+
+        isAnimating = true;
+        updateIndicator(); // Hide the indicator while animating
+        board[row][col] = currentPlayer; // Logically place piece
+
+        // Visually place and animate the piece
+        const slot = document.getElementById(`slot-${row}-${col}`);
+        const chip = document.createElement('div');
+
+        // Render the colored chip
+        chip.className = `w-[85%] h-[85%] rounded-full absolute z-10 chip-drop ${getChipStyle(currentPlayer)}`;
+        chip.id = `chip-${row}-${col}`;
+
+        // Calculate how far the chip needs to drop based on the row
+        // Top rows drop a shorter distance than bottom rows
+        const dropPercent = -((row + 1.5) * 115);
+        chip.style.setProperty('--drop-start', `${dropPercent}%`);
+
+        slot.appendChild(chip);
+        playSound('drop');
+
+        // Wait for the CSS animation to finish before checking for wins
+        setTimeout(() => {
+            isAnimating = false;
+
+            if (checkWin(row, col, currentPlayer)) {
+                gameOver = true;
+                playSound('win'); // Play fanfare immediately
+                winTimeout = setTimeout(() => {
+                    endGame(currentPlayer);
+                }, 3000);
+            } else if (checkDraw()) {
+                playSound('win');
+                endGame(0);
+            } else {
+                // Switch turn
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                updateStatus();
+                updateIndicator(); // Show new player's piece
+
+                // Trigger AI if it's Single Player mode
+                if (gameMode === '1P' && currentPlayer === 2 && !gameOver) {
+                    setTimeout(makeAIMove, 500); // 500ms delay to feel natural
+                }
+            }
+        }, 500); // matches the 0.5s CSS animation
+    }
+
+    function playSound(type) {
+        try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'drop') {
+                // Quick satisfying bloop sound
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'win') {
+                // Happy fanfare beep sequence
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.setValueAtTime(500, now + 0.1);
+                osc.frequency.setValueAtTime(600, now + 0.2);
+                osc.frequency.setValueAtTime(800, now + 0.3);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            } else if (type === 'error') {
+                // Low buzz when clicking a full column
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'move') {
+                // Soft quick tick for moving cursor
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        } catch (e) {
+            // Ignore audio errors if browser blocks it
+        }
+    }
+
+    function getLowestEmptyRow(col) {
+        for (let r = ROWS - 1; r >= 0; r--) {
+            if (board[r][col] === 0) return r;
+        }
+        return -1;
+    }
+
+    function checkDraw() {
+        // If top row is completely full, it's a draw
+        return board[0].every(cell => cell !== 0);
+    }
+
+    function checkWin(r, c, player, isSimulation = false) {
+        // Directions to check: Vertical, Horizontal, Diagonal Down-Right, Diagonal Down-Left
+        const directions = [
+            [[1, 0], [-1, 0]],
+            [[0, 1], [0, -1]],
+            [[1, 1], [-1, -1]],
+            [[1, -1], [-1, 1]]
+        ];
+
+        for (let axis of directions) {
+            let count = 1; // Count includes the piece just dropped
+            let winningCells = [[r, c]];
+
+            for (let dir of axis) {
+                const dr = dir[0];
+                const dc = dir[1];
+                let currR = r + dr;
+                let currC = c + dc;
+
+                // Keep counting as long as pieces match the player
+                while (currR >= 0 && currR < ROWS && currC >= 0 && currC < COLS && board[currR][currC] === player) {
+                    count++;
+                    winningCells.push([currR, currC]);
+                    currR += dr;
+                    currC += dc;
+                }
+            }
+
+            // If 4 or more connected, highlight them and declare win
+            if (count >= 4) {
+                if (!isSimulation) {
+                    highlightWin(winningCells);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function highlightWin(cells) {
+        currentWinningCells = cells;
+
+        // Remove old highlight if it exists
+        const oldLine = document.getElementById('win-highlight-line');
+        if (oldLine) oldLine.remove();
+
+        // Sort cells geometrically to find start and end points
+        const sorted = [...cells].sort((a, b) => {
+            if (a[1] !== b[1]) return a[1] - b[1]; // sort by col
+            return a[0] - b[0]; // sort by row
+        });
+
+        const first = sorted[0];
+        const last = sorted[sorted.length - 1];
+
+        const c1 = document.getElementById(`slot-${first[0]}-${first[1]}`);
+        const c2 = document.getElementById(`slot-${last[0]}-${last[1]}`);
+        const board = document.getElementById('board');
+
+        if (!c1 || !c2 || !board) return;
+
+        const c1Rect = c1.getBoundingClientRect();
+        const c2Rect = c2.getBoundingClientRect();
+        const boardRect = board.getBoundingClientRect();
+
+        // Calculate centers relative to the board
+        const x1 = c1Rect.left + c1Rect.width / 2 - boardRect.left;
+        const y1 = c1Rect.top + c1Rect.height / 2 - boardRect.top;
+        const x2 = c2Rect.left + c2Rect.width / 2 - boardRect.left;
+        const y2 = c2Rect.top + c2Rect.height / 2 - boardRect.top;
+
+        const distance = Math.hypot(x2 - x1, y2 - y1);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+
+        // Make the pill big enough to comfortably wrap the chips
+        const thickness = c1Rect.width + 16; // Add padding
+        const length = distance + thickness;
+
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+
+        const line = document.createElement('div');
+        line.id = 'win-highlight-line';
+        // Glowing golden capsule that encapsulates the 4 winning chips!
+        line.className = 'absolute z-20 pointer-events-none rounded-full border-[6px] sm:border-[8px] border-yellow-300 shadow-[0_0_20px_rgba(253,224,71,0.8),inset_0_0_15px_rgba(253,224,71,0.5)] animate-pulse';
+        line.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'; // Bright semi-transparent fill
+
+        line.style.width = `${length}px`;
+        line.style.height = `${thickness}px`;
+        line.style.left = `${cx - length / 2}px`;
+        line.style.top = `${cy - thickness / 2}px`;
+        line.style.transform = `rotate(${angle}rad)`;
+
+        board.appendChild(line);
+    }
+
+    function makeAIMove() {
+        // Double check state to prevent bugs if reset mid-turn
+        if (gameOver || currentPlayer !== 2 || gameMode !== '1P') return;
+
+        let bestCol = -1;
+
+        // Strategy Step 1: Can the AI win right now?
+        for (let c = 0; c < COLS; c++) {
+            if (canWinNextMove(c, 2)) {
+                bestCol = c;
+                break;
+            }
+        }
+
+        // Strategy Step 2: If AI can't win, can the Player win next turn? Block them!
+        if (bestCol === -1) {
+            for (let c = 0; c < COLS; c++) {
+                if (canWinNextMove(c, 1)) {
+                    bestCol = c;
+                    break;
+                }
+            }
+        }
+
+        // Strategy Step 3: Otherwise, pick a strategic or random column
+        if (bestCol === -1) {
+            const availableCols = [];
+            for (let c = 0; c < COLS; c++) {
+                if (getLowestEmptyRow(c) !== -1) availableCols.push(c);
+            }
+
+            // Give a slight preference to the center column (better for connect 4 strategy)
+            if (availableCols.includes(3) && Math.random() > 0.4) {
+                bestCol = 3;
+            } else if (availableCols.length > 0) {
+                bestCol = availableCols[Math.floor(Math.random() * availableCols.length)];
+            }
+        }
+
+        // Execute AI move
+        if (bestCol !== -1) {
+            playCol(bestCol);
+        }
+    }
+
+    // Helper function for AI to simulate a move
+    function canWinNextMove(col, player) {
+        const row = getLowestEmptyRow(col);
+        if (row === -1) return false; // Column is full
+
+        // Temporarily place piece
+        board[row][col] = player;
+        const win = checkWin(row, col, player, true);
+        // Undo placement
+        board[row][col] = 0;
+
+        return win;
+    }
+
+    function updateStatus() {
+        const statusText = document.getElementById('status-text');
+        const avatarEl = document.getElementById('turn-avatar');
+        const statusCard = document.getElementById('status-card');
+
+        if (currentPlayer === 1) {
+            statusText.textContent = "Red's Turn!";
+            statusText.className = "text-xl sm:text-3xl md:text-4xl font-black text-red-500 drop-shadow-sm";
+            avatarEl.innerHTML = '🔴';
+        } else {
+            const name = gameMode === '1P' ? "Robot's Turn!" : "Yellow's Turn!";
+            statusText.textContent = name;
+            statusText.className = "text-xl sm:text-3xl md:text-4xl font-black text-yellow-500 drop-shadow-sm";
+            avatarEl.innerHTML = gameMode === '1P' ? '🤖' : '🟡';
+        }
+    }
+
+    function endGame(winnerPlayer) {
+        gameOver = true;
+
+        const modal = document.getElementById('win-modal');
+        const title = document.getElementById('win-title');
+        const icon = document.getElementById('win-icon');
+        const btn = modal.querySelector('button');
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (winnerPlayer === 1) {
+            scores[1]++;
+            if (scores[1] >= WINNING_SCORE) matchOver = true;
+        } else if (winnerPlayer === 2) {
+            scores[2]++;
+            if (scores[2] >= WINNING_SCORE) matchOver = true;
+        }
+
+        updateScoreDisplay();
+
+        if (winnerPlayer === 0) {
+            title.textContent = "It's a Draw!";
+            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-gray-700 mb-6 sm:mb-8 drop-shadow-sm";
+            icon.innerHTML = '🤝';
+            btn.textContent = "Play Again!";
+        } else if (winnerPlayer === 1) {
+            if (matchOver) {
+                title.innerHTML = `🏆<br>Red Wins the Match!<br><span class='text-xl sm:text-2xl text-gray-600 drop-shadow-none'>(First to ${WINNING_SCORE})</span>`;
+                btn.textContent = "Start New Match!";
+            } else {
+                title.textContent = "Red Wins Game!";
+                btn.textContent = "Next Game!";
+            }
+            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-red-500 mb-6 sm:mb-8 drop-shadow-sm leading-tight";
+            icon.innerHTML = '🎉🔴🎉';
+        } else {
+            const name = gameMode === '1P' ? "Robot" : "Yellow";
+            const grandTitle = gameMode === '1P' ? "Robot Wins the Match!" : "Yellow Wins the Match!";
+
+            if (matchOver) {
+                title.innerHTML = `🏆<br>${grandTitle}<br><span class='text-xl sm:text-2xl text-gray-600 drop-shadow-none'>(First to ${WINNING_SCORE})</span>`;
+                btn.textContent = "Start New Match!";
+            } else {
+                title.textContent = `${name} Wins Game!`;
+                btn.textContent = "Next Game!";
+            }
+
+            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-yellow-500 mb-6 sm:mb-8 drop-shadow-sm leading-tight";
+            icon.innerHTML = gameMode === '1P' ? '🤖⚡' : '🎉🟡🎉';
+        }
+    }
+
+    function updateScoreDisplay() {
+        const p1 = document.getElementById('score-p1');
+        const p2 = document.getElementById('score-p2');
+        if(p1) p1.textContent = scores[1];
+        if(p2) p2.textContent = scores[2];
+    }
+
+    function setMode(mode) {
+        if (isAnimating) return; // Prevent breaking animations
+        gameMode = mode;
+
+        // Reset scores on mode change
+        scores = { 1: 0, 2: 0 };
+        matchOver = false;
+        updateScoreDisplay();
+
+        const p2Label = document.getElementById('score-p2-label');
+        if (p2Label) {
+            p2Label.textContent = mode === '1P' ? "Robot" : "Yellow";
+        }
+
+        const btn1p = document.getElementById('btn-1p');
+        const btn2p = document.getElementById('btn-2p');
+
+        // Visual styles for toggling buttons
+        const activeClasses = "flex-1 py-2 sm:py-3 md:py-4 bg-blue-500 text-white font-black rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] sm:shadow-[0_6px_0_0_#1d4ed8] md:shadow-[0_8px_0_0_#1d4ed8] translate-y-0 transition-all text-base sm:text-xl md:text-2xl flex items-center justify-center gap-1 sm:gap-2 border-2 border-transparent";
+        const inactiveClasses = "flex-1 py-2 sm:py-3 md:py-4 bg-white/40 text-blue-900 font-bold rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_rgba(255,255,255,0.4)] sm:shadow-[0_6px_0_0_rgba(255,255,255,0.4)] md:shadow-[0_8px_0_0_rgba(255,255,255,0.4)] translate-y-1 sm:translate-y-[2px] md:translate-y-[3px] transition-all text-base sm:text-xl md:text-2xl opacity-80 hover:bg-white/60 flex items-center justify-center gap-1 sm:gap-2 border-2 border-white/50";
+
+        if (mode === '1P') {
+            btn1p.className = activeClasses;
+            btn2p.className = inactiveClasses;
+        } else {
+            btn2p.className = activeClasses;
+            btn1p.className = inactiveClasses;
+        }
+
+        resetGame();
+    }
+
+    function resetGame() {
+        if (winTimeout) clearTimeout(winTimeout);
+
+        if (matchOver) {
+            scores = { 1: 0, 2: 0 };
+            matchOver = false;
+            updateScoreDisplay();
+        }
+
+        // Hide modal if open
+        const modal = document.getElementById('win-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Reset logic variables
+        board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+        currentPlayer = 1;
+        gameOver = false;
+        isAnimating = false;
+        currentWinningCells = null;
+
+        const oldLine = document.getElementById('win-highlight-line');
+        if (oldLine) oldLine.remove();
+
+        // Clear visual board DOM
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const slot = document.getElementById(`slot-${r}-${c}`);
+                if (slot) slot.innerHTML = '';
+            }
+        }
+
+        selectedCol = 3; // Reset column to middle
+        updateStatus();
+        updateIndicator();
+    }
+
+    // Initialize the game when the window loads
+    window.onload = () => {
+        setupBoard();
+        setMode('1P'); // Default to playing against the Robot
+
+        // Add keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') moveLeft();
+            else if (e.key === 'ArrowRight') moveRight();
+            else if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter') dropPeg();
+        });
+
+        // Ensure the win highlight resizes correctly if the device is rotated
+        window.addEventListener('resize', () => {
+            if (currentWinningCells) {
+                highlightWin(currentWinningCells);
+            }
+        });
+    };
+</script>
+</body>
+</html>
