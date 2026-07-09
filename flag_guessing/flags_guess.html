@@ -331,7 +331,7 @@
             // Fetch both Map Data and Authoritative Country Data in parallel
             const [geoRes, countriesRes] = await Promise.all([
                 fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'),
-                fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,independent,unMember')
+                fetch('https://raw.githubusercontent.com/mledoze/countries/master/countries.json')
             ]);
 
             worldGeoJson = await geoRes.json();
