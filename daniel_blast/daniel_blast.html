@@ -416,7 +416,6 @@
 </header>
 
 <div class="controls">
-    <button class="icon-btn" id="sound-btn" title="Toggle Sound">🔊</button>
     <button class="icon-btn" id="restart-btn" title="Restart Game">🔄</button>
 </div>
 
@@ -1035,10 +1034,6 @@
     // Event Listeners
     document.getElementById('restart-btn').addEventListener('click', startNewGame);
     document.getElementById('play-again-btn').addEventListener('click', startNewGame);
-    document.getElementById('sound-btn').addEventListener('click', (e) => {
-        sound.muted = !sound.muted;
-        e.target.textContent = sound.muted ? '🔇' : '🔊';
-    });
 
     // Start game on load
     window.addEventListener('load', initBoard);
