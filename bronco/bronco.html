@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bronco Off-Road Adventure</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
+            background-color: #87CEEB; /* Sky blue */
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Kid-friendly font */
+            touch-action: none; /* Prevent default touch actions like pinch-zoom */
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #8B4513 50%, #654321 100%); /* Simple sky/ground gradient fallback */
+            overflow: hidden;
+        }
+
+        /* The Bronco container */
+        #bronco {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 120px;
+            z-index: 10;
+            transform-origin: 50% 100%; /* Rotate from the center-bottom (between wheels) */
+            will-change: transform;
+        }
+
+        /* Wheels spinning animation */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .wheel-spin {
+            animation: spin 0.5s linear infinite;
+            transform-origin: 0px 0px; /* Fixed axis to the exact center of the SVG wheel group */
+        }
+
+        /* Interactive Elements (Obstacles/Collectibles) */
+        .obstacle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            will-change: transform;
+        }
+
+        .cloud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 60px;
+            z-index: 1;
+            opacity: 0.8;
+            will-change: transform;
+        }
+
+        /* UI Overlays */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none; /* Let clicks pass through to game container */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .score-board {
+            font-size: 36px;
+            color: #FFF;
+            text-shadow: 2px 2px 4px #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+
+        /* Start/Game Over Screens */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            pointer-events: auto; /* Catch clicks */
+        }
+
+        .overlay-screen h1 {
+            font-size: 48px;
+            text-shadow: 3px 3px 0 #000;
+            margin-bottom: 20px;
+        }
+
+        .big-button {
+            background-color: #FFD700;
+            border: 4px solid #FFA500;
+            border-radius: 30px;
+            padding: 20px 40px;
+            font-size: 32px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #DAA520, 0 15px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.1s;
+        }
+
+        .big-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 #DAA520, 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Particle effects */
+        .dirt-particle {
+            position: absolute;
+            background-color: #8B4513;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            animation: fly-backwards 0.5s ease-out forwards;
+        }
+
+        @keyframes fly-backwards {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50px, -20px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        :root {
+            --bronco-body: #FF9900; /* Default Cyber Orange */
+            --bronco-roof: #F8F9FA; /* Default White */
+        }
+
+        .color-section {
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .color-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 5px solid #FFF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .color-swatch:active {
+            transform: scale(0.9);
+        }
+
+        .swatch-selected {
+            border-color: #FFD700;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px #FFD700;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <!-- Background Layers -->
+    <canvas id="bg-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+
+    <!-- The Hero: A stylized Ford Bronco SVG -->
+    <div id="bronco" class="driving">
+        <svg viewBox="0 0 200 120" width="100%" height="100%">
+            <!-- Spare Tire (Back) -->
+            <rect x="5" y="35" width="20" height="45" rx="5" fill="#222"/>
+            <circle cx="15" cy="57" r="10" fill="#555"/>
+            <circle cx="15" cy="57" r="4" fill="#888"/>
+
+            <!-- Cabin (White Top) -->
+            <path d="M 25,20 L 115,20 L 130,50 L 25,50 Z" fill="var(--bronco-roof)" stroke="#DDDDDD" stroke-width="1"/>
+
+            <!-- Window cutouts (Side) -->
+            <path d="M 32,25 L 70,25 L 70,45 L 32,45 Z" fill="#87CEEB"/>
+            <path d="M 75,25 L 110,25 L 122,45 L 75,45 Z" fill="#87CEEB"/>
+
+            <!-- Side Mirror -->
+            <rect x="122" y="42" width="8" height="6" rx="2" fill="#222"/>
+
+            <!-- Main Body (Cyber Orange) -->
+            <path d="M 25,50 L 130,50 L 180,50 L 180,85 L 25,85 Z" fill="var(--bronco-body)"/>
+
+            <!-- Bronco Door/Side styling lines -->
+            <line x1="25" y1="55" x2="180" y2="55" stroke="#E68A00" stroke-width="2"/>
+            <line x1="72" y1="50" x2="72" y2="85" stroke="#E68A00" stroke-width="2"/> <!-- Door seam -->
+
+            <!-- Front Grille Area & Headlight -->
+            <rect x="175" y="52" width="8" height="30" fill="#222222"/>
+            <rect x="180" y="55" width="5" height="24" fill="#DDDDDD"/> <!-- Silver Grille Trim -->
+            <circle cx="181" cy="62" r="5" fill="#FFFFFF"/> <!-- Round Headlight -->
+            <circle cx="181" cy="62" r="2" fill="#FFFFCC"/>
+            <circle cx="181" cy="74" r="2" fill="#FFA500"/> <!-- Turn signal -->
+
+            <!-- Taillight -->
+            <rect x="23" y="55" width="4" height="15" fill="#FF0000" rx="1"/>
+
+            <!-- Bumpers -->
+            <rect x="182" y="78" width="8" height="8" rx="2" fill="#444444"/>
+            <rect x="20" y="78" width="8" height="8" rx="2" fill="#444444"/>
+
+            <!-- Fenders (Wheel Arches) -->
+            <path d="M 35,85 A 22,22 0 0,1 75,85" fill="none" stroke="#222" stroke-width="6"/>
+            <path d="M 130,85 A 22,22 0 0,1 170,85" fill="none" stroke="#222" stroke-width="6"/>
+
+            <!-- "BRONCO" Text -->
+            <text x="76" y="70" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="12"
+                  fill="#FFFFFF" letter-spacing="1">BRONCO
+            </text>
+
+            <!-- Bucking Bronco Logo (Above Rear Wheel) -->
+            <image href="https://1000logos.net/wp-content/uploads/2022/12/Ford-Bronco-Emblem.png" x="42" y="52"
+                   width="24" height="16" preserveAspectRatio="xMidYMid meet"/>
+
+            <!-- Front Wheel (Wrapped in a positioning group so the spin animation applies cleanly) -->
+            <g transform="translate(150, 85)">
+                <g id="wheel-front">
+                    <circle cx="0" cy="0" r="20" fill="#222"/>
+                    <!-- Chunky tread effect -->
+                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
+                    <circle cx="0" cy="0" r="11" fill="#444"/>
+                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
+                    <!-- Hubcap details -->
+                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
+                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="0" r="2" fill="#111"/>
+                </g>
+            </g>
+
+            <!-- Back Wheel -->
+            <g transform="translate(55, 85)">
+                <g id="wheel-back">
+                    <circle cx="0" cy="0" r="20" fill="#222"/>
+                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
+                    <circle cx="0" cy="0" r="11" fill="#444"/>
+                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
+                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
+                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="0" r="2" fill="#111"/>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <!-- Container for dynamic objects -->
+    <!-- Removed z-index to allow child elements to determine their depth relative to Bronco -->
+    <div id="objects-container"
+         style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
+
+    <!-- User Interface Layer -->
+    <div id="ui-layer">
+        <div style="display: flex; justify-content: space-between; width: 100%;">
+            <div class="score-board">Stars: <span id="score-display">0</span></div>
+            <div class="score-board">Speed: <span id="speed-display">1</span>x</div>
+        </div>
+        <!-- Instruction removed as requested -->
+    </div>
+
+    <!-- Screens -->
+    <div id="start-screen" class="overlay-screen">
+        <h1 style="margin-top: 10px; margin-bottom: 10px;">Paint Your Bronco!</h1>
+
+        <!-- Big Preview Bronco -->
+        <div style="width: 300px; height: 180px; margin-bottom: 10px;">
+            <svg viewBox="0 0 200 120" width="100%" height="100%">
+                <rect x="5" y="35" width="20" height="45" rx="5" fill="#222"/>
+                <circle cx="15" cy="57" r="10" fill="#555"/>
+                <circle cx="15" cy="57" r="4" fill="#888"/>
+                <path d="M 25,20 L 115,20 L 130,50 L 25,50 Z" fill="var(--bronco-roof)" stroke="#DDDDDD"
+                      stroke-width="1"/>
+                <path d="M 32,25 L 70,25 L 70,45 L 32,45 Z" fill="#87CEEB"/>
+                <path d="M 75,25 L 110,25 L 122,45 L 75,45 Z" fill="#87CEEB"/>
+                <rect x="122" y="42" width="8" height="6" rx="2" fill="#222"/>
+                <path d="M 25,50 L 130,50 L 180,50 L 180,85 L 25,85 Z" fill="var(--bronco-body)"/>
+                <line x1="25" y1="55" x2="180" y2="55" stroke="#E68A00" stroke-width="2"/>
+                <line x1="72" y1="50" x2="72" y2="85" stroke="#E68A00" stroke-width="2"/>
+                <rect x="175" y="52" width="8" height="30" fill="#222222"/>
+                <rect x="180" y="55" width="5" height="24" fill="#DDDDDD"/>
+                <circle cx="181" cy="62" r="5" fill="#FFFFFF"/>
+                <circle cx="181" cy="62" r="2" fill="#FFFFCC"/>
+                <circle cx="181" cy="74" r="2" fill="#FFA500"/>
+                <rect x="23" y="55" width="4" height="15" fill="#FF0000" rx="1"/>
+                <rect x="182" y="78" width="8" height="8" rx="2" fill="#444444"/>
+                <rect x="20" y="78" width="8" height="8" rx="2" fill="#444444"/>
+                <path d="M 35,85 A 22,22 0 0,1 75,85" fill="none" stroke="#222" stroke-width="6"/>
+                <path d="M 130,85 A 22,22 0 0,1 170,85" fill="none" stroke="#222" stroke-width="6"/>
+                <text x="76" y="70" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="12"
+                      fill="#FFFFFF" letter-spacing="1">BRONCO
+                </text>
+                <image href="https://1000logos.net/wp-content/uploads/2022/12/Ford-Bronco-Emblem.png" x="42" y="52"
+                       width="24" height="16" preserveAspectRatio="xMidYMid meet"/>
+                <g transform="translate(150, 85)">
+                    <circle cx="0" cy="0" r="20" fill="#222"/>
+                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
+                    <circle cx="0" cy="0" r="11" fill="#444"/>
+                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
+                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
+                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="0" r="2" fill="#111"/>
+                </g>
+                <g transform="translate(55, 85)">
+                    <circle cx="0" cy="0" r="20" fill="#222"/>
+                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
+                    <circle cx="0" cy="0" r="11" fill="#444"/>
+                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
+                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
+                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
+                    <circle cx="0" cy="0" r="2" fill="#111"/>
+                </g>
+            </svg>
+        </div>
+
+        <div class="color-section">
+            <div style="font-size: 28px; font-weight: bold; text-shadow: 2px 2px 0 #000;">🚗 Body Color</div>
+            <div class="color-row">
+                <div class="color-swatch swatch-selected" style="background-color: #FF9900;" data-color="#FF9900"
+                     data-part="body"></div>
+                <div class="color-swatch" style="background-color: #FF2222;" data-color="#FF2222"
+                     data-part="body"></div>
+                <div class="color-swatch" style="background-color: #22CC22;" data-color="#22CC22"
+                     data-part="body"></div>
+                <div class="color-swatch" style="background-color: #2288FF;" data-color="#2288FF"
+                     data-part="body"></div>
+                <div class="color-swatch" style="background-color: #FF69B4;" data-color="#FF69B4"
+                     data-part="body"></div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <div style="font-size: 28px; font-weight: bold; text-shadow: 2px 2px 0 #000;">🏠 Roof Color</div>
+            <div class="color-row">
+                <div class="color-swatch swatch-selected" style="background-color: #F8F9FA;" data-color="#F8F9FA"
+                     data-part="roof"></div>
+                <div class="color-swatch" style="background-color: #222222;" data-color="#222222"
+                     data-part="roof"></div>
+                <div class="color-swatch" style="background-color: #8B4513;" data-color="#8B4513"
+                     data-part="roof"></div>
+                <div class="color-swatch" style="background-color: #FFD700;" data-color="#FFD700"
+                     data-part="roof"></div>
+            </div>
+        </div>
+
+        <button class="big-button" id="start-btn" style="margin-top: 5px;">DRIVE!</button>
+    </div>
+
+    <div id="game-over-screen" class="overlay-screen hidden">
+        <h1>Bumpy Ride!</h1>
+        <p style="font-size: 32px;">You got <span id="final-score">0</span> stars!</p>
+        <button class="big-button" id="restart-btn" style="margin-top: 20px;">Paint & Drive Again!</button>
+    </div>
+
+</div>
+
+<script>
+    // --- Game State & Constants ---
+    const GAME_STATE = {
+        START: 0,
+        PLAYING: 1,
+        GAME_OVER: 2
+    };
+
+    let currentState = GAME_STATE.START;
+    let score = 0;
+    let gameSpeed = 5; // Base horizontal scroll speed
+    let speedMultiplier = 1; // Increases over time
+    let animationFrameId;
+    let lastTime = 0;
+
+    // Bronco properties
+    const bronco = {
+        element: document.getElementById('bronco'),
+        frontWheel: document.getElementById('wheel-front'),
+        backWheel: document.getElementById('wheel-back'),
+        y: 0,
+        velocityY: 0,
+        gravity: 0.6,
+        jumpPower: -16, // Stronger jump for big hills
+        isJumping: false,
+        angle: 0, // Current rotation angle
+        width: 200,
+        height: 120
+    };
+
+    // DOM Elements
+    const gameContainer = document.getElementById('game-container');
+    const objectsContainer = document.getElementById('objects-container');
+    const scoreDisplay = document.getElementById('score-display');
+    const speedDisplay = document.getElementById('speed-display');
+    const startScreen = document.getElementById('start-screen');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+
+    // Arrays for dynamic elements
+    let obstacles = [];
+    let collectibles = [];
+    let clouds = [];
+
+    // Canvas dimensions
+    let cw, ch;
+
+    // --- STREAMING_CHUNK:Terrain Engine... ---
+    // Function to calculate exact ground height at any given world X coordinate
+    function getTerrainY(worldX) {
+        if (!ch) return 0;
+        let baseHeight = ch * 0.7; // Base ground level
+
+        // Sum of sine waves creates a natural, unpredictable rolling hill effect
+        let y = baseHeight;
+        y += Math.sin(worldX * 0.0015) * (ch * 0.18); // Massive rolling hills
+        y += Math.sin(worldX * 0.004) * (ch * 0.08);  // Medium bumps
+        y += Math.sin(worldX * 0.01) * (ch * 0.03);   // Small rocky details
+
+        return y;
+    }
+
+    // Asset SVGs (Inline to avoid external requests)
+    const SVG_STAR = `<svg viewBox="0 0 50 50" width="100%" height="100%"><polygon points="25,2 32,16 48,18 36,30 39,46 25,38 11,46 14,30 2,18 18,16" fill="#FFD700" stroke="#DAA520" stroke-width="2"/></svg>`;
+    const SVG_ROCK = `<svg viewBox="0 0 60 40" width="100%" height="100%"><path d="M 10,40 Q 5,20 20,10 Q 35,0 45,15 Q 55,25 50,40 Z" fill="#808080" stroke="#555" stroke-width="2"/></svg>`;
+
+    // Puddle SVG redesigned to look more like embedded splattered mud
+    const SVG_PUDDLE = `<svg viewBox="0 0 100 40" width="100%" height="100%">
+        <path d="M 10,20 Q 20,5 40,15 Q 55,0 75,10 Q 95,25 80,35 Q 60,45 40,35 Q 20,40 5,30 Q -5,15 10,20 Z" fill="#4A3018" opacity="0.9" stroke="#3A2008" stroke-width="1"/>
+        <circle cx="20" cy="15" r="4" fill="#3A2008" />
+        <circle cx="70" cy="20" r="6" fill="#3A2008" />
+        <circle cx="45" cy="25" r="5" fill="#3A2008" />
+    </svg>`;
+
+    const SVG_CLOUD = `<svg viewBox="0 0 100 60" width="100%" height="100%"><path d="M 20,40 Q 10,20 30,20 Q 40,5 60,15 Q 80,5 90,25 Q 100,40 80,50 L 20,50 Z" fill="#FFFFFF" opacity="0.9"/></svg>`;
+
+    // Fun detailed bug assets
+    const SVG_BEE = `<svg viewBox="0 0 40 30" width="100%" height="100%">
+        <ellipse cx="20" cy="15" rx="15" ry="10" fill="#FFD700" />
+        <path d="M 10,5 L 15,15 M 20,5 L 25,15 M 30,5 L 35,15" stroke="#000" stroke-width="4" />
+        <circle cx="8" cy="12" r="2" fill="#000" />
+        <path d="M 20,10 Q 25,-5 35,5 Q 25,10 20,10" fill="rgba(255,255,255,0.7)" stroke="#AAA" stroke-width="1"/>
+    </svg>`;
+
+    const SVG_BUTTERFLY = `<svg viewBox="0 0 40 40" width="100%" height="100%">
+        <path d="M 20,20 Q 5,0 15,15 Q 5,30 20,20" fill="#FF69B4" stroke="#C71585" stroke-width="2"/>
+        <path d="M 20,20 Q 35,0 25,15 Q 35,30 20,20" fill="#FF69B4" stroke="#C71585" stroke-width="2"/>
+        <rect x="18" y="10" width="4" height="20" rx="2" fill="#333" />
+        <path d="M 19,10 Q 15,5 12,2 M 21,10 Q 25,5 28,2" stroke="#333" stroke-width="1.5" fill="none"/>
+    </svg>`;
+
+    // Background scrolling variables
+    let bgScrollX = 0;
+    let fgScrollX = 0;
+
+    // --- Setup & Resizing ---
+    function resize() {
+        cw = gameContainer.clientWidth;
+        ch = gameContainer.clientHeight;
+        bgCanvas.width = cw;
+        bgCanvas.height = ch;
+        drawBackgroundStatic(); // Initial draw
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- STREAMING_CHUNK:Canvas Drawing Setup... ---
+    function drawBackgroundStatic() {
+        if (currentState !== GAME_STATE.PLAYING) {
+            drawBackgroundLayers();
+            // Snap Bronco to initial terrain on load
+            const broncoScreenX = cw * 0.2;
+            const startY = getTerrainY(broncoScreenX);
+            bronco.y = startY;
+            bronco.element.style.transform = `translate(${broncoScreenX}px, ${startY - bronco.height}px)`;
+        }
+    }
+
+    function drawBackgroundLayers() {
+        bgCtx.clearRect(0, 0, cw, ch);
+
+        // 1. Mountains (Background Parallax Layer 1)
+        bgCtx.fillStyle = '#6B8E23';
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, ch * 0.6);
+        for (let x = 0; x <= cw + 200; x += 50) {
+            let y = ch * 0.5 + Math.sin((x + bgScrollX) * 0.01) * 50;
+            bgCtx.lineTo(x, y);
+        }
+        bgCtx.lineTo(cw, ch);
+        bgCtx.lineTo(0, ch);
+        bgCtx.fill();
+
+        // 2. Parallax Trees scattered randomly on the Mountains
+        const treeScroll = bgScrollX * 1.5;
+
+        // We draw trees along consistent segments relative to the background scroll
+        // This ensures they stay locked to the mountains and don't flicker.
+        const segmentWidth = 200;
+        const startSegment = Math.floor(treeScroll / segmentWidth);
+        const segmentsOnScreen = Math.ceil(cw / segmentWidth) + 1;
+
+        for (let i = startSegment; i < startSegment + segmentsOnScreen; i++) {
+            // Predictable pseudo-random placement using the segment index
+            const treeXOffset = (Math.abs(Math.sin(i * 123.45)) * segmentWidth);
+            const worldTreeX = (i * segmentWidth) + treeXOffset;
+
+            // Screen position
+            const screenX = worldTreeX - treeScroll;
+
+            // Get the mountain height at this specific spot so the tree sits firmly on it
+            const mountY = ch * 0.5 + Math.sin((worldTreeX) * 0.01) * 50;
+
+            // Varying tree sizes and slight color differences based on index
+            const sizeMod = 0.5 + (Math.abs(Math.sin(i * 456.78)) * 0.8); // 0.5 to 1.3 scale
+
+            // Draw tree body
+            bgCtx.save();
+            bgCtx.translate(screenX, mountY + 10); // +10 to embed root deeper into the mountain curve
+            bgCtx.scale(sizeMod, sizeMod);
+
+            // Trunk
+            bgCtx.fillStyle = '#5C4033';
+            bgCtx.fillRect(-5, -20, 10, 20);
+
+            // Pine needles
+            bgCtx.fillStyle = (i % 3 === 0) ? '#1A6A1A' : '#228B22'; // Randomize greens
+            bgCtx.beginPath();
+            bgCtx.moveTo(0, -70); // Tip
+            bgCtx.lineTo(20, -10); // Right bottom
+            bgCtx.lineTo(-20, -10); // Left bottom
+            bgCtx.fill();
+
+            bgCtx.restore();
+        }
+
+        // 3. Wavy Foreground Ground (Main Playable Area)
+        bgCtx.fillStyle = '#8B4513';
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, ch);
+
+        // Draw the exact wavy line based on our terrain function
+        for (let x = 0; x <= cw + 20; x += 10) {
+            let worldX = x + fgScrollX;
+            bgCtx.lineTo(x, getTerrainY(worldX));
+        }
+
+        bgCtx.lineTo(cw + 20, ch);
+        bgCtx.lineTo(0, ch);
+        bgCtx.fill();
+
+        // 4. Ground top highlight (vibrant grass edge)
+        bgCtx.beginPath();
+        for (let x = 0; x <= cw + 20; x += 10) {
+            let worldX = x + fgScrollX;
+            let y = getTerrainY(worldX);
+            if (x === 0) bgCtx.moveTo(x, y);
+            else bgCtx.lineTo(x, y);
+        }
+        bgCtx.strokeStyle = '#32CD32';
+        bgCtx.lineWidth = 14;
+        bgCtx.lineCap = 'round';
+        bgCtx.lineJoin = 'round';
+        bgCtx.stroke();
+
+        // 5. Fun Terrain Details (Grass Tufts & Fossils)
+        // Ensure details are drawn at consistent world coordinates so they don't blink
+        const detailSpacing = 100;
+        const firstDetailWorldX = Math.floor(fgScrollX / detailSpacing) * detailSpacing;
+
+        for (let worldX = firstDetailWorldX; worldX <= fgScrollX + cw + 50; worldX += detailSpacing) {
+            let x = worldX - fgScrollX; // Convert world coordinate to screen coordinate
+            let groundY = getTerrainY(worldX);
+
+            // Use the consistent worldX to seed the random placement
+            let seed = Math.abs(Math.sin(worldX));
+
+            // Grass Tufts on top
+            if (seed > 0.5) {
+                bgCtx.fillStyle = '#228B22';
+                bgCtx.beginPath();
+                bgCtx.moveTo(x, groundY);
+                bgCtx.lineTo(x - 5, groundY - 15);
+                bgCtx.lineTo(x + 5, groundY - 5);
+                bgCtx.lineTo(x + 10, groundY - 20);
+                bgCtx.lineTo(x + 15, groundY - 2);
+                bgCtx.fill();
+            }
+
+            // Subsurface details (Fossils/Rocks deep in dirt)
+            if (seed < 0.2 && groundY < ch - 100) {
+                bgCtx.strokeStyle = '#D2B48C';
+                bgCtx.lineWidth = 4;
+                bgCtx.beginPath();
+                bgCtx.moveTo(x, groundY + 60);
+                bgCtx.lineTo(x + 30, groundY + 70);
+                bgCtx.stroke();
+                bgCtx.fillStyle = '#D2B48C';
+                bgCtx.beginPath();
+                bgCtx.arc(x, groundY + 58, 4, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.beginPath();
+                bgCtx.arc(x, groundY + 62, 4, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.beginPath();
+                bgCtx.arc(x + 30, groundY + 68, 4, 0, Math.PI * 2);
+                bgCtx.fill();
+                bgCtx.beginPath();
+                bgCtx.arc(x + 30, groundY + 72, 4, 0, Math.PI * 2);
+                bgCtx.fill();
+            }
+        }
+    }
+
+    // --- STREAMING_CHUNK:Input Handlers... ---
+    function handleJump(e) {
+        if (e) e.preventDefault(); // Prevent double firing on touch devices
+
+        // Don't jump if we are on the start screen picking colors
+        if (currentState === GAME_STATE.START) {
+            return;
+        } else if (currentState === GAME_STATE.GAME_OVER) {
+            // Give a small delay before allowing restart via tap to prevent accidental restarts
+            if (Date.now() - lastGameOverTime > 1000) {
+                resetGame();
+                gameOverScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+                currentState = GAME_STATE.START;
+            }
+        } else if (currentState === GAME_STATE.PLAYING) {
+            if (!bronco.isJumping) {
+                bronco.velocityY = bronco.jumpPower;
+                bronco.isJumping = true;
+                createDirtParticles();
+
+                // Add a little visual squash/stretch effect
+                const currentTransform = bronco.element.style.transform;
+                bronco.element.style.transform = currentTransform + ' scale(0.9, 1.1)';
+            }
+        }
+    }
+
+    // Listen on the whole container for gross motor skills (kids)
+    gameContainer.addEventListener('mousedown', handleJump);
+    gameContainer.addEventListener('touchstart', handleJump, {passive: false});
+
+    // Also listen to specific buttons
+    document.getElementById('start-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        startGame();
+    });
+    document.getElementById('restart-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetGame();
+        gameOverScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+        currentState = GAME_STATE.START;
+    });
+
+    // Customization Swatch Logic
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', (e) => {
+            e.stopPropagation(); // Don't trigger a jump
+            const color = swatch.getAttribute('data-color');
+            const part = swatch.getAttribute('data-part');
+
+            // Update CSS Variable instantly for all SVGs
+            document.documentElement.style.setProperty(`--bronco-${part}`, color);
+
+            // Highlight the selected swatch in this row
+            swatch.parentElement.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('swatch-selected'));
+            swatch.classList.add('swatch-selected');
+        });
+    });
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.code === 'ArrowUp') {
+            handleJump();
+        }
+    });
+
+    // --- STREAMING_CHUNK:Game Controls & Spawners... ---
+    let lastGameOverTime = 0;
+
+    function startGame() {
+        currentState = GAME_STATE.PLAYING;
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+
+        // Start wheel animations
+        bronco.frontWheel.classList.add('wheel-spin');
+        bronco.backWheel.classList.add('wheel-spin');
+        bronco.element.classList.add('driving');
+
+        score = 0;
+        speedMultiplier = 1;
+        updateScoreDisplay();
+
+        lastTime = performance.now();
+        gameLoop(performance.now());
+    }
+
+    function resetGame() {
+        // Clear objects
+        obstacles.forEach(obs => obs.el.remove());
+        collectibles.forEach(col => col.el.remove());
+        clouds.forEach(c => c.el.remove());
+        obstacles = [];
+        collectibles = [];
+        clouds = [];
+
+        // Reset variables
+        bronco.velocityY = 0;
+        bronco.isJumping = false;
+        bronco.angle = 0;
+
+        bgScrollX = 0;
+        fgScrollX = 0;
+        drawBackgroundLayers();
+    }
+
+    function gameOver() {
+        currentState = GAME_STATE.GAME_OVER;
+        lastGameOverTime = Date.now();
+        gameOverScreen.classList.remove('hidden');
+        finalScoreDisplay.innerText = score;
+
+        // Stop animations
+        bronco.frontWheel.classList.remove('wheel-spin');
+        bronco.backWheel.classList.remove('wheel-spin');
+
+        cancelAnimationFrame(animationFrameId);
+    }
+
+    function spawnSkyObjects() {
+        // Normal Clouds
+        if (Math.random() < 0.01) {
+            const el = document.createElement('div');
+            el.className = 'cloud';
+            el.innerHTML = SVG_CLOUD;
+
+            const scale = 0.5 + Math.random() * 1;
+            const startY = Math.random() * (ch * 0.3); // Top 30% of screen
+            const startX = cw + 100;
+
+            el.style.transform = `translate(${startX}px, ${startY}px) scale(${scale})`;
+
+            objectsContainer.appendChild(el);
+            clouds.push({el, x: startX, y: startY, speed: (Math.random() * 0.5 + 0.2), scale: scale, type: 'cloud'});
+        }
+
+        // Bugs (Bees and Butterflies)
+        if (Math.random() < 0.002) { // Rare spawn (approx once every 8 seconds)
+            const el = document.createElement('div');
+            el.className = 'cloud';
+            el.style.zIndex = '2'; // Just above clouds, below bronco
+            const isBee = Math.random() > 0.5;
+            el.innerHTML = isBee ? SVG_BEE : SVG_BUTTERFLY;
+
+            // Larger scale bug requested:
+            const scale = 0.2 + Math.random() * 0.2;
+
+            // Keep them only in the top 40% of the screen (the sky area)
+            const startY = Math.random() * (ch * 0.4);
+            const startX = cw + 100;
+
+            el.style.transform = `translate(${startX}px, ${startY}px) scale(${scale})`;
+
+            objectsContainer.appendChild(el);
+            const speed = isBee ? (1.5 + Math.random()) : (1 + Math.random());
+            clouds.push({
+                el,
+                x: startX,
+                y: startY,
+                speed: speed,
+                scale: scale,
+                type: 'bug',
+                floatOffset: Math.random() * 10
+            });
+        }
+    }
+
+    let framesSinceLastObstacle = 0;
+
+    function spawnGroundObject() {
+        framesSinceLastObstacle++;
+
+        // Make spawning dependent on speed, ensuring minimum distance
+        let spawnThreshold = Math.max(60, 150 - (speedMultiplier * 20));
+
+        if (framesSinceLastObstacle > spawnThreshold && Math.random() < 0.05) {
+            framesSinceLastObstacle = 0;
+
+            const isObstacle = Math.random() > 0.4;
+
+            const el = document.createElement('div');
+            el.style.position = 'absolute';
+            el.style.top = '0';
+            el.style.left = '0';
+
+            const worldX = cw + 50 + fgScrollX; // Anchor to the scrolling world coordinate
+
+            if (isObstacle) {
+                el.className = 'obstacle';
+                const isRock = Math.random() > 0.5;
+                if (isRock) {
+                    el.innerHTML = SVG_ROCK;
+                    el.style.width = '60px';
+                    el.style.height = '40px';
+                    el.style.zIndex = '5'; // Rocks draw standard
+                } else {
+                    el.innerHTML = SVG_PUDDLE;
+                    el.style.width = '100px';
+                    el.style.height = '40px';
+                    el.style.zIndex = '4'; // Puddles draw slightly behind rocks
+                }
+                objectsContainer.appendChild(el);
+                obstacles.push({
+                    el,
+                    worldX: worldX,
+                    width: isRock ? 60 : 100,
+                    height: 40,
+                    type: isRock ? 'rock' : 'puddle'
+                });
+            } else {
+                el.innerHTML = SVG_STAR;
+                el.style.width = '50px';
+                el.style.height = '50px';
+                el.style.zIndex = '15'; // **STARS ARE ALWAYS IN FRONT**
+                objectsContainer.appendChild(el);
+
+                // Stars float slightly above the terrain
+                const hoverOffset = 30 + Math.random() * 150;
+                collectibles.push({el, worldX: worldX, width: 50, height: 50, hoverOffset: hoverOffset});
+            }
+        }
+    }
+
+    // --- STREAMING_CHUNK:Visuals & Collisions... ---
+    function createDirtParticles() {
+        // Only spawn dirt if we are mostly touching the ground
+        if (bronco.isJumping && bronco.y < getTerrainY(cw * 0.2 + fgScrollX) - 20) return;
+
+        for (let i = 0; i < 5; i++) {
+            const p = document.createElement('div');
+            p.className = 'dirt-particle';
+            p.style.zIndex = '12'; // Above car, below UI
+
+            const broncoScreenX = cw * 0.2;
+            p.style.left = `${broncoScreenX + 40 + (Math.random() * 20)}px`;
+            p.style.top = `${bronco.y - 10}px`;
+
+            const size = 5 + Math.random() * 10;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+
+            document.body.appendChild(p);
+
+            setTimeout(() => {
+                p.remove();
+            }, 500);
+        }
+    }
+
+    function updatePhysics() {
+        const broncoScreenX = cw * 0.2; // Fixed horizontal position on screen
+        const broncoWorldX = broncoScreenX + fgScrollX; // Exact position in the scrolling world
+
+        // 1. Get the terrain height at the Bronco's exact location
+        const groundY = getTerrainY(broncoWorldX);
+
+        // 2. Calculate the slope to tilt the car
+        const nextY = getTerrainY(broncoWorldX + 40); // Look slightly ahead
+        const prevY = getTerrainY(broncoWorldX - 40); // Look slightly behind
+        const targetAngleRad = Math.atan2(nextY - prevY, 80);
+        let targetAngleDeg = targetAngleRad * (180 / Math.PI);
+
+        // Limit the maximum tilt so it doesn't flip entirely
+        targetAngleDeg = Math.max(-45, Math.min(45, targetAngleDeg));
+
+        // 3. Handle Vertical Movement (Jumping/Falling)
+        if (bronco.isJumping) {
+            bronco.y += bronco.velocityY;
+            bronco.velocityY += bronco.gravity;
+
+            // Slowly pitch forward while in the air for a natural trajectory
+            targetAngleDeg += (bronco.velocityY * 1.5);
+
+            // Hit ground check
+            if (bronco.y >= groundY) {
+                bronco.y = groundY;
+                bronco.isJumping = false;
+                bronco.velocityY = 0;
+                createDirtParticles(); // Dust on landing
+            }
+        } else {
+            // Stick firmly to the ground
+            bronco.y = groundY;
+            bronco.velocityY = 0;
+
+            // Generate dirt while driving up/down hills
+            if (Math.random() < 0.2) createDirtParticles();
+        }
+
+        // 4. Smooth Rotation Interpolation
+        bronco.angle += (targetAngleDeg - bronco.angle) * 0.15;
+
+        // 5. Apply Position and Rotation to DOM Element
+        bronco.element.style.transform = `translate(${broncoScreenX}px, ${bronco.y - bronco.height}px) rotate(${bronco.angle}deg)`;
+    }
+
+    function checkCollisions() {
+        const broncoScreenX = cw * 0.2;
+        const broncoCenterX = broncoScreenX + 100;
+        const broncoCenterY = bronco.y - 40; // Center mass
+
+        // Check Obstacles
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            const obsCenterX = obs.screenX + obs.width / 2;
+            const obsCenterY = obs.screenY + obs.height / 2;
+
+            const dist = Math.hypot(broncoCenterX - obsCenterX, broncoCenterY - obsCenterY);
+
+            if (dist < 50) { // Generous collision radius for kids
+                gameOver();
+                return; // Stop checking
+            }
+        }
+
+        // Check Collectibles (Stars)
+        for (let i = collectibles.length - 1; i >= 0; i--) {
+            const star = collectibles[i];
+            const starCenterX = star.screenX + star.width / 2;
+            const starCenterY = star.screenY + star.height / 2;
+
+            const dist = Math.hypot(broncoCenterX - starCenterX, broncoCenterY - starCenterY);
+
+            if (dist < 80) { // Large magnet radius for stars
+                score++;
+                updateScoreDisplay();
+
+                // Visual pop effect
+                star.el.style.transition = 'transform 0.2s, opacity 0.2s';
+                star.el.style.transform = `translate(${star.screenX}px, ${star.screenY}px) scale(2)`;
+                star.el.style.opacity = '0';
+
+                const elementToRemove = star.el;
+                setTimeout(() => {
+                    elementToRemove.remove();
+                }, 200);
+
+                collectibles.splice(i, 1);
+
+                // Increase speed slightly every 5 stars
+                if (score % 5 === 0) {
+                    speedMultiplier += 0.1;
+                    speedDisplay.innerText = speedMultiplier.toFixed(1);
+                    speedDisplay.parentElement.style.color = '#FFD700';
+                    setTimeout(() => {
+                        speedDisplay.parentElement.style.color = '#FFF';
+                    }, 500);
+                }
+            }
+        }
+    }
+
+    function updateScoreDisplay() {
+        scoreDisplay.innerText = score;
+        scoreDisplay.style.transform = 'scale(1.5)';
+        setTimeout(() => {
+            scoreDisplay.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    // --- STREAMING_CHUNK:Game Loop... ---
+    function gameLoop(timestamp) {
+        if (currentState !== GAME_STATE.PLAYING) return;
+
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
+
+        const currentSpeed = gameSpeed * speedMultiplier;
+
+        // Update Scroll
+        bgScrollX += currentSpeed * 0.2;
+        fgScrollX += currentSpeed;
+
+        drawBackgroundLayers();
+        updatePhysics();
+
+        spawnSkyObjects();
+        spawnGroundObject();
+
+        // Update Clouds & Bugs
+        for (let i = clouds.length - 1; i >= 0; i--) {
+            clouds[i].x -= clouds[i].speed;
+
+            // Add bobbing animation for bugs
+            let currentY = clouds[i].y;
+            if (clouds[i].type === 'bug') {
+                currentY += Math.sin(timestamp * 0.005 + clouds[i].floatOffset) * 10;
+            }
+
+            clouds[i].el.style.transform = `translate(${clouds[i].x}px, ${currentY}px) scale(${clouds[i].scale})`;
+
+            if (clouds[i].x < -150) {
+                clouds[i].el.remove();
+                clouds.splice(i, 1);
+            }
+        }
+
+        // Update Obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            obstacles[i].screenX = obstacles[i].worldX - fgScrollX;
+            obstacles[i].screenY = getTerrainY(obstacles[i].worldX) - obstacles[i].height;
+
+            // SINK THE MUD: Offset puddle placement so it looks embedded in the dirt rather than resting on the grass
+            if (obstacles[i].type === 'puddle') {
+                obstacles[i].screenY += 15;
+            }
+
+            obstacles[i].el.style.transform = `translate(${obstacles[i].screenX}px, ${obstacles[i].screenY}px)`;
+
+            if (obstacles[i].screenX < -100) {
+                obstacles[i].el.remove();
+                obstacles.splice(i, 1);
+            }
+        }
+
+        // Update Collectibles
+        for (let i = collectibles.length - 1; i >= 0; i--) {
+            collectibles[i].screenX = collectibles[i].worldX - fgScrollX;
+            collectibles[i].screenY = getTerrainY(collectibles[i].worldX) - collectibles[i].height - collectibles[i].hoverOffset;
+
+            collectibles[i].el.style.transform = `translate(${collectibles[i].screenX}px, ${collectibles[i].screenY}px) rotate(${timestamp * 0.1}deg)`;
+
+            if (collectibles[i].screenX < -100) {
+                collectibles[i].el.remove();
+                collectibles.splice(i, 1);
+            }
+        }
+
+        checkCollisions();
+
+        if (currentState === GAME_STATE.PLAYING) {
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+    }
+
+    // Initial draw
+    drawBackgroundStatic();
+
+</script>
+</body>
+</html>
