@@ -668,7 +668,11 @@
 
     // --- STREAMING_CHUNK:Input Handlers... ---
     function handleJump(e) {
-        if (e) e.preventDefault(); // Prevent double firing on touch devices
+        // Prevent default on touch to stop double-firing, BUT only if
+        // we are playing so we don't break UI interactions on start screens.
+        if (e && e.type === 'touchstart' && currentState === GAME_STATE.PLAYING) {
+            e.preventDefault();
+        }
 
         // Don't jump if we are on the start screen picking colors
         if (currentState === GAME_STATE.START) {
@@ -698,23 +702,39 @@
     gameContainer.addEventListener('mousedown', handleJump);
     gameContainer.addEventListener('touchstart', handleJump, {passive: false});
 
-    // Also listen to specific buttons
-    document.getElementById('start-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
+    // UI Buttons (Support both Click and Touch for instant tablet responsiveness)
+    const startBtn = document.getElementById('start-btn');
+    const startAction = (e) => {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
         startGame();
-    });
-    document.getElementById('restart-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
+    };
+    startBtn.addEventListener('click', startAction);
+    startBtn.addEventListener('touchstart', startAction, {passive: false});
+
+    const restartBtn = document.getElementById('restart-btn');
+    const restartAction = (e) => {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
         resetGame();
         gameOverScreen.classList.add('hidden');
         startScreen.classList.remove('hidden');
         currentState = GAME_STATE.START;
-    });
+    };
+    restartBtn.addEventListener('click', restartAction);
+    restartBtn.addEventListener('touchstart', restartAction, {passive: false});
 
-    // Customization Swatch Logic
+    // Customization Swatch Logic (Touch enabled)
     document.querySelectorAll('.color-swatch').forEach(swatch => {
-        swatch.addEventListener('click', (e) => {
-            e.stopPropagation(); // Don't trigger a jump
+        const selectColor = (e) => {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            } // Don't trigger a jump
             const color = swatch.getAttribute('data-color');
             const part = swatch.getAttribute('data-part');
 
@@ -724,13 +744,16 @@
             // Highlight the selected swatch in this row
             swatch.parentElement.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('swatch-selected'));
             swatch.classList.add('swatch-selected');
-        });
+        };
+        swatch.addEventListener('click', selectColor);
+        swatch.addEventListener('touchstart', selectColor, {passive: false});
     });
 
     // Keyboard support
     window.addEventListener('keydown', (e) => {
         if (e.code === 'Space' || e.code === 'ArrowUp') {
-            handleJump();
+            if (currentState === GAME_STATE.PLAYING) e.preventDefault(); // Stop page scroll
+            handleJump(e);
         }
     });
 
@@ -836,7 +859,6 @@
     }
 
     let framesSinceLastObstacle = 0;
-
     function spawnGroundObject() {
         framesSinceLastObstacle++;
 
