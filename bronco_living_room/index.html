@@ -1505,6 +1505,100 @@ function saveCustom() {
   } catch (_) {}
 }
 
+
+/** Toy-scale Bronco horse: bold silhouette on high-contrast plaque (CanvasTexture). */
+function makeBroncoHorseTexture() {
+  const S = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = S;
+  canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, S, S);
+
+  // Cream plaque with chunky dark border — stays readable on any body color
+  const pad = 10;
+  const rr = 32;
+  ctx.fillStyle = '#f3eee3';
+  ctx.beginPath();
+  ctx.moveTo(pad + rr, pad);
+  ctx.arcTo(S - pad, pad, S - pad, S - pad, rr);
+  ctx.arcTo(S - pad, S - pad, pad, S - pad, rr);
+  ctx.arcTo(pad, S - pad, pad, pad, rr);
+  ctx.arcTo(pad, pad, S - pad, pad, rr);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#1a1520';
+  ctx.lineWidth = 12;
+  ctx.stroke();
+
+  // Chunky side-profile mustang (toy silhouette, facing left)
+  ctx.fillStyle = '#1a1520';
+  ctx.save();
+  ctx.translate(S * 0.50, S * 0.52);
+  ctx.scale(S * 0.0039, S * 0.0039);
+  ctx.beginPath();
+  // body (solid blob)
+  ctx.moveTo(-58, 5);
+  ctx.bezierCurveTo(-72, -22, -28, -42, 14, -34);
+  ctx.bezierCurveTo(42, -28, 62, -8, 66, 12);
+  ctx.bezierCurveTo(68, 32, 50, 42, 26, 40);
+  ctx.lineTo(-42, 40);
+  ctx.bezierCurveTo(-56, 40, -64, 22, -58, 5);
+  ctx.closePath();
+  // neck + head (connected into body)
+  ctx.moveTo(10, -26);
+  ctx.bezierCurveTo(4, -52, 16, -76, 34, -90);
+  ctx.bezierCurveTo(46, -98, 60, -92, 58, -78);
+  ctx.lineTo(48, -70);
+  ctx.bezierCurveTo(44, -58, 52, -46, 60, -38);
+  ctx.bezierCurveTo(46, -34, 24, -32, 12, -24);
+  ctx.closePath();
+  // ear
+  ctx.moveTo(32, -88);
+  ctx.lineTo(24, -112);
+  ctx.lineTo(42, -96);
+  ctx.closePath();
+  // mane
+  ctx.moveTo(4, -38);
+  ctx.bezierCurveTo(-12, -58, -6, -82, 12, -92);
+  ctx.bezierCurveTo(4, -72, -2, -52, 6, -34);
+  ctx.closePath();
+  // legs overlap body so no gaps (chunky blocks)
+  ctx.moveTo(30, 20);
+  ctx.lineTo(20, 82);
+  ctx.lineTo(38, 82);
+  ctx.lineTo(46, 20);
+  ctx.closePath();
+  ctx.moveTo(10, 22);
+  ctx.lineTo(-2, 76);
+  ctx.lineTo(16, 76);
+  ctx.lineTo(28, 22);
+  ctx.closePath();
+  ctx.moveTo(-24, 22);
+  ctx.lineTo(-36, 82);
+  ctx.lineTo(-18, 82);
+  ctx.lineTo(-8, 22);
+  ctx.closePath();
+  ctx.moveTo(-46, 18);
+  ctx.lineTo(-64, 74);
+  ctx.lineTo(-46, 74);
+  ctx.lineTo(-30, 18);
+  ctx.closePath();
+  // tail
+  ctx.moveTo(-60, -8);
+  ctx.bezierCurveTo(-92, -32, -100, 8, -82, 30);
+  ctx.bezierCurveTo(-72, 8, -70, -6, -56, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 function buildBronco() {
   const g = bronco.group;
   while (g.children.length) g.remove(g.children[0]);
@@ -1513,6 +1607,7 @@ function buildBronco() {
   bronco.accentParts = [];
   bronco.wheels = [];
   bronco.spare = null;
+  bronco.horseLogo = null;
 
   const bodyColor = DEFAULT_CUSTOM.body;
   const roofColor = DEFAULT_CUSTOM.roof;
@@ -1694,6 +1789,33 @@ function buildBronco() {
     spare.position.set(0, 0.72, -0.98);
     g.add(spare);
     bronco.spare = { group: spare, tire: spareTire, rim: spareRim, ring: spareRing };
+  }
+
+  // Rear Bronco horse logo — above spare so both read from raised chase cam
+  {
+    const horseTex = makeBroncoHorseTexture();
+    // ~spare diameter tall; fixed cream plaque stays high-contrast on any body paint
+    const horseW = 0.46;
+    const horseH = 0.50;
+    const horse = new THREE.Mesh(
+      new THREE.PlaneGeometry(horseW, horseH),
+      new THREE.MeshStandardMaterial({
+        map: horseTex,
+        transparent: true,
+        roughness: 0.55,
+        metalness: 0.06,
+        side: THREE.DoubleSide,
+        depthWrite: true,
+      })
+    );
+    horse.castShadow = false;
+    horse.receiveShadow = false;
+    // Plane faces +Z by default; flip to face rearward (-Z) for chase cam
+    horse.rotation.y = Math.PI;
+    // Spare center y=0.72 r≈0.26 → top ~0.98; place plaque just above, same rear plane
+    horse.position.set(0, 1.22, -0.90);
+    g.add(horse);
+    bronco.horseLogo = horse;
   }
 
   g.position.set(bronco.x, 0, bronco.z);
