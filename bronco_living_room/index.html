@@ -435,29 +435,93 @@
         height: 8.25rem;
       }
     }
+    /* Drag/slide steer pad — ring track + thumb (not a poke button; GO is the poke) */
     #stickBase {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: rgba(255,246,232,0.72);
-      border: 4px solid rgba(255,255,255,0.95);
-      box-shadow: inset 0 0 18px rgba(0,0,0,0.1), 0 6px 18px rgba(0,0,0,0.22);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0 18%, transparent 19%),
+        radial-gradient(circle at 50% 50%, transparent 0 34%, rgba(70,110,160,0.14) 35% 48%, transparent 49%),
+        rgba(236, 242, 250, 0.78);
+      border: 3px solid rgba(255,255,255,0.92);
+      box-shadow:
+        inset 0 0 0 7px rgba(120,150,190,0.22),
+        inset 0 2px 10px rgba(0,0,0,0.08),
+        0 6px 18px rgba(0,0,0,0.2);
       position: relative;
+      overflow: hidden;
     }
+    #stickBase::after {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      border: 2px dashed rgba(90,120,160,0.38);
+      pointer-events: none;
+      z-index: 0;
+    }
+    #stickSlideHint {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #stickSlideHint span {
+      position: absolute;
+      color: rgba(70,105,150,0.55);
+      font-size: 0.85rem;
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+      opacity: 0.9;
+    }
+    #stickSlideHint .n { top: 7%; left: 50%; transform: translateX(-50%); }
+    #stickSlideHint .s { bottom: 7%; left: 50%; transform: translateX(-50%); }
+    #stickSlideHint .w { left: 8%; top: 50%; transform: translateY(-50%); }
+    #stickSlideHint .e { right: 8%; top: 50%; transform: translateY(-50%); }
     #stickKnob {
       position: absolute;
-      width: 48%;
-      height: 48%;
+      width: 38%;
+      height: 38%;
       left: 50%;
       top: 50%;
-      margin-left: -24%;
-      margin-top: -24%;
+      margin-left: -19%;
+      margin-top: -19%;
       border-radius: 50%;
-      background: #3a7ec4;
-      border: 4px solid #fff;
-      box-shadow: 0 5px 14px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.12);
+      background: linear-gradient(180deg, #d8e6f5 0%, #9bb4d0 55%, #7a98b8 100%);
+      border: 3px solid rgba(255,255,255,0.95);
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.28),
+        inset 0 -3px 0 rgba(0,0,0,0.12),
+        inset 0 2px 4px rgba(255,255,255,0.55);
       transform: translate(0, 0);
       will-change: transform;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #stickKnob::after {
+      content: "↔";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -54%);
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: rgba(45,70,105,0.55);
+      letter-spacing: -0.05em;
+      pointer-events: none;
+    }
+    #stickBase.dragging #stickSlideHint { opacity: 0.25; }
+    #stickBase.dragging #stickKnob {
+      background: linear-gradient(180deg, #c5d8ee 0%, #6f93b8 55%, #557a9e 100%);
+      box-shadow:
+        0 5px 14px rgba(0,0,0,0.32),
+        inset 0 -3px 0 rgba(0,0,0,0.14),
+        inset 0 2px 4px rgba(255,255,255,0.4);
     }
     /* Big toddler "GO" forward pad — lower-left */
     #goPad {
@@ -570,18 +634,20 @@
       }
     }
     #stickBase.cue::before {
-      content: "▲";
+      content: "slide";
       position: absolute;
-      top: 12%;
+      top: 14%;
       left: 50%;
       transform: translateX(-50%);
-      color: #2e6aad;
-      font-size: 1.15rem;
+      color: #3a5f88;
+      font-size: 0.72rem;
       font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       opacity: 0.85;
       pointer-events: none;
       animation: stickBlink 1.05s ease-in-out infinite;
-      z-index: 1;
+      z-index: 3;
     }
     @keyframes stickBlink {
       0%, 100% { opacity: 0.35; }
@@ -709,7 +775,12 @@
     <div id="goArrowOverlay" aria-hidden="true">▲</div>
     <button type="button" id="goPad" aria-label="Go forward"><span class="goChevron">▲</span><span>GO</span></button>
     <div id="stickZone">
-      <div id="stickBase"><div id="stickKnob"></div></div>
+      <div id="stickBase" aria-label="Slide to steer">
+        <div id="stickSlideHint" aria-hidden="true">
+          <span class="n">▲</span><span class="s">▼</span><span class="w">◀</span><span class="e">▶</span>
+        </div>
+        <div id="stickKnob"></div>
+      </div>
     </div>
   </div>
   <canvas id="c"></canvas>
@@ -1037,7 +1108,7 @@ function buildFurniture() {
   couch.add(cp2);
   couch.position.set(0, 0, backZ);
   g.add(couch);
-  addStaticAABB({ x: 0, y: 0.55, z: backZ }, 1.95, 0.7, 0.72); // softer couch
+  addStaticAABB({ x: 0, y: 0.55, z: backZ }, 1.75, 0.6, 0.58); // softer couch glance
 
   // Coffee table (in front of couch, still near back — mid room stays toy-filled)
   const table = new THREE.Group();
@@ -1052,26 +1123,26 @@ function buildFurniture() {
   const tableZ = backZ + 3.2;
   table.position.set(0, 0, tableZ);
   g.add(table);
-  addStaticAABB({ x: 0, y: 0.3, z: tableZ }, 0.98, 0.35, 0.48); // softer table
+  addStaticAABB({ x: 0, y: 0.3, z: tableZ }, 0.85, 0.3, 0.38); // softer table glance
 
   // TV stand + TV (back-right)
   const stand = box(2.8, 0.55, 0.7, '#8b7355');
   stand.position.set(rightX - 1.5, 0.28, backZ - 0.2);
   g.add(stand);
-  addStaticAABB({ x: rightX - 1.5, y: 0.4, z: backZ - 0.2 }, 1.28, 0.55, 0.34);
+  addStaticAABB({ x: rightX - 1.5, y: 0.4, z: backZ - 0.2 }, 1.15, 0.5, 0.28);
   const tv = box(2.2, 1.3, 0.12, '#2a2a32', { metalness: 0.4, roughness: 0.4 });
   tv.position.set(rightX - 1.5, 1.25, backZ - 0.25);
   g.add(tv);
   const screen = box(1.95, 1.05, 0.04, '#5a9fd4', { roughness: 0.3 });
   screen.position.set(rightX - 1.5, 1.25, backZ - 0.18);
   g.add(screen);
-  addStaticAABB({ x: rightX - 1.5, y: 1.2, z: backZ - 0.25 }, 1.05, 0.75, 0.16);
+  addStaticAABB({ x: rightX - 1.5, y: 1.2, z: backZ - 0.25 }, 0.95, 0.7, 0.14);
 
   // Bookshelf left
   const shelf = box(1.2, 2.2, 0.45, '#d4b896');
   shelf.position.set(leftX + 0.2, 1.1, backZ - 0.15);
   g.add(shelf);
-  addStaticAABB({ x: leftX + 0.2, y: 1.1, z: backZ - 0.15 }, 0.55, 1.15, 0.24);
+  addStaticAABB({ x: leftX + 0.2, y: 1.1, z: backZ - 0.15 }, 0.48, 1.05, 0.2);
   const bookColors = ['#e85d4c', '#5cb88a', '#4a90d9', '#f0c040', '#9b7ed9'];
   bookColors.forEach((c, i) => {
     const b = box(0.22, 0.55, 0.35, c);
@@ -1083,7 +1154,7 @@ function buildFurniture() {
   const side = box(0.7, 0.55, 0.7, '#c4a882');
   side.position.set(-3.4, 0.28, backZ + 0.3);
   g.add(side);
-  addStaticAABB({ x: -3.4, y: 0.35, z: backZ + 0.3 }, 0.32, 0.4, 0.32);
+  addStaticAABB({ x: -3.4, y: 0.35, z: backZ + 0.3 }, 0.28, 0.35, 0.28);
   const lampBase = cyl(0.12, 0.18, 0.35, '#eee8e0');
   lampBase.position.set(-3.4, 0.73, backZ + 0.3);
   g.add(lampBase);
@@ -1098,7 +1169,7 @@ function buildFurniture() {
   const plant = sphere(0.4, '#6cbc7a', { roughness: 0.9 });
   plant.position.set(rightX, 0.7, frontZ);
   g.add(plant);
-  addStaticAABB({ x: rightX, y: 0.45, z: frontZ }, 0.28, 0.55, 0.28);
+  addStaticAABB({ x: rightX, y: 0.45, z: frontZ }, 0.24, 0.48, 0.24);
 
   // Toy chest (front-left)
   const chest = box(1.6, 0.7, 0.9, '#e8a04a');
@@ -1107,7 +1178,7 @@ function buildFurniture() {
   const lid = box(1.65, 0.1, 0.95, '#d49040');
   lid.position.set(leftX + 0.5, 0.75, frontZ);
   g.add(lid);
-  addStaticAABB({ x: leftX + 0.5, y: 0.4, z: frontZ }, 0.72, 0.45, 0.42);
+  addStaticAABB({ x: leftX + 0.5, y: 0.4, z: frontZ }, 0.62, 0.4, 0.36);
 
   // Extra fixed armchair (right wall) — glance-off furniture, not mid clutter
   const chair = new THREE.Group();
@@ -1119,13 +1190,13 @@ function buildFurniture() {
   chair.add(cBack);
   chair.position.set(rightX - 0.3, 0, 1.5);
   g.add(chair);
-  addStaticAABB({ x: rightX - 0.3, y: 0.5, z: 1.5 }, 0.6, 0.55, 0.55);
+  addStaticAABB({ x: rightX - 0.3, y: 0.5, z: 1.5 }, 0.5, 0.48, 0.45);
 
   // Low shelf / bench on left wall
   const bench = box(2.4, 0.45, 0.7, '#d4b896');
   bench.position.set(leftX + 0.1, 0.22, 3.5);
   g.add(bench);
-  addStaticAABB({ x: leftX + 0.1, y: 0.3, z: 3.5 }, 1.1, 0.35, 0.32);
+  addStaticAABB({ x: leftX + 0.1, y: 0.3, z: 3.5 }, 0.95, 0.3, 0.26);
 
   // Walls as static (inner bounds)
   const wallThick = 0.15;
@@ -1162,13 +1233,20 @@ function buildToys() {
   const g = new THREE.Group();
   const pastel = ['#ffb4a2', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#bdb2ff', '#ffc6ff', '#a0c4ff'];
 
-  // Soft blocks — clustered in MID room so kids don't just hug walls
+  // Soft blocks — 3 separate shove piles (not one jam magnet)
+  // Pile A: left-mid  |  Pile B: center-ahead lure  |  Pile C: right-mid
   const blockPos = [
-    [-1.2, 0.25, 0.4], [-0.75, 0.25, 0.7], [-1.0, 0.55, 0.5],
-    [1.4, 0.25, -0.6], [1.75, 0.25, -0.35], [1.55, 0.55, -0.5],
-    [0.2, 0.25, 1.8], [-2.2, 0.25, -1.4], [2.4, 0.25, 1.2],
-    [-0.4, 0.25, -2.0], [0.6, 0.55, -1.7], [-1.8, 0.25, 2.2],
-    [3.0, 0.25, -0.2], [-2.8, 0.25, 0.3], [0.9, 0.25, 0.1],
+    // Pile A (left)
+    [-3.2, 0.25, 0.2], [-2.75, 0.25, 0.55], [-3.0, 0.55, 0.35],
+    [-2.9, 0.25, -0.2],
+    // Pile B (ahead lure on +Z — open corridor first ~2s of GO)
+    [0.15, 0.25, 5.9], [-0.25, 0.25, 6.25], [0.35, 0.55, 6.05],
+    [-0.05, 0.25, 6.55], [0.55, 0.25, 5.7],
+    // Pile C (right)
+    [3.1, 0.25, -0.4], [3.45, 0.25, -0.1], [3.2, 0.55, -0.25],
+    [2.9, 0.25, 0.2],
+    // Light scatter (not a wall-hug heap)
+    [-1.6, 0.25, -2.6], [1.8, 0.25, -2.8],
   ];
   blockPos.forEach((p, i) => {
     const s = 0.4 + (i % 3) * 0.05;
@@ -1179,15 +1257,15 @@ function buildToys() {
     makePushable(m, s * 0.65, 0.5);
   });
 
-  // Balls — mid-floor attractors
+  // Balls — one per shove spot + a couple floaters
   const ballData = [
-    [0.3, 0.28, -0.3, 0.28, '#ff8fab'],
-    [-1.5, 0.32, 1.1, 0.32, '#80ed99'],
-    [1.8, 0.22, 1.5, 0.22, '#72efdd'],
-    [-0.6, 0.3, 2.6, 0.3, '#ffd60a'],
-    [2.2, 0.25, -1.8, 0.25, '#c77dff'],
-    [0.0, 0.35, 0.9, 0.35, '#ff9f1c'],
-    [-2.4, 0.26, -0.5, 0.26, '#4ecdc4'],
+    [-3.0, 0.28, 0.9, 0.28, '#ff8fab'],   // pile A
+    [0.0, 0.32, 6.7, 0.32, '#80ed99'],    // pile B lure
+    [3.3, 0.22, 0.5, 0.22, '#72efdd'],    // pile C
+    [-1.2, 0.3, -3.0, 0.3, '#ffd60a'],
+    [2.0, 0.25, -3.2, 0.25, '#c77dff'],
+    [-4.0, 0.26, 2.0, 0.26, '#4ecdc4'],
+    [4.0, 0.28, 2.2, 0.28, '#ff9f1c'],
   ];
   ballData.forEach(([x, y, z, r, c]) => {
     const m = sphere(r, c, { roughness: 0.55, seg: 14 });
@@ -1196,14 +1274,14 @@ function buildToys() {
     makePushable(m, r, 0.4);
   });
 
-  // Pillows (flat boxes) — soft shoveables across mid rug
+  // Pillows — near piles, leave drive corridors open
   const pillows = [
-    [-0.8, 0.12, -0.9, 0.9, 0.2, 0.7, '#ffc8dd'],
-    [1.1, 0.12, 0.6, 0.8, 0.18, 0.6, '#bde0fe'],
-    [-1.6, 0.12, 1.9, 0.7, 0.22, 0.7, '#cdb4db'],
-    [2.0, 0.12, 2.4, 0.85, 0.2, 0.55, '#ffafcc'],
-    [0.4, 0.12, -2.4, 1.0, 0.2, 0.75, '#fdffb6'],
-    [-2.6, 0.12, 0.8, 0.75, 0.18, 0.65, '#caffbf'],
+    [-3.4, 0.12, -0.5, 0.9, 0.2, 0.7, '#ffc8dd'],
+    [3.4, 0.12, -0.8, 0.8, 0.18, 0.6, '#bde0fe'],
+    [0.6, 0.12, 6.9, 0.85, 0.2, 0.55, '#ffafcc'],
+    [-2.0, 0.12, -3.4, 0.7, 0.22, 0.7, '#cdb4db'],
+    [2.2, 0.12, -3.5, 1.0, 0.2, 0.75, '#fdffb6'],
+    [-4.2, 0.12, 1.4, 0.75, 0.18, 0.65, '#caffbf'],
   ];
   pillows.forEach(([x, y, z, w, h, d, c]) => {
     const m = box(w, h, d, c, { roughness: 0.95 });
@@ -1213,13 +1291,12 @@ function buildToys() {
     makePushable(m, Math.max(w, d) * 0.45, 0.35);
   });
 
-  // Stuffed-toy blobs (squishy spheres + ears) — mid + near-mid
+  // Stuffed-toy blobs — parked at shove spots, not boxing spawn
   function stuffedAnimal(x, z, bodyColor, earColor) {
     const body = sphere(0.38, bodyColor, { roughness: 0.9, seg: 12 });
     body.position.set(x, 0.38, z);
     g.add(body);
     makePushable(body, 0.4, 0.55);
-    // ears are decorative children — attach to body so they move
     const earL = sphere(0.14, earColor, { roughness: 0.9, seg: 8 });
     earL.position.set(-0.22, 0.32, 0);
     body.add(earL);
@@ -1230,28 +1307,28 @@ function buildToys() {
     nose.position.set(0, 0.05, 0.35);
     body.add(nose);
   }
-  stuffedAnimal(-2.0, 0.2, '#f4a261', '#e76f51');
-  stuffedAnimal(1.6, -2.2, '#90dbf4', '#00b4d8');
-  stuffedAnimal(-0.5, 2.0, '#ffcfd2', '#ff8fab');
-  stuffedAnimal(2.8, 0.8, '#b8f2e6', '#98f5e1');
-  stuffedAnimal(0.6, -0.8, '#e2cfc4', '#d4a373');
-  stuffedAnimal(-3.2, 2.5, '#ffd6a5', '#f4a261');
+  stuffedAnimal(-3.5, 1.1, '#f4a261', '#e76f51');   // pile A
+  stuffedAnimal(0.9, 6.4, '#90dbf4', '#00b4d8');    // pile B
+  stuffedAnimal(3.6, 0.6, '#ffcfd2', '#ff8fab');    // pile C
+  stuffedAnimal(-2.2, -3.6, '#b8f2e6', '#98f5e1');
+  stuffedAnimal(2.6, -3.4, '#e2cfc4', '#d4a373');
+  stuffedAnimal(-4.5, 3.0, '#ffd6a5', '#f4a261');
 
-  // --- Extra silly pushables (mid-room focus, leave drive lanes open) ---
+  // --- Extra silly pushables (tied to 2–3 shove spots, leave drive lanes open) ---
 
-  // Giant floor pillow (mid-left)
+  // Giant floor pillow (pile A wing)
   {
     const m = box(1.6, 0.28, 1.1, '#ff9ecd', { roughness: 0.98 });
-    m.position.set(-3.4, 0.14, -1.6);
+    m.position.set(-4.0, 0.14, -0.8);
     m.rotation.y = 0.35;
     g.add(m);
     makePushable(m, 0.85, 0.45);
   }
 
-  // Rubber duck–ish (yellow blob + beak)
+  // Rubber duck (pile C)
   {
     const body = sphere(0.36, '#ffe66d', { roughness: 0.55, seg: 12 });
-    body.position.set(2.6, 0.36, -0.9);
+    body.position.set(3.8, 0.36, -1.0);
     g.add(body);
     const head = sphere(0.24, '#ffe66d', { roughness: 0.55, seg: 10 });
     head.position.set(0, 0.28, 0.22);
@@ -1269,7 +1346,7 @@ function buildToys() {
     makePushable(body, 0.42, 0.4);
   }
 
-  // Stackable-looking rings / donuts — mid cluster
+  // Stackable rings — one near each pile
   function toyRing(x, z, color, r = 0.38) {
     const m = new THREE.Mesh(
       new THREE.TorusGeometry(r, r * 0.28, 10, 22),
@@ -1282,15 +1359,15 @@ function buildToys() {
     g.add(m);
     makePushable(m, r * 0.95, 0.35);
   }
-  toyRing(-1.0, -1.5, '#ff6b6b', 0.4);
-  toyRing(1.2, 2.0, '#4ecdc4', 0.36);
-  toyRing(0.0, 0.2, '#ffe66d', 0.34);
-  toyRing(3.2, 1.6, '#bdb2ff', 0.32);
+  toyRing(-2.6, 0.8, '#ff6b6b', 0.4);
+  toyRing(-0.6, 6.2, '#4ecdc4', 0.36);
+  toyRing(2.8, 0.9, '#ffe66d', 0.34);
+  toyRing(1.5, -3.0, '#bdb2ff', 0.32);
 
-  // Beach ball (big, very light) — centerish lure
+  // Beach ball — center of ahead lure pile B
   {
     const m = sphere(0.55, '#ff6b6b', { roughness: 0.4, seg: 16 });
-    m.position.set(-0.2, 0.55, 1.2);
+    m.position.set(-0.15, 0.55, 6.3);
     const band = new THREE.Mesh(
       new THREE.SphereGeometry(0.552, 16, 8, 0, Math.PI * 2, 0.7, 0.55),
       mat('#fffef5', { roughness: 0.4 })
@@ -1305,7 +1382,7 @@ function buildToys() {
     makePushable(m, 0.55, 0.22);
   }
 
-  // Plush star
+  // Plush star (pile C fringe)
   {
     const proxy = sphere(0.22, '#ffe066', { roughness: 0.9, seg: 10 });
     for (let i = 0; i < 5; i++) {
@@ -1316,12 +1393,12 @@ function buildToys() {
       tip.rotation.x = Math.PI / 2;
       proxy.add(tip);
     }
-    proxy.position.set(2.0, 0.34, 0.2);
+    proxy.position.set(3.5, 0.34, 1.3);
     g.add(proxy);
     makePushable(proxy, 0.4, 0.4);
   }
 
-  // Plush heart
+  // Plush heart (back scatter)
   {
     const holder = new THREE.Group();
     const c1 = sphere(0.26, '#ff6b9d', { roughness: 0.92, seg: 10 });
@@ -1332,16 +1409,15 @@ function buildToys() {
     tip.rotation.x = Math.PI;
     tip.position.set(0, -0.18, 0);
     holder.add(c1, c2, tip);
-    holder.position.set(-1.8, 0.38, -2.6);
+    holder.position.set(-1.2, 0.38, -3.8);
     g.add(holder);
-    // makePushable expects mesh.position — Groups work the same for x/z
     makePushable(holder, 0.42, 0.38);
   }
 
-  // Cardboard box that slides
+  // Cardboard box (pile A)
   {
     const m = box(0.7, 0.55, 0.7, '#d4a574', { roughness: 0.95 });
-    m.position.set(1.0, 0.28, -1.2);
+    m.position.set(-2.5, 0.28, -0.6);
     m.rotation.y = 0.25;
     const flap = box(0.68, 0.08, 0.35, '#c49564', { roughness: 0.95 });
     flap.position.set(0, 0.3, 0.12);
@@ -1353,10 +1429,10 @@ function buildToys() {
     makePushable(m, 0.48, 0.5);
   }
 
-  // Soft cone "party hat" toy
+  // Soft cone (away from spawn)
   {
     const m = cyl(0.02, 0.32, 0.55, '#bdb2ff', { roughness: 0.85, seg: 12 });
-    m.position.set(-2.4, 0.28, 1.5);
+    m.position.set(-3.6, 0.28, 2.2);
     const pom = sphere(0.1, '#ffc6ff', { roughness: 0.9, seg: 8 });
     pom.position.set(0, 0.32, 0);
     m.add(pom);
@@ -1364,10 +1440,10 @@ function buildToys() {
     makePushable(m, 0.34, 0.3);
   }
 
-  // Little soft cylinder "juice cup"
+  // Juice cup (pile B fringe)
   {
     const m = cyl(0.22, 0.2, 0.4, '#9bf6ff', { roughness: 0.7, seg: 14 });
-    m.position.set(0.8, 0.2, 2.8);
+    m.position.set(1.1, 0.2, 6.6);
     const straw = cyl(0.03, 0.03, 0.35, '#ff8fab', { roughness: 0.6, seg: 6 });
     straw.position.set(0.08, 0.3, 0);
     m.add(straw);
@@ -1375,23 +1451,23 @@ function buildToys() {
     makePushable(m, 0.28, 0.32);
   }
 
-  // Extra mid-room soft blocks tower lure
+  // Soft blocks tower on pile B lure
   {
     const colors = ['#ffadad', '#ffd6a5', '#fdffb6'];
     for (let i = 0; i < 3; i++) {
       const s = 0.42;
       const m = box(s, s, s, colors[i], { roughness: 0.85 });
-      m.position.set(-0.1 + i * 0.05, 0.25 + i * 0.42, -0.05);
+      m.position.set(0.7 + i * 0.05, 0.25 + i * 0.42, 6.0);
       m.rotation.y = i * 0.2;
       g.add(m);
       makePushable(m, s * 0.65, 0.48);
     }
   }
 
-  // Soft bowling-pin-ish lure near center
+  // Soft bowling pin near pile C
   {
     const m = cyl(0.12, 0.22, 0.55, '#fff0f5', { roughness: 0.8, seg: 12 });
-    m.position.set(1.5, 0.28, 1.0);
+    m.position.set(2.6, 0.28, 0.4);
     const top = sphere(0.14, '#ff8fab', { roughness: 0.8, seg: 10 });
     top.position.set(0, 0.32, 0);
     m.add(top);
@@ -1399,45 +1475,53 @@ function buildToys() {
     makePushable(m, 0.28, 0.33);
   }
 
-  // Kid Games UX: thin toys immediately around Bronco spawn so windows/spare
-  // read on first Drive!. Push out of a small clear radius; bias toward the
-  // mid-room rug so that heap stays dense as the soft-shove lure. Masses /
-  // makePushable radii unchanged (Preschool soft watch).
+  // Open spawn lane into ahead shove pile (~2s win holding GO).
+  // Forward = +Z (yaw 0). Thin toys that box spawn; keep pile B lure ahead.
   {
     const spawnX = typeof bronco !== 'undefined' ? bronco.x : 0;
     const spawnZ = typeof bronco !== 'undefined' ? bronco.z : 2.5;
-    const clearR = 1.65;
-    const midMinZ = -0.9;
-    const midMaxZ = 1.2;
+    // Clear a corridor ahead (+Z) and a bubble around spawn
+    const clearR = 2.35;
+    const laneHalfW = 1.45;
+    const laneEndZ = spawnZ + 2.55; // open path before lure (~2s at floaty speed)
     for (const p of pushables) {
       if (!p.mesh || !p.mesh.position) continue;
       const mx = p.mesh.position.x;
       const mz = p.mesh.position.z;
-      // Leave denser center-rug cluster alone (lure just ahead toward mid room)
-      if (mz >= midMinZ && mz <= midMaxZ && Math.abs(mx) < 2.35) continue;
+      // Protect the ahead lure pile B (z >= ~4.3)
+      if (mz >= spawnZ + 2.6 && Math.abs(mx - spawnX) < 2.1) continue;
       let dx = mx - spawnX;
       let dz = mz - spawnZ;
       let dist = Math.hypot(dx, dz);
-      const need = clearR + p.radius * 0.3;
-      if (dist >= need) continue;
-      // Near-overlap: bias toward mid-room (-Z from spawn) so silhouette clears
-      // and toys feed the lure pile instead of fanning into walls.
+      const inLaneAhead = mz > spawnZ - 0.4 && mz < laneEndZ && Math.abs(mx - spawnX) < laneHalfW;
+      const need = clearR + p.radius * 0.35;
+      if (!inLaneAhead && dist >= need) continue;
       if (dist < 0.08) {
-        dx = (mx || 0.2) * 0.25;
-        dz = -1;
+        dx = (mx - spawnX) || 0.35;
+        dz = 1.0; // bias forward into lure
         dist = Math.hypot(dx, dz) || 1;
       }
       let ux = dx / dist;
       let uz = dz / dist;
-      // Blend radial exit with toward-mid so +Z-side toys don't drift further away
-      const midUx = mx * 0.12;
-      const midUz = -1;
-      const midLen = Math.hypot(midUx, midUz) || 1;
-      ux = ux * 0.3 + (midUx / midLen) * 0.7;
-      uz = uz * 0.3 + (midUz / midLen) * 0.7;
+      // Prefer sliding sideways out of the forward lane, or ahead into pile B
+      if (inLaneAhead) {
+        const side = Math.sign(mx - spawnX) || (Math.random() < 0.5 ? -1 : 1);
+        ux = side;
+        uz = 0.15;
+      } else {
+        // Blend radial exit with toward-ahead lure
+        ux = ux * 0.45 + 0.0;
+        uz = uz * 0.45 + 0.55;
+      }
       const ulen = Math.hypot(ux, uz) || 1;
-      p.mesh.position.x = spawnX + (ux / ulen) * need;
-      p.mesh.position.z = spawnZ + (uz / ulen) * need;
+      let nx = spawnX + (ux / ulen) * Math.max(need, laneHalfW + 0.4);
+      let nz = spawnZ + (uz / ulen) * Math.max(need, 1.2);
+      // Keep protected lure zone free of relocated clutter
+      if (nz >= spawnZ + 2.6 && Math.abs(nx - spawnX) < 2.1) {
+        nx = spawnX + Math.sign(nx - spawnX || 1) * 2.4;
+      }
+      p.mesh.position.x = nx;
+      p.mesh.position.z = nz;
     }
   }
 
@@ -1879,104 +1963,169 @@ function buildBronco() {
   g.add(body);
   bronco.bodyParts.push(body);
 
-  // Cabin / greenhouse
-  const cabin = box(0.95, 0.5, 0.95, bodyColor, { roughness: 0.45, metalness: 0.12 });
-  cabin.position.set(0, 1.0, -0.15);
-  g.add(cabin);
-  bronco.bodyParts.push(cabin);
+  // Cabin + rear: open frames + dark voids (CSG-free). Solid panels must NOT cover wells/windows.
+  const cabinY = 1.02;
+  const cabinZ = -0.10;
 
-  // Windshield + side windows (semi-transparent toy glass)
-  const glassOpts = { roughness: 0.12, metalness: 0.28, transparent: true, opacity: 0.42, depthWrite: false };
-  const windshield = box(0.78, 0.36, 0.05, '#9fd4f0', glassOpts);
-  windshield.position.set(0, 1.02, 0.30);
-  windshield.rotation.x = -0.22;
-  windshield.castShadow = false;
-  g.add(windshield);
-  const winL = box(0.04, 0.30, 0.52, '#9fd4f0', glassOpts);
-  winL.position.set(-0.485, 1.02, -0.12);
-  winL.castShadow = false;
-  g.add(winL);
-  const winR = box(0.04, 0.30, 0.52, '#9fd4f0', glassOpts);
-  winR.position.set(0.485, 1.02, -0.12);
-  winR.castShadow = false;
-  g.add(winR);
-  // Tiny rear cabin glass strip
-  const winRear = box(0.72, 0.28, 0.04, '#9fd4f0', glassOpts);
-  winRear.position.set(0, 1.05, -0.60);
-  winRear.castShadow = false;
-  g.add(winRear);
+  // Dark cabin volume
+  const voidMat = new THREE.MeshBasicMaterial({ color: 0x000000, toneMapped: false });
+  {
+    const cavity = new THREE.Mesh(new THREE.BoxGeometry(0.84, 0.48, 0.90), voidMat);
+    cavity.position.set(0, cabinY, cabinZ);
+    g.add(cavity);
+  }
+  // Seat / dash silhouettes (readable through glass)
+  {
+    const backMat = new THREE.MeshBasicMaterial({ color: 0x3a4555, toneMapped: false });
+    const seatMat = new THREE.MeshBasicMaterial({ color: 0x252e3a, toneMapped: false });
+    const dashMat = new THREE.MeshBasicMaterial({ color: 0x0a0c10, toneMapped: false });
+    const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.10, 0.22), seatMat);
+    cushion.position.set(0, cabinY - 0.16, cabinZ + 0.14);
+    g.add(cushion);
+    const seatBack = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.32, 0.08), backMat);
+    seatBack.position.set(0, cabinY - 0.02, cabinZ + 0.02);
+    g.add(seatBack);
+    const rearBack = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.30, 0.07), backMat);
+    rearBack.position.set(0, cabinY - 0.02, cabinZ - 0.30);
+    g.add(rearBack);
+    for (const hx of [-0.18, 0.18]) {
+      const hr = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.11, 0.06), backMat);
+      hr.position.set(hx, cabinY + 0.16, cabinZ - 0.30);
+      g.add(hr);
+    }
+    const dash = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.06, 0.18), dashMat);
+    dash.position.set(0, cabinY - 0.16, cabinZ + 0.34);
+    g.add(dash);
+  }
 
-  // Hood slope hint
+  // Beveled window recesses: outer plastic lip → mid step → deep black void (+ seat silhouette)
+  const plugMat = new THREE.MeshBasicMaterial({ color: 0x000000, toneMapped: false });
+  const stepMat = new THREE.MeshBasicMaterial({ color: 0x1a0c0c, toneMapped: false }); // dark body-tint step
+  // Windshield: mid step then deep plug
+  {
+    const step = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.34, 0.05), stepMat);
+    step.position.set(0, cabinY + 0.02, cabinZ + 0.42);
+    step.rotation.x = -0.12;
+    g.add(step);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.28, 0.08), plugMat);
+    m.position.set(0, cabinY + 0.02, cabinZ + 0.30);
+    m.rotation.x = -0.12;
+    g.add(m);
+  }
+  // Sides
+  for (const sx of [-1, 1]) {
+    const step = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.34, 0.60), stepMat);
+    step.position.set(sx * 0.46, cabinY + 0.02, cabinZ);
+    g.add(step);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.28, 0.52), plugMat);
+    m.position.set(sx * 0.36, cabinY + 0.02, cabinZ);
+    g.add(m);
+  }
+  // Rear
+  {
+    const step = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.34, 0.05), stepMat);
+    step.position.set(0, cabinY + 0.12, cabinZ - 0.42);
+    g.add(step);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.28, 0.08), plugMat);
+    m.position.set(0, cabinY + 0.12, cabinZ - 0.30);
+    g.add(m);
+  }
+  // Thick outer frame bars (OPEN centers)
+  const lipMatOpts = { roughness: 0.40, metalness: 0.12 };
+  for (const sx of [-0.53, 0.53]) {
+    const rail = box(0.06, 0.40, 0.66, bodyColor, lipMatOpts);
+    rail.position.set(sx, cabinY + 0.02, cabinZ);
+    g.add(rail); bronco.bodyParts.push(rail);
+  }
+  {
+    const z = cabinZ + 0.51;
+    for (const [w,h,x,y] of [[0.82,0.07,0,cabinY+0.20],[0.82,0.07,0,cabinY-0.16],[0.08,0.36,-0.40,cabinY+0.02],[0.08,0.36,0.40,cabinY+0.02]]) {
+      const s = box(w, h, 0.06, bodyColor, lipMatOpts);
+      s.position.set(x, y, z); s.rotation.x = -0.12;
+      g.add(s); bronco.bodyParts.push(s);
+    }
+  }
+  {
+    const z = cabinZ - 0.51;
+    for (const [w,h,x,y] of [[0.82,0.07,0,cabinY+0.28],[0.82,0.07,0,cabinY-0.04],[0.08,0.36,-0.40,cabinY+0.12],[0.08,0.36,0.40,cabinY+0.12]]) {
+      const s = box(w, h, 0.06, bodyColor, lipMatOpts);
+      s.position.set(x, y, z);
+      g.add(s); bronco.bodyParts.push(s);
+    }
+  }
+
+  function makeGlass(w, h, d, x, y, z, rx = 0) {
+    const m = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      new THREE.MeshBasicMaterial({
+        color: 0xd8eef8, transparent: true, opacity: 0.07,
+        depthWrite: false, side: THREE.DoubleSide, toneMapped: false,
+      })
+    );
+    m.position.set(x, y, z);
+    if (rx) m.rotation.x = rx;
+    m.renderOrder = 3;
+    g.add(m);
+  }
+  makeGlass(0.60, 0.24, 0.012, 0, cabinY + 0.02, cabinZ + 0.34, -0.12);
+  makeGlass(0.012, 0.24, 0.48, -0.38, cabinY + 0.02, cabinZ);
+  makeGlass(0.012, 0.24, 0.48,  0.38, cabinY + 0.02, cabinZ);
+  makeGlass(0.58, 0.24, 0.012, 0, cabinY + 0.12, cabinZ - 0.34);
+
   const hood = box(1.0, 0.12, 0.55, bodyColor, { roughness: 0.4, metalness: 0.15 });
   hood.position.set(0, 0.78, 0.55);
   hood.rotation.x = -0.15;
-  g.add(hood);
-  bronco.bodyParts.push(hood);
+  g.add(hood); bronco.bodyParts.push(hood);
 
-  // Roof (independently recolorable)
-  const roof = box(0.88, 0.06, 0.85, roofColor, { roughness: 0.5 });
-  roof.position.set(0, 1.28, -0.15);
-  g.add(roof);
-  bronco.roofParts.push(roof);
+  const roof = box(0.84, 0.055, 0.90, roofColor, { roughness: 0.5 });
+  roof.position.set(0, 1.33, -0.10);
+  g.add(roof); bronco.roofParts.push(roof);
+  for (const rx of [-0.20, 0.20]) {
+    const rail = box(0.055, 0.035, 0.72, roofColor, { roughness: 0.55 });
+    rail.position.set(rx, 1.37, -0.10);
+    g.add(rail); bronco.roofParts.push(rail);
+  }
 
-  // Beltline stripe follows roof for a friendly two-tone
   const stripe = box(1.08, 0.08, 1.65, roofColor, { roughness: 0.5 });
   stripe.position.set(0, 0.48, 0);
-  g.add(stripe);
-  bronco.roofParts.push(stripe);
+  g.add(stripe); bronco.roofParts.push(stripe);
 
-  // Grille
   const grille = box(0.7, 0.28, 0.06, '#2a2a2a', { metalness: 0.5, roughness: 0.4 });
   grille.position.set(0, 0.55, 0.88);
   g.add(grille);
-  // Grille bars
   for (let i = -2; i <= 2; i++) {
     const bar = box(0.04, 0.22, 0.04, '#c0c0c0', { metalness: 0.7, roughness: 0.35 });
     bar.position.set(i * 0.12, 0.55, 0.92);
     g.add(bar);
   }
-  // Bronco-ish badge
   const badge = box(0.22, 0.1, 0.03, accent);
   badge.position.set(0, 0.72, 0.9);
-  g.add(badge);
-  bronco.accentParts.push(badge);
+  g.add(badge); bronco.accentParts.push(badge);
 
-  // Headlights
   const hlL = cyl(0.1, 0.1, 0.08, '#fffde8', { roughness: 0.2, metalness: 0.3, seg: 12 });
   hlL.rotation.x = Math.PI / 2;
   hlL.position.set(-0.35, 0.55, 0.9);
   g.add(hlL);
-  const hlR = hlL.clone();
-  hlR.position.x = 0.35;
-  g.add(hlR);
+  const hlR = hlL.clone(); hlR.position.x = 0.35; g.add(hlR);
 
-  // Tail lights
-  const tlL = box(0.18, 0.12, 0.06, '#e85d4c', { roughness: 0.4, metalness: 0.2 });
-  tlL.position.set(-0.4, 0.55, -0.88);
+  const tlL = box(0.16, 0.11, 0.05, '#e85d4c', { roughness: 0.4, metalness: 0.2 });
+  tlL.position.set(-0.44, 0.50, -0.92);
   g.add(tlL);
-  const tlR = tlL.clone();
-  tlR.position.x = 0.4;
-  g.add(tlR);
+  const tlR = tlL.clone(); tlR.position.x = 0.44; g.add(tlR);
 
-  // Bumpers (fixed light accent)
   const bumpF = box(1.05, 0.14, 0.16, accent, { roughness: 0.55 });
   bumpF.position.set(0, 0.32, 0.92);
-  g.add(bumpF);
-  bronco.accentParts.push(bumpF);
+  g.add(bumpF); bronco.accentParts.push(bumpF);
   const bumpR = box(1.05, 0.14, 0.16, accent, { roughness: 0.55 });
-  bumpR.position.set(0, 0.32, -0.92);
-  g.add(bumpR);
-  bronco.accentParts.push(bumpR);
+  bumpR.position.set(0, 0.32, -0.95);
+  g.add(bumpR); bronco.accentParts.push(bumpR);
 
-  // Fender flares / wheel arches hint
   for (const [sx, sz] of [[-0.55, 0.55], [0.55, 0.55], [-0.55, -0.55], [0.55, -0.55]]) {
     const flare = box(0.12, 0.28, 0.45, bodyColor, { roughness: 0.5 });
     flare.position.set(sx, 0.42, sz);
-    g.add(flare);
-    bronco.bodyParts.push(flare);
+    g.add(flare); bronco.bodyParts.push(flare);
   }
 
-  // Chunky tires + rims (per-wheel materials so recolor is shared via applyCustomization)
   const tireGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.22, 16);
   const rimGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.24, 12);
   const accentRingGeo = new THREE.TorusGeometry(0.2, 0.035, 8, 20);
@@ -1986,99 +2135,117 @@ function buildBronco() {
     const rimMat = mat('#3a3a3a', { metalness: 0.55, roughness: 0.4 });
     const accentMat = mat('#3a3a3a', { metalness: 0.35, roughness: 0.5 });
     const tire = new THREE.Mesh(tireGeo, tireMat);
-    tire.rotation.z = Math.PI / 2;
-    tire.castShadow = true;
-    wheel.add(tire);
+    tire.rotation.z = Math.PI / 2; tire.castShadow = true; wheel.add(tire);
     const rim = new THREE.Mesh(rimGeo, rimMat);
-    rim.rotation.z = Math.PI / 2;
-    rim.castShadow = true;
-    wheel.add(rim);
-    // Sidewall / lip accent so wheel color reads clearly for kids
+    rim.rotation.z = Math.PI / 2; rim.castShadow = true; wheel.add(rim);
     const ring = new THREE.Mesh(accentRingGeo, accentMat);
-    ring.rotation.y = Math.PI / 2;
-    ring.castShadow = true;
-    wheel.add(ring);
+    ring.rotation.y = Math.PI / 2; ring.castShadow = true; wheel.add(ring);
     const baseY = 0.28;
     wheel.position.set(wx, baseY, wz);
     g.add(wheel);
     bronco.wheels.push({ group: wheel, tire, rim, ring, baseY, wx, wz });
   }
 
-  // Side mirrors
   const mirL = box(0.08, 0.08, 0.12, accent);
   mirL.position.set(-0.55, 0.95, 0.25);
-  g.add(mirL);
-  bronco.accentParts.push(mirL);
-  const mirR = mirL.clone();
-  mirR.position.x = 0.55;
-  g.add(mirR);
-  bronco.accentParts.push(mirR);
+  g.add(mirL); bronco.accentParts.push(mirL);
+  const mirR = mirL.clone(); mirR.position.x = 0.55; g.add(mirR); bronco.accentParts.push(mirR);
 
-  // Spare wheel on the back (decorative; follows wheel paint, does not roll-drive)
+  // REAR HATCH: HOLLOW frame around spare (solid panel was hiding the well)
+  {
+    const hatchZ = -0.920;
+    const hatchY = 0.64;
+    const wellBack = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.30, 0.30, 0.05, 28),
+      new THREE.MeshBasicMaterial({ color: 0x050608, toneMapped: false })
+    );
+    wellBack.rotation.x = Math.PI / 2;
+    wellBack.position.set(0, hatchY, -0.800);
+    g.add(wellBack);
+    // Recess sleeve: stacked dark tori forming a cup the spare sits IN
+    for (const [rad, tube, z, col] of [
+      [0.275, 0.035, -0.870, '#0c1014'],
+      [0.270, 0.030, -0.845, '#080a0c'],
+      [0.265, 0.025, -0.825, '#050608'],
+    ]) {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(rad, tube, 8, 28),
+        mat(col, { roughness: 0.95, metalness: 0.02 })
+      );
+      ring.position.set(0, hatchY, z);
+      ring.castShadow = false;
+      g.add(ring);
+    }
+
+    const topBar = box(0.96, 0.14, 0.13, bodyColor, { roughness: 0.40, metalness: 0.14 });
+    topBar.position.set(0, hatchY + 0.23, hatchZ);
+    g.add(topBar); bronco.bodyParts.push(topBar);
+    const botBar = box(0.96, 0.12, 0.13, bodyColor, { roughness: 0.40, metalness: 0.14 });
+    botBar.position.set(0, hatchY - 0.25, hatchZ);
+    g.add(botBar); bronco.bodyParts.push(botBar);
+    const leftBar = box(0.18, 0.34, 0.13, bodyColor, { roughness: 0.40, metalness: 0.14 });
+    leftBar.position.set(-0.39, hatchY, hatchZ);
+    g.add(leftBar); bronco.bodyParts.push(leftBar);
+    const rightBar = box(0.18, 0.34, 0.13, bodyColor, { roughness: 0.40, metalness: 0.14 });
+    rightBar.position.set(0.39, hatchY, hatchZ);
+    g.add(rightBar); bronco.bodyParts.push(rightBar);
+
+    // Molded circular collar: body ring wraps the spare (reads as ONE panel with a well)
+    const wellLip = new THREE.Mesh(
+      new THREE.RingGeometry(0.250, 0.335, 36),
+      mat(bodyColor, { roughness: 0.40, metalness: 0.14, side: THREE.DoubleSide })
+    );
+    wellLip.position.set(0, hatchY, -0.966);
+    wellLip.castShadow = false;
+    g.add(wellLip); bronco.bodyParts.push(wellLip);
+    // Inner bevel of the well (darker body) — depth cue without filling the hole
+    const wellBevel = new THREE.Mesh(
+      new THREE.RingGeometry(0.235, 0.265, 32),
+      mat('#2a1212', { roughness: 0.55, metalness: 0.06, side: THREE.DoubleSide })
+    );
+    wellBevel.position.set(0, hatchY, -0.945);
+    wellBevel.castShadow = false;
+    g.add(wellBevel);
+
+    // Bridge under rear glass / above spare — continuous body for horse paint
+    const bridge = box(0.86, 0.10, 0.12, bodyColor, { roughness: 0.40, metalness: 0.14 });
+    bridge.position.set(0, 0.905, -0.910);
+    g.add(bridge); bronco.bodyParts.push(bridge);
+  }
+
   {
     const spare = new THREE.Group();
     const spareTireMat = mat('#1a1a1a', { roughness: 0.92 });
     const spareRimMat = mat('#3a3a3a', { metalness: 0.55, roughness: 0.4 });
     const spareRingMat = mat('#3a3a3a', { metalness: 0.35, roughness: 0.5 });
-    const spareTire = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.26, 0.26, 0.16, 16),
-      spareTireMat
-    );
-    spareTire.rotation.x = Math.PI / 2; // face rearward
-    spareTire.castShadow = true;
-    spare.add(spareTire);
-    const spareRim = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.11, 0.11, 0.18, 12),
-      spareRimMat
-    );
-    spareRim.rotation.x = Math.PI / 2;
-    spareRim.castShadow = true;
-    spare.add(spareRim);
-    const spareRing = new THREE.Mesh(
-      new THREE.TorusGeometry(0.18, 0.03, 8, 20),
-      spareRingMat
-    );
-    // Torus default lies in XY; rotate so ring faces rear (same as tire face)
-    spareRing.castShadow = true;
-    spare.add(spareRing);
-    // Mount bracket
-    const bracket = box(0.12, 0.35, 0.08, accent, { roughness: 0.55 });
-    bracket.position.set(0, 0, 0.08);
-    spare.add(bracket);
-    bronco.accentParts.push(bracket);
-    spare.position.set(0, 0.72, -0.98);
+    const spareTire = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.245, 0.10, 22), spareTireMat);
+    spareTire.rotation.x = Math.PI / 2; spareTire.castShadow = true; spare.add(spareTire);
+    const spareRim = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.068, 14), spareRimMat);
+    spareRim.rotation.x = Math.PI / 2; spareRim.castShadow = true; spare.add(spareRim);
+    const spareRing = new THREE.Mesh(new THREE.TorusGeometry(0.175, 0.022, 8, 22), spareRingMat);
+    spareRing.castShadow = true; spare.add(spareRing);
+    const bracket = box(0.11, 0.11, 0.02, accent, { roughness: 0.55 });
+    bracket.position.set(0, 0, 0.0);
+    spare.add(bracket); bronco.accentParts.push(bracket);
+    spare.position.set(0, 0.64, -0.885);
     g.add(spare);
     bronco.spare = { group: spare, tire: spareTire, rim: spareRim, ring: spareRing };
   }
 
-  // Rear Bronco horse mark — flush on rear body panel (no floating plaque)
   {
     const horseTex = makeBroncoHorseTexture();
-    // Big enough for a 4yo; aspect matches rearing pony silhouette
-    const horseW = 0.50;
-    const horseH = 0.52;
     const horse = new THREE.Mesh(
-      new THREE.PlaneGeometry(horseW, horseH),
+      new THREE.PlaneGeometry(0.34, 0.32),
       new THREE.MeshStandardMaterial({
-        map: horseTex,
-        transparent: true,
-        alphaTest: 0.15,
-        roughness: 0.62,
-        metalness: 0.04,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -1,
-        polygonOffsetUnits: -1,
+        map: horseTex, transparent: true, alphaTest: 0.18,
+        roughness: 0.85, metalness: 0.0, side: THREE.FrontSide,
+        depthWrite: true,
       })
     );
-    horse.castShadow = false;
-    horse.receiveShadow = false;
-    // Plane faces +Z by default; flip to face rearward (-Z) for chase cam
+    horse.castShadow = false; horse.receiveShadow = false;
     horse.rotation.y = Math.PI;
-    // Body rear face at z≈-0.85; barely offset to avoid z-fight (flush, not a board)
-    // Spare center y=0.72 r≈0.26 → top ~0.98; place so HEAD sits clear above spare
-    horse.position.set(0, 1.16, -0.855);
+    horse.renderOrder = 2;
+    horse.position.set(0, 0.905, -0.971);
     g.add(horse);
     bronco.horseLogo = horse;
   }
@@ -2232,12 +2399,15 @@ let goArrowTimer = 0;
 
 function setupStick() {
   const zone = document.getElementById('stickZone');
+  const base = document.getElementById('stickBase');
   const knob = document.getElementById('stickKnob');
   let active = false;
+  let dragging = false;
   let pid = null;
+  let startX = 0, startY = 0;
 
   function setKnob(nx, ny) {
-    const max = zone.clientWidth * 0.36;
+    const max = zone.clientWidth * 0.34;
     const dx = nx * max;
     const dy = ny * max;
     knob.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -2251,8 +2421,8 @@ function setupStick() {
     let dy = (clientY - cy) / (rect.height / 2);
     const mag = Math.hypot(dx, dy);
     if (mag > 1) { dx /= mag; dy /= mag; }
-    // deadzone
-    const dead = STICK_DEAD;
+    // deadzone — thumb stays home until a real slide
+    const dead = Math.max(STICK_DEAD, 0.14);
     let ox = 0, oy = 0;
     if (mag > dead) {
       const scale = (mag - dead) / (1 - dead);
@@ -2266,22 +2436,34 @@ function setupStick() {
 
   function end() {
     active = false;
+    dragging = false;
     pid = null;
     input.sx = 0;
     input.sz = 0;
     setKnob(0, 0);
+    if (base) base.classList.remove('dragging');
   }
 
   zone.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     active = true;
+    dragging = false;
     pid = e.pointerId;
+    startX = e.clientX;
+    startY = e.clientY;
     zone.setPointerCapture(pid);
-    read(e.clientX, e.clientY);
+    // Tap alone does nothing — wait for a slide so it reads as a drag pad
+    setKnob(0, 0);
+    input.sx = 0;
+    input.sz = 0;
   });
   zone.addEventListener('pointermove', (e) => {
     if (!active || e.pointerId !== pid) return;
     e.preventDefault();
+    const slide = Math.hypot(e.clientX - startX, e.clientY - startY);
+    if (!dragging && slide < 10) return; // require a short drag before steering
+    dragging = true;
+    if (base) base.classList.add('dragging');
     read(e.clientX, e.clientY);
   });
   zone.addEventListener('pointerup', end);
@@ -2431,7 +2613,7 @@ function doHelpUnstuck(opts) {
   }
   const w = resolveWalls(bronco.x, bronco.z, bronco.radius * 0.7);
   bronco.x = w.x; bronco.z = w.z;
-  const st = resolveStatic(bronco.x, bronco.z, bronco.radius * 0.55);
+  const st = resolveStatic(bronco.x, bronco.z, bronco.radius * 0.42);
   bronco.x = st.x; bronco.z = st.z;
   bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.55);
   bronco.group.position.set(bronco.x, 0, bronco.z);
@@ -2564,22 +2746,23 @@ function updateBronco(dt) {
 
   const w = resolveWalls(nx, nz, bronco.radius * 0.7);
   nx = w.x; nz = w.z;
-  // Smaller furniture radius so Bronco glances off couch/table more than wedges
-  const st = resolveStatic(nx, nz, bronco.radius * 0.55);
+  // Soft furniture radius — playful glance-off, rare dig-in
+  const st = resolveStatic(nx, nz, bronco.radius * 0.42);
   nx = st.x; nz = st.z;
 
-  // Slight bounce on furniture contact — deflect rather than dig in
+  // Stronger glance-off on furniture — shove slides past instead of sticking
   if (st.hit) {
-    const glance = 0.10 + Math.min(0.18, Math.abs(bronco.speed) * 0.06);
+    const glance = 0.22 + Math.min(0.32, Math.abs(bronco.speed) * 0.12);
     nx += st.nx * glance;
     nz += st.nz * glance;
     const inward = bronco.vx * (-st.nx) + bronco.vz * (-st.nz);
     if (inward > 0) {
-      bronco.vx += st.nx * inward * 0.9;
-      bronco.vz += st.nz * inward * 0.9;
-      bronco.speed *= 0.78;
+      bronco.vx += st.nx * inward * 1.15;
+      bronco.vz += st.nz * inward * 1.15;
+      // Keep most speed so it feels like a bounce, not a sticky wall
+      bronco.speed *= 0.92;
     }
-    yawAwayFromNormal(st.nx, st.nz, dt * 0.65);
+    yawAwayFromNormal(st.nx, st.nz, dt * 0.95);
   }
 
   // Accumulate contact normal (wall + furniture)
@@ -2592,11 +2775,11 @@ function updateBronco(dt) {
     lastPushNz = pnz / plen;
   }
 
-  // If blocked heavily, kill speed a bit + track stuck
+  // If blocked heavily, ease speed a little (keep floaty; avoid sticky stop)
   const moved = Math.hypot(nx - bronco.x, nz - bronco.z);
   const want = Math.abs(bronco.speed) * dt;
-  if (want > 0.001 && moved < want * 0.3) {
-    bronco.speed *= 0.55;
+  if (want > 0.001 && moved < want * 0.22) {
+    bronco.speed *= 0.72;
   }
 
   const pressingIn = input.go || Math.abs(throttle) > 0.15 || Math.abs(bronco.speed) > 0.05;
@@ -2621,42 +2804,40 @@ function updateBronco(dt) {
     }
   }
 
-  // Soft bounce after ~0.25s stuck — must NOT reset stuckTimer
-  if (stuckTimer >= 0.25 && softBounceCd <= 0 && plen > 0.001) {
-    const push = 0.55 + Math.min(0.55, stuckTimer * 0.35);
+  // Soft bounce after ~0.55s truly stuck — must NOT reset stuckTimer
+  if (stuckTimer >= 0.55 && softBounceCd <= 0 && plen > 0.001) {
+    const push = 0.75 + Math.min(0.7, stuckTimer * 0.4);
     nx += lastPushNx * push;
     nz += lastPushNz * push;
-    yawAwayFromNormal(lastPushNx, lastPushNz, 0.2);
-    bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.35);
-    softBounceCd = 0.28;
+    yawAwayFromNormal(lastPushNx, lastPushNz, 0.28);
+    bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.45);
+    softBounceCd = 0.42;
     softBounceFails += 1;
-    setHelpVisible(true);
+    // Don't flash Spin! on first soft bounce — wait for a real jam
     const w2 = resolveWalls(nx, nz, bronco.radius * 0.7);
     nx = w2.x; nz = w2.z;
-    const st2 = resolveStatic(nx, nz, bronco.radius * 0.55);
+    const st2 = resolveStatic(nx, nz, bronco.radius * 0.42);
     nx = st2.x; nz = st2.z;
-  } else if (stuckTimer >= 0.25 && softBounceCd <= 0 && (nearEdge || nearCorner)) {
-    yawAwayFromNormal(-bronco.x, -bronco.z, 0.25);
+  } else if (stuckTimer >= 0.55 && softBounceCd <= 0 && (nearEdge || nearCorner)) {
+    yawAwayFromNormal(-bronco.x, -bronco.z, 0.3);
     const len = Math.hypot(bronco.x, bronco.z) || 1;
-    nx += (-bronco.x / len) * 0.4;
-    nz += (-bronco.z / len) * 0.4;
-    softBounceCd = 0.3;
+    nx += (-bronco.x / len) * 0.55;
+    nz += (-bronco.z / len) * 0.55;
+    softBounceCd = 0.42;
     softBounceFails += 1;
-    setHelpVisible(true);
   }
 
-  // After 2 failed soft bounces (~0.8s), auto Spin once; keep button for next jam
-  if (softBounceFails >= 2 && stuckTimer >= 0.8 && !autoUnstuckDone) {
+  // After 3 failed soft bounces (~1.6s), auto Spin once; Spin! is celebration not spam
+  if (softBounceFails >= 3 && stuckTimer >= 1.6 && !autoUnstuckDone) {
     autoUnstuckDone = true;
     doHelpUnstuck({ fromAuto: true });
-    // apply post-unstuck position into nx/nz for this frame
     nx = bronco.x;
     nz = bronco.z;
   }
 
-  // Arm Help: contact + intent ≥0.35s, or near-corner light input ≥0.6s
-  if (plen > 0.001 && pressingIn && stuckTimer >= 0.35) setHelpVisible(true);
-  if (nearCorner && lightInput && stuckTimer >= 0.6) setHelpVisible(true);
+  // Arm Help later so Spin! stays special
+  if (plen > 0.001 && pressingIn && stuckTimer >= 0.9) setHelpVisible(true);
+  if (nearCorner && lightInput && stuckTimer >= 1.2) setHelpVisible(true);
 
   if (helpHold > 0) {
     helpHold = Math.max(0, helpHold - dt);
@@ -2735,7 +2916,7 @@ function pushToys(dt) {
       let dd = Math.hypot(ddx, ddz);
       const md = p.radius + o.radius;
       if (dd < md && dd > 0.0001) {
-        const ov = (md - dd) * 0.5;
+        const ov = (md - dd) * 0.35;
         const nx = ddx / dd;
         const nz = ddz / dd;
         px += nx * ov;
@@ -3155,6 +3336,8 @@ bindHoldAction(document.getElementById('garageResetBtn'), {
     applyCustomization(true);
   },
 });
-  </script>
+  
+
+</script>
 </body>
 </html>
