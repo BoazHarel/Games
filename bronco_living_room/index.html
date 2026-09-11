@@ -740,7 +740,7 @@ if (!renderer.getContext()) {
 }
 
 // ---------- Constants ----------
-const ROOM = { w: 14, d: 12, h: 4.2 };
+const ROOM = { w: 30, d: 26, h: 4.5 }; // Round2: ~2.15× cozy playroom (still walled)
 const FLOOR_Y = 0;
 const BODY_COLORS = ['#3a7ec4', '#e85d4c', '#5cb88a', '#f0c040', '#9b7ed9', '#f0a05a', '#ff8fab', '#ffffff'];
 const ROOF_COLORS = ['#f5f5f5', '#3a7ec4', '#e85d4c', '#5cb88a', '#f0c040', '#9b7ed9', '#2a2a2a', '#ffd6a5'];
@@ -771,31 +771,31 @@ renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffe8d0);
-scene.fog = new THREE.Fog(0xffe8d0, 16, 28);
+scene.fog = new THREE.Fog(0xffe8d0, 24, 52);
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 60);
-camera.position.set(0, 4, 8);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 90);
+camera.position.set(0, 5.2, 10);
 
 // Warm cheerful lights
 const hemi = new THREE.HemisphereLight(0xfff0dd, 0xd4b896, 0.85);
 scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff2dc, 1.05);
-sun.position.set(4, 10, 3);
+sun.position.set(6, 14, 5);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 sun.shadow.camera.near = 1;
-sun.shadow.camera.far = 28;
-sun.shadow.camera.left = -10;
-sun.shadow.camera.right = 10;
-sun.shadow.camera.top = 10;
-sun.shadow.camera.bottom = -10;
+sun.shadow.camera.far = 48;
+sun.shadow.camera.left = -20;
+sun.shadow.camera.right = 20;
+sun.shadow.camera.top = 20;
+sun.shadow.camera.bottom = -20;
 sun.shadow.bias = -0.0008;
 scene.add(sun);
-const fill = new THREE.PointLight(0xffc9a8, 0.45, 20);
-fill.position.set(-3, 3.2, -2);
+const fill = new THREE.PointLight(0xffc9a8, 0.5, 36);
+fill.position.set(-6, 3.5, -4);
 scene.add(fill);
-const lamp = new THREE.PointLight(0xffe0b0, 0.35, 12);
-lamp.position.set(4, 2.5, 3);
+const lamp = new THREE.PointLight(0xffe0b0, 0.4, 22);
+lamp.position.set(8, 2.8, 6);
 scene.add(lamp);
 
 // ---------- Helpers ----------
@@ -923,13 +923,17 @@ function buildRoom() {
   floor.receiveShadow = true;
   group.add(floor);
 
-  // Rug
-  const rug = box(6.5, 0.04, 4.5, '#f2a0a0', { roughness: 1 });
-  rug.position.set(0, 0.02, 0.5);
+  // Rug (scaled with larger playroom — still a cozy island)
+  const rug = box(12, 0.04, 9, '#f2a0a0', { roughness: 1 });
+  rug.position.set(0, 0.02, 0.8);
   group.add(rug);
-  const rugInner = box(5.5, 0.035, 3.5, '#ffe0c8', { roughness: 1 });
-  rugInner.position.set(0, 0.03, 0.5);
+  const rugInner = box(10, 0.035, 7.2, '#ffe0c8', { roughness: 1 });
+  rugInner.position.set(0, 0.03, 0.8);
   group.add(rugInner);
+  // Second smaller rug near play area
+  const rug2 = box(5.5, 0.035, 4.2, '#a8d8ea', { roughness: 1 });
+  rug2.position.set(6.5, 0.025, 5.5);
+  group.add(rug2);
 
   // Walls
   const wallMat = '#fff5ea';
@@ -952,21 +956,34 @@ function buildRoom() {
     group.add(bb);
   }
 
-  // Window on back wall
+  // Windows on back wall (spaced for wider room)
   const winFrame = box(3.2, 2.2, 0.12, '#f0e0c8');
-  winFrame.position.set(-2.5, 2.4, -ROOM.d / 2 + 0.12);
+  winFrame.position.set(-5.5, 2.4, -ROOM.d / 2 + 0.12);
   group.add(winFrame);
   const winGlass = box(2.7, 1.7, 0.06, '#b8e0f0', { roughness: 0.2, metalness: 0.1 });
-  winGlass.position.set(-2.5, 2.4, -ROOM.d / 2 + 0.16);
+  winGlass.position.set(-5.5, 2.4, -ROOM.d / 2 + 0.16);
   group.add(winGlass);
+  const winFrame2 = box(3.0, 2.0, 0.12, '#f0e0c8');
+  winFrame2.position.set(1.2, 2.35, -ROOM.d / 2 + 0.12);
+  group.add(winFrame2);
+  const winGlass2 = box(2.5, 1.55, 0.06, '#b8e0f0', { roughness: 0.2, metalness: 0.1 });
+  winGlass2.position.set(1.2, 2.35, -ROOM.d / 2 + 0.16);
+  group.add(winGlass2);
 
   // Picture frame
   const pic = box(1.4, 1.1, 0.08, '#fffaf0');
-  pic.position.set(3.2, 2.5, -ROOM.d / 2 + 0.12);
+  pic.position.set(7.5, 2.5, -ROOM.d / 2 + 0.12);
   group.add(pic);
   const picArt = box(1.1, 0.8, 0.05, '#a8d8ea');
-  picArt.position.set(3.2, 2.5, -ROOM.d / 2 + 0.16);
+  picArt.position.set(7.5, 2.5, -ROOM.d / 2 + 0.16);
   group.add(picArt);
+  // Side-wall poster (left)
+  const poster = box(0.08, 1.3, 1.6, '#fffaf0');
+  poster.position.set(-ROOM.w / 2 + 0.12, 2.3, 2.5);
+  group.add(poster);
+  const posterArt = box(0.05, 1.0, 1.3, '#ffb4a2');
+  posterArt.position.set(-ROOM.w / 2 + 0.16, 2.3, 2.5);
+  group.add(posterArt);
 
   return group;
 }
@@ -991,6 +1008,11 @@ function addStaticAABB(meshOrCenter, hw, hh, hd) {
 
 function buildFurniture() {
   const g = new THREE.Group();
+  // Furniture hugs walls of the larger room — open mid-floor for play
+  const backZ = -ROOM.d / 2 + 1.9;
+  const frontZ = ROOM.d / 2 - 2.2;
+  const leftX = -ROOM.w / 2 + 2.0;
+  const rightX = ROOM.w / 2 - 2.0;
 
   // Couch (back of room)
   const couch = new THREE.Group();
@@ -1013,11 +1035,11 @@ function buildFurniture() {
   const cp2 = box(0.9, 0.45, 0.25, '#ffd6a5');
   cp2.position.set(0.9, 0.85, -0.25);
   couch.add(cp2);
-  couch.position.set(0, 0, -4.2);
+  couch.position.set(0, 0, backZ);
   g.add(couch);
-  addStaticAABB({ x: 0, y: 0.55, z: -4.2 }, 1.95, 0.7, 0.72); // softer couch
+  addStaticAABB({ x: 0, y: 0.55, z: backZ }, 1.95, 0.7, 0.72); // softer couch
 
-  // Coffee table
+  // Coffee table (in front of couch, still near back — mid room stays toy-filled)
   const table = new THREE.Group();
   const top = box(2.2, 0.12, 1.1, '#c4a882');
   top.position.y = 0.48;
@@ -1027,64 +1049,83 @@ function buildFurniture() {
     leg.position.set(lx, 0.24, lz);
     table.add(leg);
   }
-  table.position.set(0, 0, -1.2);
+  const tableZ = backZ + 3.2;
+  table.position.set(0, 0, tableZ);
   g.add(table);
-  addStaticAABB({ x: 0, y: 0.3, z: -1.2 }, 0.98, 0.35, 0.48); // softer table
+  addStaticAABB({ x: 0, y: 0.3, z: tableZ }, 0.98, 0.35, 0.48); // softer table
 
-  // TV stand + TV
+  // TV stand + TV (back-right)
   const stand = box(2.8, 0.55, 0.7, '#8b7355');
-  stand.position.set(4.2, 0.28, -4.5);
+  stand.position.set(rightX - 1.5, 0.28, backZ - 0.2);
   g.add(stand);
-  addStaticAABB({ x: 4.2, y: 0.4, z: -4.5 }, 1.28, 0.55, 0.34);
+  addStaticAABB({ x: rightX - 1.5, y: 0.4, z: backZ - 0.2 }, 1.28, 0.55, 0.34);
   const tv = box(2.2, 1.3, 0.12, '#2a2a32', { metalness: 0.4, roughness: 0.4 });
-  tv.position.set(4.2, 1.25, -4.55);
+  tv.position.set(rightX - 1.5, 1.25, backZ - 0.25);
   g.add(tv);
   const screen = box(1.95, 1.05, 0.04, '#5a9fd4', { roughness: 0.3 });
-  screen.position.set(4.2, 1.25, -4.48);
+  screen.position.set(rightX - 1.5, 1.25, backZ - 0.18);
   g.add(screen);
-  addStaticAABB({ x: 4.2, y: 1.2, z: -4.55 }, 1.05, 0.75, 0.16);
+  addStaticAABB({ x: rightX - 1.5, y: 1.2, z: backZ - 0.25 }, 1.05, 0.75, 0.16);
 
   // Bookshelf left
   const shelf = box(1.2, 2.2, 0.45, '#d4b896');
-  shelf.position.set(-5.5, 1.1, -4.5);
+  shelf.position.set(leftX + 0.2, 1.1, backZ - 0.15);
   g.add(shelf);
-  addStaticAABB({ x: -5.5, y: 1.1, z: -4.5 }, 0.55, 1.15, 0.24);
+  addStaticAABB({ x: leftX + 0.2, y: 1.1, z: backZ - 0.15 }, 0.55, 1.15, 0.24);
   const bookColors = ['#e85d4c', '#5cb88a', '#4a90d9', '#f0c040', '#9b7ed9'];
   bookColors.forEach((c, i) => {
     const b = box(0.22, 0.55, 0.35, c);
-    b.position.set(-5.85 + i * 0.22, 0.55, -4.45);
+    b.position.set(leftX - 0.15 + i * 0.22, 0.55, backZ - 0.1);
     g.add(b);
   });
 
   // Side table near couch
   const side = box(0.7, 0.55, 0.7, '#c4a882');
-  side.position.set(-3.2, 0.28, -4.0);
+  side.position.set(-3.4, 0.28, backZ + 0.3);
   g.add(side);
-  addStaticAABB({ x: -3.2, y: 0.35, z: -4.0 }, 0.32, 0.4, 0.32);
+  addStaticAABB({ x: -3.4, y: 0.35, z: backZ + 0.3 }, 0.32, 0.4, 0.32);
   const lampBase = cyl(0.12, 0.18, 0.35, '#eee8e0');
-  lampBase.position.set(-3.2, 0.73, -4.0);
+  lampBase.position.set(-3.4, 0.73, backZ + 0.3);
   g.add(lampBase);
   const shade = cyl(0.28, 0.35, 0.35, '#ffe8c8', { roughness: 0.8 });
-  shade.position.set(-3.2, 1.05, -4.0);
+  shade.position.set(-3.4, 1.05, backZ + 0.3);
   g.add(shade);
 
-  // Plant pot
+  // Plant pot (front-right corner)
   const pot = cyl(0.22, 0.18, 0.4, '#e07060');
-  pot.position.set(5.5, 0.2, 3.5);
+  pot.position.set(rightX, 0.2, frontZ);
   g.add(pot);
   const plant = sphere(0.4, '#6cbc7a', { roughness: 0.9 });
-  plant.position.set(5.5, 0.7, 3.5);
+  plant.position.set(rightX, 0.7, frontZ);
   g.add(plant);
-  addStaticAABB({ x: 5.5, y: 0.45, z: 3.5 }, 0.28, 0.55, 0.28);
+  addStaticAABB({ x: rightX, y: 0.45, z: frontZ }, 0.28, 0.55, 0.28);
 
-  // Toy chest
+  // Toy chest (front-left)
   const chest = box(1.6, 0.7, 0.9, '#e8a04a');
-  chest.position.set(-5.2, 0.35, 3.8);
+  chest.position.set(leftX + 0.5, 0.35, frontZ);
   g.add(chest);
   const lid = box(1.65, 0.1, 0.95, '#d49040');
-  lid.position.set(-5.2, 0.75, 3.8);
+  lid.position.set(leftX + 0.5, 0.75, frontZ);
   g.add(lid);
-  addStaticAABB({ x: -5.2, y: 0.4, z: 3.8 }, 0.72, 0.45, 0.42);
+  addStaticAABB({ x: leftX + 0.5, y: 0.4, z: frontZ }, 0.72, 0.45, 0.42);
+
+  // Extra fixed armchair (right wall) — glance-off furniture, not mid clutter
+  const chair = new THREE.Group();
+  const cSeat = box(1.3, 0.4, 1.2, '#c9a0dc');
+  cSeat.position.set(0, 0.35, 0);
+  chair.add(cSeat);
+  const cBack = box(1.3, 0.85, 0.28, '#b388c9');
+  cBack.position.set(0, 0.85, -0.45);
+  chair.add(cBack);
+  chair.position.set(rightX - 0.3, 0, 1.5);
+  g.add(chair);
+  addStaticAABB({ x: rightX - 0.3, y: 0.5, z: 1.5 }, 0.6, 0.55, 0.55);
+
+  // Low shelf / bench on left wall
+  const bench = box(2.4, 0.45, 0.7, '#d4b896');
+  bench.position.set(leftX + 0.1, 0.22, 3.5);
+  g.add(bench);
+  addStaticAABB({ x: leftX + 0.1, y: 0.3, z: 3.5 }, 1.1, 0.35, 0.32);
 
   // Walls as static (inner bounds)
   const wallThick = 0.15;
@@ -1121,11 +1162,13 @@ function buildToys() {
   const g = new THREE.Group();
   const pastel = ['#ffb4a2', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#bdb2ff', '#ffc6ff', '#a0c4ff'];
 
-  // Soft blocks
+  // Soft blocks — clustered in MID room so kids don't just hug walls
   const blockPos = [
-    [-2.5, 0.25, 1.5], [ -2.1, 0.25, 1.8], [-2.3, 0.55, 1.6],
-    [2.8, 0.25, 2.2], [3.1, 0.25, 2.0], [2.9, 0.55, 2.1],
-    [1.2, 0.25, 3.5], [-4, 0.25, 1], [3.5, 0.25, -0.2],
+    [-1.2, 0.25, 0.4], [-0.75, 0.25, 0.7], [-1.0, 0.55, 0.5],
+    [1.4, 0.25, -0.6], [1.75, 0.25, -0.35], [1.55, 0.55, -0.5],
+    [0.2, 0.25, 1.8], [-2.2, 0.25, -1.4], [2.4, 0.25, 1.2],
+    [-0.4, 0.25, -2.0], [0.6, 0.55, -1.7], [-1.8, 0.25, 2.2],
+    [3.0, 0.25, -0.2], [-2.8, 0.25, 0.3], [0.9, 0.25, 0.1],
   ];
   blockPos.forEach((p, i) => {
     const s = 0.4 + (i % 3) * 0.05;
@@ -1136,13 +1179,15 @@ function buildToys() {
     makePushable(m, s * 0.65, 0.5);
   });
 
-  // Balls
+  // Balls — mid-floor attractors
   const ballData = [
-    [1.5, 0.28, 1.2, 0.28, '#ff8fab'],
-    [-1.8, 0.32, 2.5, 0.32, '#80ed99'],
-    [0.5, 0.22, 3.2, 0.22, '#72efdd'],
-    [4.0, 0.3, 1.5, 0.3, '#ffd60a'],
-    [-3.5, 0.25, 2.8, 0.25, '#c77dff'],
+    [0.3, 0.28, -0.3, 0.28, '#ff8fab'],
+    [-1.5, 0.32, 1.1, 0.32, '#80ed99'],
+    [1.8, 0.22, 1.5, 0.22, '#72efdd'],
+    [-0.6, 0.3, 2.6, 0.3, '#ffd60a'],
+    [2.2, 0.25, -1.8, 0.25, '#c77dff'],
+    [0.0, 0.35, 0.9, 0.35, '#ff9f1c'],
+    [-2.4, 0.26, -0.5, 0.26, '#4ecdc4'],
   ];
   ballData.forEach(([x, y, z, r, c]) => {
     const m = sphere(r, c, { roughness: 0.55, seg: 14 });
@@ -1151,12 +1196,14 @@ function buildToys() {
     makePushable(m, r, 0.4);
   });
 
-  // Pillows (flat boxes)
+  // Pillows (flat boxes) — soft shoveables across mid rug
   const pillows = [
-    [-1.2, 0.12, 0.8, 0.9, 0.2, 0.7, '#ffc8dd'],
-    [2.0, 0.12, 0.3, 0.8, 0.18, 0.6, '#bde0fe'],
-    [-0.3, 0.12, 2.8, 0.7, 0.22, 0.7, '#cdb4db'],
-    [3.8, 0.12, 2.8, 0.85, 0.2, 0.55, '#ffafcc'],
+    [-0.8, 0.12, -0.9, 0.9, 0.2, 0.7, '#ffc8dd'],
+    [1.1, 0.12, 0.6, 0.8, 0.18, 0.6, '#bde0fe'],
+    [-1.6, 0.12, 1.9, 0.7, 0.22, 0.7, '#cdb4db'],
+    [2.0, 0.12, 2.4, 0.85, 0.2, 0.55, '#ffafcc'],
+    [0.4, 0.12, -2.4, 1.0, 0.2, 0.75, '#fdffb6'],
+    [-2.6, 0.12, 0.8, 0.75, 0.18, 0.65, '#caffbf'],
   ];
   pillows.forEach(([x, y, z, w, h, d, c]) => {
     const m = box(w, h, d, c, { roughness: 0.95 });
@@ -1166,7 +1213,7 @@ function buildToys() {
     makePushable(m, Math.max(w, d) * 0.45, 0.35);
   });
 
-  // Stuffed-toy blobs (squishy spheres + ears)
+  // Stuffed-toy blobs (squishy spheres + ears) — mid + near-mid
   function stuffedAnimal(x, z, bodyColor, earColor) {
     const body = sphere(0.38, bodyColor, { roughness: 0.9, seg: 12 });
     body.position.set(x, 0.38, z);
@@ -1183,18 +1230,19 @@ function buildToys() {
     nose.position.set(0, 0.05, 0.35);
     body.add(nose);
   }
-  stuffedAnimal(-3.8, -0.5, '#f4a261', '#e76f51');
-  stuffedAnimal(2.2, -2.8, '#90dbf4', '#00b4d8');
-  stuffedAnimal(-1.5, 3.6, '#ffcfd2', '#ff8fab');
-  stuffedAnimal(5.0, 0.5, '#b8f2e6', '#98f5e1');
-  stuffedAnimal(0.8, -3.5, '#e2cfc4', '#d4a373');
+  stuffedAnimal(-2.0, 0.2, '#f4a261', '#e76f51');
+  stuffedAnimal(1.6, -2.2, '#90dbf4', '#00b4d8');
+  stuffedAnimal(-0.5, 2.0, '#ffcfd2', '#ff8fab');
+  stuffedAnimal(2.8, 0.8, '#b8f2e6', '#98f5e1');
+  stuffedAnimal(0.6, -0.8, '#e2cfc4', '#d4a373');
+  stuffedAnimal(-3.2, 2.5, '#ffd6a5', '#f4a261');
 
-  // --- Extra silly pushables (scattered, leave drive lanes open) ---
+  // --- Extra silly pushables (mid-room focus, leave drive lanes open) ---
 
-  // Giant floor pillow
+  // Giant floor pillow (mid-left)
   {
     const m = box(1.6, 0.28, 1.1, '#ff9ecd', { roughness: 0.98 });
-    m.position.set(-4.6, 0.14, -2.2);
+    m.position.set(-3.4, 0.14, -1.6);
     m.rotation.y = 0.35;
     g.add(m);
     makePushable(m, 0.85, 0.45);
@@ -1203,7 +1251,7 @@ function buildToys() {
   // Rubber duck–ish (yellow blob + beak)
   {
     const body = sphere(0.36, '#ffe66d', { roughness: 0.55, seg: 12 });
-    body.position.set(4.6, 0.36, -2.4);
+    body.position.set(2.6, 0.36, -0.9);
     g.add(body);
     const head = sphere(0.24, '#ffe66d', { roughness: 0.55, seg: 10 });
     head.position.set(0, 0.28, 0.22);
@@ -1221,7 +1269,7 @@ function buildToys() {
     makePushable(body, 0.42, 0.4);
   }
 
-  // Stackable-looking rings / donuts
+  // Stackable-looking rings / donuts — mid cluster
   function toyRing(x, z, color, r = 0.38) {
     const m = new THREE.Mesh(
       new THREE.TorusGeometry(r, r * 0.28, 10, 22),
@@ -1234,14 +1282,15 @@ function buildToys() {
     g.add(m);
     makePushable(m, r * 0.95, 0.35);
   }
-  toyRing(-2.8, -3.2, '#ff6b6b', 0.4);
-  toyRing(3.2, 3.6, '#4ecdc4', 0.36);
-  toyRing(0.2, -1.6, '#ffe66d', 0.34);
+  toyRing(-1.0, -1.5, '#ff6b6b', 0.4);
+  toyRing(1.2, 2.0, '#4ecdc4', 0.36);
+  toyRing(0.0, 0.2, '#ffe66d', 0.34);
+  toyRing(3.2, 1.6, '#bdb2ff', 0.32);
 
-  // Beach ball (big, very light)
+  // Beach ball (big, very light) — centerish lure
   {
     const m = sphere(0.55, '#ff6b6b', { roughness: 0.4, seg: 16 });
-    m.position.set(-0.8, 0.55, -4.2);
+    m.position.set(-0.2, 0.55, 1.2);
     const band = new THREE.Mesh(
       new THREE.SphereGeometry(0.552, 16, 8, 0, Math.PI * 2, 0.7, 0.55),
       mat('#fffef5', { roughness: 0.4 })
@@ -1267,7 +1316,7 @@ function buildToys() {
       tip.rotation.x = Math.PI / 2;
       proxy.add(tip);
     }
-    proxy.position.set(5.2, 0.34, 2.8);
+    proxy.position.set(2.0, 0.34, 0.2);
     g.add(proxy);
     makePushable(proxy, 0.4, 0.4);
   }
@@ -1283,7 +1332,7 @@ function buildToys() {
     tip.rotation.x = Math.PI;
     tip.position.set(0, -0.18, 0);
     holder.add(c1, c2, tip);
-    holder.position.set(-5.0, 0.38, 1.8);
+    holder.position.set(-1.8, 0.38, -2.6);
     g.add(holder);
     // makePushable expects mesh.position — Groups work the same for x/z
     makePushable(holder, 0.42, 0.38);
@@ -1292,7 +1341,7 @@ function buildToys() {
   // Cardboard box that slides
   {
     const m = box(0.7, 0.55, 0.7, '#d4a574', { roughness: 0.95 });
-    m.position.set(1.8, 0.28, -3.8);
+    m.position.set(1.0, 0.28, -1.2);
     m.rotation.y = 0.25;
     const flap = box(0.68, 0.08, 0.35, '#c49564', { roughness: 0.95 });
     flap.position.set(0, 0.3, 0.12);
@@ -1307,7 +1356,7 @@ function buildToys() {
   // Soft cone "party hat" toy
   {
     const m = cyl(0.02, 0.32, 0.55, '#bdb2ff', { roughness: 0.85, seg: 12 });
-    m.position.set(-3.2, 0.28, 3.8);
+    m.position.set(-2.4, 0.28, 1.5);
     const pom = sphere(0.1, '#ffc6ff', { roughness: 0.9, seg: 8 });
     pom.position.set(0, 0.32, 0);
     m.add(pom);
@@ -1318,7 +1367,7 @@ function buildToys() {
   // Little soft cylinder "juice cup"
   {
     const m = cyl(0.22, 0.2, 0.4, '#9bf6ff', { roughness: 0.7, seg: 14 });
-    m.position.set(4.2, 0.2, 0.2);
+    m.position.set(0.8, 0.2, 2.8);
     const straw = cyl(0.03, 0.03, 0.35, '#ff8fab', { roughness: 0.6, seg: 6 });
     straw.position.set(0.08, 0.3, 0);
     m.add(straw);
@@ -1326,8 +1375,75 @@ function buildToys() {
     makePushable(m, 0.28, 0.32);
   }
 
+  // Extra mid-room soft blocks tower lure
+  {
+    const colors = ['#ffadad', '#ffd6a5', '#fdffb6'];
+    for (let i = 0; i < 3; i++) {
+      const s = 0.42;
+      const m = box(s, s, s, colors[i], { roughness: 0.85 });
+      m.position.set(-0.1 + i * 0.05, 0.25 + i * 0.42, -0.05);
+      m.rotation.y = i * 0.2;
+      g.add(m);
+      makePushable(m, s * 0.65, 0.48);
+    }
+  }
+
+  // Soft bowling-pin-ish lure near center
+  {
+    const m = cyl(0.12, 0.22, 0.55, '#fff0f5', { roughness: 0.8, seg: 12 });
+    m.position.set(1.5, 0.28, 1.0);
+    const top = sphere(0.14, '#ff8fab', { roughness: 0.8, seg: 10 });
+    top.position.set(0, 0.32, 0);
+    m.add(top);
+    g.add(m);
+    makePushable(m, 0.28, 0.33);
+  }
+
+  // Kid Games UX: thin toys immediately around Bronco spawn so windows/spare
+  // read on first Drive!. Push out of a small clear radius; bias toward the
+  // mid-room rug so that heap stays dense as the soft-shove lure. Masses /
+  // makePushable radii unchanged (Preschool soft watch).
+  {
+    const spawnX = typeof bronco !== 'undefined' ? bronco.x : 0;
+    const spawnZ = typeof bronco !== 'undefined' ? bronco.z : 2.5;
+    const clearR = 1.65;
+    const midMinZ = -0.9;
+    const midMaxZ = 1.2;
+    for (const p of pushables) {
+      if (!p.mesh || !p.mesh.position) continue;
+      const mx = p.mesh.position.x;
+      const mz = p.mesh.position.z;
+      // Leave denser center-rug cluster alone (lure just ahead toward mid room)
+      if (mz >= midMinZ && mz <= midMaxZ && Math.abs(mx) < 2.35) continue;
+      let dx = mx - spawnX;
+      let dz = mz - spawnZ;
+      let dist = Math.hypot(dx, dz);
+      const need = clearR + p.radius * 0.3;
+      if (dist >= need) continue;
+      // Near-overlap: bias toward mid-room (-Z from spawn) so silhouette clears
+      // and toys feed the lure pile instead of fanning into walls.
+      if (dist < 0.08) {
+        dx = (mx || 0.2) * 0.25;
+        dz = -1;
+        dist = Math.hypot(dx, dz) || 1;
+      }
+      let ux = dx / dist;
+      let uz = dz / dist;
+      // Blend radial exit with toward-mid so +Z-side toys don't drift further away
+      const midUx = mx * 0.12;
+      const midUz = -1;
+      const midLen = Math.hypot(midUx, midUz) || 1;
+      ux = ux * 0.3 + (midUx / midLen) * 0.7;
+      uz = uz * 0.3 + (midUz / midLen) * 0.7;
+      const ulen = Math.hypot(ux, uz) || 1;
+      p.mesh.position.x = spawnX + (ux / ulen) * need;
+      p.mesh.position.z = spawnZ + (uz / ulen) * need;
+    }
+  }
+
   return g;
 }
+
 
 // ---------- Bronco ----------
 const bronco = {
@@ -1396,6 +1512,7 @@ function buildBronco() {
   bronco.roofParts = [];
   bronco.accentParts = [];
   bronco.wheels = [];
+  bronco.spare = null;
 
   const bodyColor = DEFAULT_CUSTOM.body;
   const roofColor = DEFAULT_CUSTOM.roof;
@@ -1412,6 +1529,27 @@ function buildBronco() {
   cabin.position.set(0, 1.0, -0.15);
   g.add(cabin);
   bronco.bodyParts.push(cabin);
+
+  // Windshield + side windows (semi-transparent toy glass)
+  const glassOpts = { roughness: 0.12, metalness: 0.28, transparent: true, opacity: 0.42, depthWrite: false };
+  const windshield = box(0.78, 0.36, 0.05, '#9fd4f0', glassOpts);
+  windshield.position.set(0, 1.02, 0.30);
+  windshield.rotation.x = -0.22;
+  windshield.castShadow = false;
+  g.add(windshield);
+  const winL = box(0.04, 0.30, 0.52, '#9fd4f0', glassOpts);
+  winL.position.set(-0.485, 1.02, -0.12);
+  winL.castShadow = false;
+  g.add(winL);
+  const winR = box(0.04, 0.30, 0.52, '#9fd4f0', glassOpts);
+  winR.position.set(0.485, 1.02, -0.12);
+  winR.castShadow = false;
+  g.add(winR);
+  // Tiny rear cabin glass strip
+  const winRear = box(0.72, 0.28, 0.04, '#9fd4f0', glassOpts);
+  winRear.position.set(0, 1.05, -0.60);
+  winRear.castShadow = false;
+  g.add(winRear);
 
   // Hood slope hint
   const hood = box(1.0, 0.12, 0.55, bodyColor, { roughness: 0.4, metalness: 0.15 });
@@ -1521,6 +1659,43 @@ function buildBronco() {
   g.add(mirR);
   bronco.accentParts.push(mirR);
 
+  // Spare wheel on the back (decorative; follows wheel paint, does not roll-drive)
+  {
+    const spare = new THREE.Group();
+    const spareTireMat = mat('#1a1a1a', { roughness: 0.92 });
+    const spareRimMat = mat('#3a3a3a', { metalness: 0.55, roughness: 0.4 });
+    const spareRingMat = mat('#3a3a3a', { metalness: 0.35, roughness: 0.5 });
+    const spareTire = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.26, 0.26, 0.16, 16),
+      spareTireMat
+    );
+    spareTire.rotation.x = Math.PI / 2; // face rearward
+    spareTire.castShadow = true;
+    spare.add(spareTire);
+    const spareRim = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.11, 0.11, 0.18, 12),
+      spareRimMat
+    );
+    spareRim.rotation.x = Math.PI / 2;
+    spareRim.castShadow = true;
+    spare.add(spareRim);
+    const spareRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.18, 0.03, 8, 20),
+      spareRingMat
+    );
+    // Torus default lies in XY; rotate so ring faces rear (same as tire face)
+    spareRing.castShadow = true;
+    spare.add(spareRing);
+    // Mount bracket
+    const bracket = box(0.12, 0.35, 0.08, accent, { roughness: 0.55 });
+    bracket.position.set(0, 0, 0.08);
+    spare.add(bracket);
+    bronco.accentParts.push(bracket);
+    spare.position.set(0, 0.72, -0.98);
+    g.add(spare);
+    bronco.spare = { group: spare, tire: spareTire, rim: spareRim, ring: spareRing };
+  }
+
   g.position.set(bronco.x, 0, bronco.z);
   scene.add(g);
   applyCustomization(false);
@@ -1555,6 +1730,14 @@ function applyCustomization(persist = true) {
     w.group.scale.setScalar(scale);
     w.group.position.y = w.baseY * scale;
   });
+  if (bronco.spare) {
+    bronco.spare.rim.material.color.set(wheelCol);
+    if (bronco.spare.ring) bronco.spare.ring.material.color.set(wheelCol);
+    bronco.spare.tire.material.color.copy(tireCol);
+    // Keep spare readable; mild scale with wheel size without floating off mount
+    const spareScale = 0.92 + (scale - 1) * 0.55;
+    bronco.spare.group.scale.setScalar(spareScale);
+  }
 
   if (persist) saveCustom();
   syncGarageUI();
@@ -2195,7 +2378,7 @@ function pushToys(dt) {
 
 // ---------- Camera ----------
 const camTarget = new THREE.Vector3();
-const camPos = new THREE.Vector3(0, 4, 8);
+const camPos = new THREE.Vector3(0, 5.2, 10);
 
 function clampCamInsideRoom(pos, margin) {
   const hw = ROOM.w / 2 - margin;
@@ -2206,20 +2389,21 @@ function clampCamInsideRoom(pos, margin) {
 }
 
 function updateCamera(dt) {
-  const backIdeal = 4.2;
-  const upIdeal = 2.8;
+  // Round2: higher chase cam that frames Bronco body (not top-down; still shows floor ahead)
+  const backIdeal = 5.0;
+  const upIdeal = 4.35;
   const c = Math.cos(bronco.yaw);
   const s = Math.sin(bronco.yaw);
 
   // Near-wall amount
-  const wallPad = 2.0;
+  const wallPad = 2.6;
   const nearWallX = Math.max(0, Math.abs(bronco.x) - (ROOM.w / 2 - wallPad));
   const nearWallZ = Math.max(0, Math.abs(bronco.z) - (ROOM.d / 2 - wallPad));
   const nearWall = Math.min(1, Math.max(nearWallX, nearWallZ) / wallPad);
 
   // Facing into a wall? (blank-wall stare guard)
-  const edgeX = ROOM.w / 2 - 2.4;
-  const edgeZ = ROOM.d / 2 - 2.4;
+  const edgeX = ROOM.w / 2 - 3.0;
+  const edgeZ = ROOM.d / 2 - 3.0;
   const facingWall =
     (s > 0.45 && bronco.x > edgeX) ||
     (s < -0.45 && bronco.x < -edgeX) ||
@@ -2228,51 +2412,51 @@ function updateCamera(dt) {
   const faceAmt = facingWall ? 1 : nearWall * 0.55;
 
   // When near/facing wall: pull back toward room center, raise cam — never leave kids on blank wall
-  let back = backIdeal * (1 - 0.35 * nearWall);
-  let up = upIdeal + 1.15 * nearWall + 1.1 * faceAmt;
+  let back = backIdeal * (1 - 0.28 * nearWall);
+  let up = upIdeal + 0.85 * nearWall + 0.9 * faceAmt;
   // Bias camera orbit toward room center instead of behind-truck into wall
   const centerBias = 0.35 + 0.85 * faceAmt + 0.4 * nearWall;
   let desired = new THREE.Vector3(
-    bronco.x - s * back * (1 - 0.55 * faceAmt) + (-bronco.x) * centerBias * 0.22,
+    bronco.x - s * back * (1 - 0.55 * faceAmt) + (-bronco.x) * centerBias * 0.18,
     up,
-    bronco.z - c * back * (1 - 0.55 * faceAmt) + (-bronco.z) * centerBias * 0.22
+    bronco.z - c * back * (1 - 0.55 * faceAmt) + (-bronco.z) * centerBias * 0.18
   );
   // Extra pull toward room center when facing wall
   if (faceAmt > 0.2) {
     const clen = Math.hypot(bronco.x, bronco.z) || 1;
     desired.x += (-bronco.x / clen) * (1.2 * faceAmt);
     desired.z += (-bronco.z / clen) * (1.2 * faceAmt);
-    desired.y = Math.max(desired.y, 3.2 + faceAmt * 1.4);
+    desired.y = Math.max(desired.y, 4.4 + faceAmt * 1.0);
     // Slightly longer shot so toys stay in frame
-    back = Math.max(back, 3.2);
+    back = Math.max(back, 3.6);
   }
-  clampCamInsideRoom(desired, 0.85);
+  clampCamInsideRoom(desired, 1.0);
 
   // If still too close to Bronco after clamp, lift and nudge toward room center
   const dx = desired.x - bronco.x;
   const dz = desired.z - bronco.z;
   const dist = Math.hypot(dx, dz);
-  if (dist < 2.0 || faceAmt > 0.5) {
-    const towardCenterX = -bronco.x * 0.22;
-    const towardCenterZ = -bronco.z * 0.22;
-    const wantDist = faceAmt > 0.5 ? 3.0 : 2.4;
+  if (dist < 2.4 || faceAmt > 0.5) {
+    const towardCenterX = -bronco.x * 0.18;
+    const towardCenterZ = -bronco.z * 0.18;
+    const wantDist = faceAmt > 0.5 ? 3.4 : 2.8;
     desired.x = bronco.x + (dist > 0.01 ? (dx / dist) * wantDist : towardCenterX) + towardCenterX;
     desired.z = bronco.z + (dist > 0.01 ? (dz / dist) * wantDist : towardCenterZ) + towardCenterZ;
-    desired.y = Math.max(desired.y, 3.6 + faceAmt * 0.8);
-    clampCamInsideRoom(desired, 0.85);
+    desired.y = Math.max(desired.y, 4.6 + faceAmt * 0.7);
+    clampCamInsideRoom(desired, 1.0);
   }
 
-  // Look slightly toward room center when near walls so toys stay visible
+  // Look at Bronco body (cabin ~y1.0) with a little floor ahead for steer/GO — not top-down
   const lookBias = 0.35 + 0.9 * faceAmt;
   const look = new THREE.Vector3(
-    bronco.x + s * 0.45 * (1 - 0.7 * faceAmt) - bronco.x * 0.08 * lookBias,
-    0.75 + 0.55 * nearWall + 0.5 * faceAmt,
-    bronco.z + c * 0.45 * (1 - 0.7 * faceAmt) - bronco.z * 0.08 * lookBias
+    bronco.x + s * 0.28 * (1 - 0.7 * faceAmt) - bronco.x * 0.06 * lookBias,
+    1.05 + 0.35 * nearWall + 0.35 * faceAmt,
+    bronco.z + c * 0.28 * (1 - 0.7 * faceAmt) - bronco.z * 0.06 * lookBias
   );
   const k = 1 - Math.pow(0.001, dt);
   camPos.lerp(desired, Math.min(1, k * 3.2));
-  clampCamInsideRoom(camPos, 0.75);
-  camPos.y = Math.max(1.8, camPos.y);
+  clampCamInsideRoom(camPos, 0.9);
+  camPos.y = Math.max(3.2, camPos.y);
   // Brief Spin! camera nudge for cause/effect
   if (camNudgeT > 0) {
     const nt = camNudgeT;
@@ -2435,8 +2619,8 @@ async function startPlay() {
   bronco.group.rotation.y = bronco.yaw;
   const c = Math.cos(bronco.yaw);
   const s = Math.sin(bronco.yaw);
-  camPos.set(bronco.x - s * 4.2, 2.6, bronco.z - c * 4.2);
-  camTarget.set(bronco.x, 0.6, bronco.z);
+  camPos.set(bronco.x - s * 5.0, 4.35, bronco.z - c * 5.0);
+  camTarget.set(bronco.x, 1.05, bronco.z);
   camera.position.copy(camPos);
   // Short wordless-friendly hint; fade quick — GO pulse is the real cue
   setTimeout(() => {
@@ -2480,17 +2664,17 @@ function frame(now) {
     const t = now * 0.00045;
     const bx = bronco.x;
     const bz = bronco.z;
-    const radius = 3.15;
-    const height = 1.75;
+    const radius = 3.35;
+    const height = 2.15;
     camera.position.set(bx + Math.sin(t) * radius, height, bz + Math.cos(t) * radius);
-    camera.lookAt(bx, 0.55, bz);
+    camera.lookAt(bx, 0.85, bz);
   } else {
     // Idle orbit — frame Bronco so start overlay shows him clearly
     bronco.group.rotation.y = bronco.yaw + now * 0.00015;
     const t = now * 0.0003;
     const bx = bronco.x, bz = bronco.z;
-    camera.position.set(bx + Math.sin(t) * 6.2, 3.6, bz + Math.cos(t) * 6.2);
-    camera.lookAt(bx, 0.55, bz);
+    camera.position.set(bx + Math.sin(t) * 7.2, 4.8, bz + Math.cos(t) * 7.2);
+    camera.lookAt(bx, 1.0, bz);
   }
   renderer.render(scene, camera);
 }
