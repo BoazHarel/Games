@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Bronco Living Room</title>
+  <style>
+    :root {
+      --warm: #fff6e8;
+      --accent: #4a90d9;
+      --ink: #3d2c1e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1a120c;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    #c {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    #fail {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #2a1f16;
+      color: #fff6e8;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      font-size: 1.25rem;
+      line-height: 1.5;
+    }
+    #fail.show { display: flex; }
+
+    #start {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      /* Soft short veil — live idle-orbit Bronco stays clearly visible */
+      background: linear-gradient(180deg,
+        rgba(255,214,165,0.18) 0%,
+        rgba(255,180,162,0.08) 28%,
+        rgba(168,216,234,0.05) 55%,
+        rgba(255,214,165,0.42) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.55rem;
+      padding: 1rem 1.5rem max(2.4rem, calc(env(safe-area-inset-bottom) + 1.4rem));
+      transition: opacity 0.4s ease, visibility 0.4s;
+      pointer-events: none;
+    }
+    #start.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #start h1 {
+      font-size: clamp(1.35rem, 5.5vw, 2.1rem);
+      color: var(--ink);
+      text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(255,246,232,0.85);
+      text-align: center;
+      background: rgba(255,246,232,0.55);
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      margin-bottom: 0.15rem;
+    }
+    #start p {
+      display: none; /* kids: hide how-to blurb */
+      color: #5a4030;
+      font-size: 0.7rem;
+      text-align: center;
+      max-width: 18rem;
+      opacity: 0.55;
+    }
+    #start p.parentOnly {
+      display: block;
+      font-size: 0.58rem;
+      max-width: 14rem;
+      line-height: 1.2;
+      margin-top: -0.15rem;
+      opacity: 0.5;
+      background: rgba(255,246,232,0.35);
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+    }
+    #startBtns, #start .bigBtn {
+      pointer-events: auto;
+    }
+    .bigBtn {
+      appearance: none;
+      border: none;
+      color: white;
+      font-size: clamp(1.35rem, 5.5vw, 2rem);
+      font-weight: 800;
+      padding: 0.85rem 2.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transform: translateY(0);
+      transition: transform 0.1s, box-shadow 0.1s;
+      min-width: 11rem;
+    }
+    #driveBtn {
+      font-size: clamp(1.55rem, 6.5vw, 2.35rem);
+      padding: 1rem 2.6rem;
+      min-width: 13.5rem;
+      min-height: 4.1rem;
+    }
+    #customizeBtn {
+      font-size: clamp(1.05rem, 4vw, 1.35rem);
+      padding: 0.65rem 1.6rem;
+      min-width: 0;
+      width: auto;
+      max-width: 12.5rem;
+      opacity: 0.95;
+    }
+    .bigBtn:active {
+      transform: translateY(6px);
+    }
+    #driveBtn, #garageDriveBtn {
+      background: #4a90d9;
+      box-shadow: 0 8px 0 #2e6aad, 0 12px 24px rgba(0,0,0,0.2);
+    }
+    #driveBtn:active, #garageDriveBtn:active {
+      box-shadow: 0 2px 0 #2e6aad, 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #customizeBtn {
+      background: #e8913a;
+      box-shadow: 0 8px 0 #c46e1a, 0 12px 24px rgba(0,0,0,0.2);
+    }
+    #customizeBtn:active {
+      box-shadow: 0 2px 0 #c46e1a, 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #startBtns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #garage {
+      position: fixed;
+      inset: 0;
+      z-index: 55;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-end;
+      pointer-events: none;
+      padding: max(0.35rem, env(safe-area-inset-top)) 0.6rem max(0.55rem, env(safe-area-inset-bottom));
+    }
+    #garage.show {
+      display: flex;
+      pointer-events: none;
+    }
+    /* Keep upper ~55% clear so the live 3D Bronco stays visible */
+    #garagePreviewHint {
+      pointer-events: none;
+      text-align: center;
+      color: #3d2c1e;
+      font-weight: 800;
+      font-size: clamp(1rem, 3.8vw, 1.35rem);
+      text-shadow: 0 1px 0 #fff8, 0 2px 8px rgba(255,246,232,0.9);
+      margin-bottom: auto;
+      padding-top: 0.35rem;
+      opacity: 0.92;
+    }
+    #garagePanel {
+      width: min(100%, 34rem);
+      margin: 0 auto;
+      background: rgba(255,246,232,0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 1.4rem 1.4rem 1.1rem 1.1rem;
+      padding: 0.45rem 0.7rem 0.65rem;
+      box-shadow: 0 -4px 28px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.12);
+      pointer-events: auto;
+      max-height: min(38vh, 17.5rem);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 2px solid rgba(255,255,255,0.65);
+    }
+    @media (orientation: landscape) {
+      #garage {
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: flex-end;
+        padding: max(0.35rem, env(safe-area-inset-top)) max(0.55rem, env(safe-area-inset-right)) max(0.35rem, env(safe-area-inset-bottom)) 0.35rem;
+      }
+      #garagePreviewHint {
+        position: absolute;
+        left: 0; right: 0;
+        top: max(0.35rem, env(safe-area-inset-top));
+        margin: 0;
+      }
+      #garagePanel {
+        width: min(42vw, 22rem);
+        max-height: none;
+        height: calc(100% - 0.2rem);
+        margin: 0;
+        border-radius: 1.2rem;
+        align-self: stretch;
+      }
+    }
+    #garagePanel h2 {
+      display: none;
+    }
+    .garageRow {
+      margin-bottom: 0.3rem;
+    }
+    .garageLabel {
+      display: none;
+    }
+    .swatchRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      justify-content: center;
+      min-height: 3.4rem;
+      align-items: center;
+    }
+    .swatch {
+      width: 3.25rem;
+      height: 3.25rem;
+      min-width: 48px;
+      min-height: 48px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      cursor: pointer;
+      padding: 0;
+      appearance: none;
+      transition: transform 0.12s;
+      flex: 0 0 auto;
+    }
+    .swatch:active { transform: scale(0.9); }
+    .swatch.selected {
+      outline: 3px solid var(--ink);
+      outline-offset: 3px;
+      transform: scale(1.1);
+    }
+    .partChips {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: center;
+      margin-bottom: 0.45rem;
+    }
+    .partChip {
+      appearance: none;
+      border: 3px solid transparent;
+      background: rgba(255,255,255,0.75);
+      width: 3.4rem;
+      height: 3.4rem;
+      min-width: 52px;
+      min-height: 52px;
+      border-radius: 1rem;
+      font-size: 1.55rem;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .partChip.active {
+      border-color: var(--ink);
+      background: #fff;
+      transform: scale(1.06);
+    }
+    .partChip:active { transform: scale(0.94); }
+    .garageSecondary {
+      appearance: none;
+      border: none;
+      background: rgba(176,160,144,0.55);
+      color: #5a4030;
+      width: 2.85rem;
+      height: 2.85rem;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #8a7a6a;
+      line-height: 1;
+    }
+    .garageSecondary:active { transform: translateY(2px); box-shadow: 0 1px 0 #8a7a6a; }
+    #garageHomeBtn {
+      order: 1;
+      background: rgba(122,158,126,0.85);
+      color: #fff;
+      box-shadow: 0 3px 0 #5a7e5e;
+    }
+    #garageHomeBtn:active { box-shadow: 0 1px 0 #5a7e5e; }
+    .sizeRow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    .sizeBtn {
+      appearance: none;
+      border: none;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: #4a90d9;
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 800;
+      box-shadow: 0 4px 0 #2e6aad;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .sizeBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2e6aad; }
+    #wheelSizeLabel {
+      min-width: 5.5rem;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .garageActions {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.55rem;
+      justify-content: center;
+      align-items: center;
+      margin-top: 0.45rem;
+    }
+    .garageActions .bigBtn {
+      font-size: clamp(1.15rem, 4.2vw, 1.55rem);
+      padding: 0.75rem 1.6rem;
+      min-width: 8.5rem;
+      flex: 1 1 auto;
+      max-width: 14rem;
+    }
+    #garageDriveBtn {
+      order: 3;
+    }
+    #garageResetBtn.garageSecondary {
+      order: 2;
+      font-size: 1.15rem;
+      padding: 0;
+      min-width: 44px;
+    }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      display: none;
+    }
+    #hud.show { display: block; }
+
+    #homeBtn {
+      position: absolute;
+      top: max(0.55rem, env(safe-area-inset-top));
+      left: max(0.55rem, env(safe-area-inset-left));
+      appearance: none;
+      border: none;
+      pointer-events: auto;
+      background: rgba(255,246,232,0.92);
+      color: var(--ink);
+      font-size: clamp(1rem, 3.8vw, 1.25rem);
+      font-weight: 800;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      cursor: pointer;
+      z-index: 25;
+      isolation: isolate;
+      overflow: visible;
+    }
+    #homeBtn:active { transform: scale(0.96); }
+    /* Long-press fill ring (Home / Garage Reset) */
+    .holdRing {
+      position: absolute;
+      inset: -5px;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+      background: conic-gradient(#4a90d9 calc(var(--hold, 0) * 1%), rgba(255,255,255,0.15) 0);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+      transition: opacity 0.08s linear;
+    }
+    .holding > .holdRing { opacity: 1; }
+    #garageResetBtn {
+      position: relative;
+      isolation: isolate;
+      overflow: visible;
+    }
+
+    #stickZone {
+      position: absolute;
+      width: 9rem;
+      height: 9rem;
+      pointer-events: auto;
+      touch-action: none;
+      z-index: 22;
+    }
+    /* Portrait: bottom-right for right thumb — extra safe-area padding */
+    @media (orientation: portrait) {
+      #stickZone {
+        right: max(1.15rem, calc(env(safe-area-inset-right) + 0.55rem));
+        bottom: max(1.55rem, calc(env(safe-area-inset-bottom) + 0.45rem));
+      }
+    }
+    /* Landscape: still thumb-reachable, a bit larger */
+    @media (orientation: landscape) {
+      #stickZone {
+        right: max(1.25rem, calc(env(safe-area-inset-right) + 0.45rem));
+        bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.35rem));
+        width: 8.25rem;
+        height: 8.25rem;
+      }
+    }
+    #stickBase {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(255,246,232,0.72);
+      border: 4px solid rgba(255,255,255,0.95);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.1), 0 6px 18px rgba(0,0,0,0.22);
+      position: relative;
+    }
+    #stickKnob {
+      position: absolute;
+      width: 48%;
+      height: 48%;
+      left: 50%;
+      top: 50%;
+      margin-left: -24%;
+      margin-top: -24%;
+      border-radius: 50%;
+      background: #3a7ec4;
+      border: 4px solid #fff;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.35), inset 0 -3px 0 rgba(0,0,0,0.12);
+      transform: translate(0, 0);
+      will-change: transform;
+    }
+    /* Big toddler "GO" forward pad — lower-left */
+    #goPad {
+      position: absolute;
+      appearance: none;
+      border: none;
+      pointer-events: auto;
+      touch-action: none;
+      z-index: 22;
+      width: 6.6rem;
+      height: 6.6rem;
+      border-radius: 50%;
+      background: rgba(46, 210, 110, 0.78);
+      border: 5px solid rgba(255,255,255,0.95);
+      box-shadow: 0 7px 20px rgba(0,0,0,0.24), inset 0 -5px 0 rgba(0,0,0,0.14), 0 0 0 0 rgba(80,230,120,0.55);
+      color: #fff;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.05rem;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #goPad .goChevron {
+      font-size: 1.15rem;
+      line-height: 1;
+      opacity: 0.95;
+      margin-top: -0.15rem;
+    }
+    #goPad:active, #goPad.held {
+      background: rgba(30, 185, 90, 0.9);
+      transform: scale(0.96);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2), inset 0 -2px 0 rgba(0,0,0,0.12);
+    }
+    #goPad.cue {
+      animation: goPulse 0.85s ease-in-out infinite;
+      background: rgba(40, 230, 115, 0.95);
+    }
+    @keyframes goPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 7px 20px rgba(0,0,0,0.24), inset 0 -5px 0 rgba(0,0,0,0.14), 0 0 0 0 rgba(46,210,110,0.95);
+        filter: brightness(1);
+      }
+      50% {
+        transform: scale(1.14);
+        box-shadow: 0 12px 32px rgba(40,200,100,0.5), inset 0 -5px 0 rgba(0,0,0,0.14), 0 0 0 14px rgba(46,210,110,0.72);
+        filter: brightness(1.22);
+      }
+    }
+    #goPad.cue:active, #goPad.cue.held {
+      animation: none;
+      transform: scale(0.96);
+    }
+    /* Giant wordless ▲ above GO for first ~3s */
+    #goArrowOverlay {
+      position: absolute;
+      pointer-events: none;
+      z-index: 23;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(4.2rem, 22vw, 6.5rem);
+      font-weight: 900;
+      color: rgba(46, 210, 110, 0.42);
+      text-shadow: 0 4px 0 rgba(255,255,255,0.35), 0 8px 24px rgba(40,180,90,0.25);
+      line-height: 1;
+      animation: goArrowBob 0.9s ease-in-out infinite;
+      user-select: none;
+    }
+    #goArrowOverlay.show { display: flex; }
+    @keyframes goArrowBob {
+      0%, 100% { transform: translateY(0); opacity: 0.38; }
+      50% { transform: translateY(-10px); opacity: 0.55; }
+    }
+    @media (orientation: portrait) {
+      #goArrowOverlay {
+        left: max(0.95rem, calc(env(safe-area-inset-left) + 0.4rem));
+        bottom: max(8.4rem, calc(env(safe-area-inset-bottom) + 7.3rem));
+        width: 6.6rem;
+      }
+    }
+    @media (orientation: landscape) {
+      #goArrowOverlay {
+        left: max(1.1rem, calc(env(safe-area-inset-left) + 0.35rem));
+        bottom: max(7.1rem, calc(env(safe-area-inset-bottom) + 6.5rem));
+        width: 5.85rem;
+        font-size: clamp(3.4rem, 16vw, 5rem);
+      }
+    }
+    @media (orientation: portrait) {
+      #goPad {
+        left: max(0.95rem, calc(env(safe-area-inset-left) + 0.4rem));
+        bottom: max(1.45rem, calc(env(safe-area-inset-bottom) + 0.35rem));
+      }
+    }
+    @media (orientation: landscape) {
+      #goPad {
+        left: max(1.1rem, calc(env(safe-area-inset-left) + 0.35rem));
+        bottom: max(0.9rem, calc(env(safe-area-inset-bottom) + 0.3rem));
+        width: 5.85rem;
+        height: 5.85rem;
+        font-size: 1.45rem;
+      }
+    }
+    #stickBase.cue::before {
+      content: "▲";
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #2e6aad;
+      font-size: 1.15rem;
+      font-weight: 900;
+      opacity: 0.85;
+      pointer-events: none;
+      animation: stickBlink 1.05s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes stickBlink {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.95; }
+    }
+    #helpBtn {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: max(9.6rem, calc(env(safe-area-inset-bottom) + 8.5rem));
+      appearance: none;
+      border: none;
+      pointer-events: auto;
+      display: none;
+      background: #ff7a9a;
+      color: #fff;
+      font-size: clamp(1.2rem, 4.5vw, 1.55rem);
+      font-weight: 900;
+      padding: 0.7rem 1.1rem;
+      border-radius: 1.35rem;
+      box-shadow: 0 7px 0 #d66a88, 0 12px 26px rgba(0,0,0,0.24);
+      cursor: pointer;
+      z-index: 26;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+      min-width: 72px;
+      min-height: 72px;
+      width: auto;
+      touch-action: none;
+    }
+    @media (orientation: landscape) {
+      #helpBtn {
+        bottom: max(7.4rem, calc(env(safe-area-inset-bottom) + 6.4rem));
+        left: max(8.4rem, calc(env(safe-area-inset-left) + 7.6rem));
+        transform: none;
+      }
+    }
+    #helpBtn.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: helpPop 0.35s ease-out, helpPulse 1.05s ease-in-out infinite;
+    }
+    #helpBtn:active {
+      transform: translateX(-50%) translateY(4px);
+      box-shadow: 0 2px 0 #d66a88, 0 4px 12px rgba(0,0,0,0.2);
+      animation: none;
+    }
+    @media (orientation: landscape) {
+      #helpBtn:active { transform: translateY(4px); }
+    }
+    @keyframes helpPop {
+      from { transform: translateX(-50%) scale(0.7); opacity: 0; }
+      to { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+    @media (orientation: landscape) {
+      @keyframes helpPop {
+        from { transform: scale(0.7); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+    }
+    @keyframes helpPulse {
+      0%, 100% { filter: brightness(1); box-shadow: 0 7px 0 #d66a88, 0 12px 26px rgba(0,0,0,0.24), 0 0 0 0 rgba(255,122,154,0.55); }
+      50% { filter: brightness(1.12); box-shadow: 0 7px 0 #d66a88, 0 14px 30px rgba(255,100,140,0.35), 0 0 0 12px rgba(255,122,154,0); }
+    }
+    #hint {
+      position: absolute;
+      bottom: max(13.2rem, calc(env(safe-area-inset-bottom) + 12.2rem));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(61,44,30,0.45);
+      color: #fff6e8;
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0.75;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    @media (orientation: landscape) {
+      #hint { bottom: max(10.5rem, calc(env(safe-area-inset-bottom) + 9.5rem)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="fail">Oops! This device cannot show 3D graphics.<br/>Try another browser or device.</div>
+  <div id="start">
+    <h1>Bronco Living Room</h1>
+    <p class="parentOnly">Parents: tilt or stick steers · GO drives</p>
+    <div id="startBtns">
+      <button id="driveBtn" class="bigBtn" type="button">🚗 Drive!</button>
+      <button id="customizeBtn" class="bigBtn" type="button">🎨 Paint</button>
+    </div>
+  </div>
+  <div id="garage" aria-hidden="true">
+    <div id="garagePreviewHint">Your Bronco</div>
+    <div id="garagePanel">
+      <div class="partChips" role="tablist" aria-label="Paint part">
+        <button type="button" class="partChip active" data-part="body" aria-label="Body" title="Body">🚗</button>
+        <button type="button" class="partChip" data-part="roof" aria-label="Roof" title="Roof">🪟</button>
+        <button type="button" class="partChip" data-part="wheel" aria-label="Wheels" title="Wheels">🛞</button>
+      </div>
+      <div class="garageRow" id="swatchRowActive">
+        <div class="swatchRow" id="activeSwatches"></div>
+      </div>
+      <div class="garageRow" id="wheelSizeRow" hidden>
+        <div class="sizeRow">
+          <button type="button" class="sizeBtn" id="wheelSizeMinus" aria-label="Smaller wheels">−</button>
+          <div id="wheelSizeLabel">●</div>
+          <button type="button" class="sizeBtn" id="wheelSizePlus" aria-label="Bigger wheels">+</button>
+        </div>
+      </div>
+      <div class="garageActions">
+        <button type="button" class="garageSecondary" id="garageHomeBtn" aria-label="Home">🏠</button>
+        <button type="button" class="garageSecondary" id="garageResetBtn" aria-label="Reset look"><span class="holdRing" aria-hidden="true"></span>↻</button>
+        <button type="button" class="bigBtn" id="garageDriveBtn">Drive!</button>
+      </div>
+    </div>
+  </div>
+  <div id="hud">
+    <button type="button" id="homeBtn" aria-label="Home"><span class="holdRing" aria-hidden="true"></span>🏠</button>
+    <button type="button" id="helpBtn" aria-label="Help spin">🔄 Spin!</button>
+    <div id="hint">GO ▶</div>
+    <div id="goArrowOverlay" aria-hidden="true">▲</div>
+    <button type="button" id="goPad" aria-label="Go forward"><span class="goChevron">▲</span><span>GO</span></button>
+    <div id="stickZone">
+      <div id="stickBase"><div id="stickKnob"></div></div>
+    </div>
+  </div>
+  <canvas id="c"></canvas>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+  <script type="module">
+import * as THREE from 'three';
+
+// ---------- WebGL check ----------
+const failEl = document.getElementById('fail');
+const canvas = document.getElementById('c');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+} catch (e) {
+  failEl.classList.add('show');
+  throw e;
+}
+if (!renderer.getContext()) {
+  failEl.classList.add('show');
+  throw new Error('No WebGL');
+}
+
+// ---------- Constants ----------
+const ROOM = { w: 14, d: 12, h: 4.2 };
+const FLOOR_Y = 0;
+const BODY_COLORS = ['#3a7ec4', '#e85d4c', '#5cb88a', '#f0c040', '#9b7ed9', '#f0a05a', '#ff8fab', '#ffffff'];
+const ROOF_COLORS = ['#f5f5f5', '#3a7ec4', '#e85d4c', '#5cb88a', '#f0c040', '#9b7ed9', '#2a2a2a', '#ffd6a5'];
+const WHEEL_COLORS = ['#1a1a1a', '#3a3a3a', '#6b6b6b', '#c0c0c0', '#f5f5f5', '#e85d4c', '#4a90d9', '#f0c040'];
+const WHEEL_SIZE_IDS = ['small', 'normal', 'big'];
+const WHEEL_SIZE_LABELS = { small: 'Small', normal: 'Normal', big: 'Big' };
+const WHEEL_SIZE_SCALE = { small: 0.82, normal: 1.0, big: 1.28 };
+const DEFAULT_CUSTOM = { body: '#3a7ec4', roof: '#f5f5f5', wheel: '#3a3a3a', wheelSize: 'normal' };
+const STORAGE_KEY = 'bronco-living-room-custom';
+const OLD_STORAGE_KEY = 'bronco-living-room-color';
+const MAX_SPEED = 1.7;
+const ACCEL = 4.5;
+const FRICTION = 5.5;
+const TURN_RATE = 1.45;
+const STICK_DEAD = 0.08;
+const TILT_DEAD = 4; // degrees
+const TILT_SCALE = 0.028;
+const TILT_CLAMP = 18;
+
+// ---------- Renderer / scene ----------
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffe8d0);
+scene.fog = new THREE.Fog(0xffe8d0, 16, 28);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 60);
+camera.position.set(0, 4, 8);
+
+// Warm cheerful lights
+const hemi = new THREE.HemisphereLight(0xfff0dd, 0xd4b896, 0.85);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff2dc, 1.05);
+sun.position.set(4, 10, 3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 28;
+sun.shadow.camera.left = -10;
+sun.shadow.camera.right = 10;
+sun.shadow.camera.top = 10;
+sun.shadow.camera.bottom = -10;
+sun.shadow.bias = -0.0008;
+scene.add(sun);
+const fill = new THREE.PointLight(0xffc9a8, 0.45, 20);
+fill.position.set(-3, 3.2, -2);
+scene.add(fill);
+const lamp = new THREE.PointLight(0xffe0b0, 0.35, 12);
+lamp.position.set(4, 2.5, 3);
+scene.add(lamp);
+
+// ---------- Helpers ----------
+function mat(color, opts = {}) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: opts.roughness ?? 0.65,
+    metalness: opts.metalness ?? 0.05,
+    ...opts,
+  });
+}
+function box(w, h, d, color, opts) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color, opts));
+  m.castShadow = true;
+  m.receiveShadow = true;
+  return m;
+}
+function cyl(rTop, rBot, h, color, opts) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, h, opts?.seg ?? 16), mat(color, opts));
+  m.castShadow = true;
+  m.receiveShadow = true;
+  return m;
+}
+function sphere(r, color, opts) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, opts?.seg ?? 16, opts?.seg ?? 12), mat(color, opts));
+  m.castShadow = true;
+  m.receiveShadow = true;
+  return m;
+}
+
+
+// ---------- Soft sparkles (visual only, silent) ----------
+const SPARKLE_CAP = 40;
+const SPARKLE_COLORS = [0xffb4a2, 0xffd6a5, 0xfdffb6, 0xcaffbf, 0x9bf6ff, 0xbdb2ff, 0xffc6ff, 0xa0c4ff, 0xfff0a0];
+const sparklePool = [];
+const sparkleRoot = new THREE.Group();
+scene.add(sparkleRoot);
+
+function initSparkles() {
+  const geoStar = new THREE.SphereGeometry(0.055, 6, 4);
+  const geoDot = new THREE.CircleGeometry(0.07, 8);
+  for (let i = 0; i < SPARKLE_CAP; i++) {
+    const isStar = (i % 3) !== 0;
+    const geo = isStar ? geoStar : geoDot;
+    const mat = new THREE.MeshBasicMaterial({
+      color: SPARKLE_COLORS[i % SPARKLE_COLORS.length],
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    sparkleRoot.add(mesh);
+    sparklePool.push({
+      mesh,
+      life: 0,
+      maxLife: 0.55,
+      vx: 0, vy: 0, vz: 0,
+      spin: 0,
+    });
+  }
+}
+
+function spawnSparkles(x, y, z, count = 7) {
+  // Hard cap per burst — short sparkles, no spam
+  count = Math.min(count, 18);
+  let n = 0;
+  for (const s of sparklePool) {
+    if (s.life > 0) continue;
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 0.55 + Math.random() * 1.4;
+    s.vx = Math.cos(ang) * spd;
+    s.vz = Math.sin(ang) * spd;
+    s.vy = 0.9 + Math.random() * 1.6;
+    s.maxLife = 0.4 + Math.random() * 0.3;
+    s.life = s.maxLife;
+    s.spin = (Math.random() - 0.5) * 8;
+    s.mesh.position.set(
+      x + (Math.random() - 0.5) * 0.15,
+      y + (Math.random() - 0.5) * 0.1,
+      z + (Math.random() - 0.5) * 0.15
+    );
+    s.mesh.scale.setScalar(0.7 + Math.random() * 0.9);
+    s.mesh.material.color.setHex(SPARKLE_COLORS[(Math.random() * SPARKLE_COLORS.length) | 0]);
+    s.mesh.material.opacity = 0.95;
+    s.mesh.visible = true;
+    if (++n >= count) break;
+  }
+}
+
+function updateSparkles(dt) {
+  for (const s of sparklePool) {
+    if (s.life <= 0) continue;
+    s.life -= dt;
+    if (s.life <= 0) {
+      s.life = 0;
+      s.mesh.visible = false;
+      s.mesh.material.opacity = 0;
+      continue;
+    }
+    const t = s.life / s.maxLife;
+    s.mesh.position.x += s.vx * dt;
+    s.mesh.position.y += s.vy * dt;
+    s.mesh.position.z += s.vz * dt;
+    s.vy -= 2.8 * dt;
+    s.vx *= 0.96;
+    s.vz *= 0.96;
+    s.mesh.rotation.y += s.spin * dt;
+    s.mesh.lookAt(camera.position);
+    s.mesh.material.opacity = Math.min(1, t * 1.35) * 0.95;
+    const sc = (0.55 + 0.55 * t) * (0.7 + (1 - t) * 0.35);
+    s.mesh.scale.setScalar(sc);
+  }
+}
+
+// ---------- Room ----------
+function buildRoom() {
+  const group = new THREE.Group();
+
+  // Floor
+  const floor = box(ROOM.w, 0.12, ROOM.d, '#e8d4b8', { roughness: 0.9 });
+  floor.position.y = -0.06;
+  floor.receiveShadow = true;
+  group.add(floor);
+
+  // Rug
+  const rug = box(6.5, 0.04, 4.5, '#f2a0a0', { roughness: 1 });
+  rug.position.set(0, 0.02, 0.5);
+  group.add(rug);
+  const rugInner = box(5.5, 0.035, 3.5, '#ffe0c8', { roughness: 1 });
+  rugInner.position.set(0, 0.03, 0.5);
+  group.add(rugInner);
+
+  // Walls
+  const wallMat = '#fff5ea';
+  const back = box(ROOM.w, ROOM.h, 0.2, wallMat, { roughness: 0.95 });
+  back.position.set(0, ROOM.h / 2, -ROOM.d / 2);
+  group.add(back);
+  const left = box(0.2, ROOM.h, ROOM.d, '#ffe8d6', { roughness: 0.95 });
+  left.position.set(-ROOM.w / 2, ROOM.h / 2, 0);
+  group.add(left);
+  const right = box(0.2, ROOM.h, ROOM.d, '#ffe8d6', { roughness: 0.95 });
+  right.position.set(ROOM.w / 2, ROOM.h / 2, 0);
+  group.add(right);
+
+  // Baseboards
+  for (const [x, z, rot] of [
+    [0, -ROOM.d / 2 + 0.12, 0],
+  ]) {
+    const bb = box(ROOM.w - 0.4, 0.18, 0.08, '#d4b896');
+    bb.position.set(x, 0.09, z);
+    group.add(bb);
+  }
+
+  // Window on back wall
+  const winFrame = box(3.2, 2.2, 0.12, '#f0e0c8');
+  winFrame.position.set(-2.5, 2.4, -ROOM.d / 2 + 0.12);
+  group.add(winFrame);
+  const winGlass = box(2.7, 1.7, 0.06, '#b8e0f0', { roughness: 0.2, metalness: 0.1 });
+  winGlass.position.set(-2.5, 2.4, -ROOM.d / 2 + 0.16);
+  group.add(winGlass);
+
+  // Picture frame
+  const pic = box(1.4, 1.1, 0.08, '#fffaf0');
+  pic.position.set(3.2, 2.5, -ROOM.d / 2 + 0.12);
+  group.add(pic);
+  const picArt = box(1.1, 0.8, 0.05, '#a8d8ea');
+  picArt.position.set(3.2, 2.5, -ROOM.d / 2 + 0.16);
+  group.add(picArt);
+
+  return group;
+}
+
+// Static furniture AABBs: {min:{x,y,z}, max:{x,y,z}} in world space
+const staticAABBs = [];
+
+function addStaticAABB(meshOrCenter, hw, hh, hd) {
+  let cx, cy, cz;
+  if (meshOrCenter.isObject3D) {
+    const p = new THREE.Vector3();
+    meshOrCenter.getWorldPosition(p);
+    cx = p.x; cy = p.y; cz = p.z;
+  } else {
+    cx = meshOrCenter.x; cy = meshOrCenter.y; cz = meshOrCenter.z;
+  }
+  staticAABBs.push({
+    min: { x: cx - hw, y: cy - hh, z: cz - hd },
+    max: { x: cx + hw, y: cy + hh, z: cz + hd },
+  });
+}
+
+function buildFurniture() {
+  const g = new THREE.Group();
+
+  // Couch (back of room)
+  const couch = new THREE.Group();
+  const seat = box(4.2, 0.55, 1.5, '#7eb8e8');
+  seat.position.set(0, 0.4, 0);
+  couch.add(seat);
+  const backrest = box(4.2, 0.9, 0.35, '#6aa8d8');
+  backrest.position.set(0, 0.95, -0.55);
+  couch.add(backrest);
+  const armL = box(0.35, 0.7, 1.5, '#6aa8d8');
+  armL.position.set(-1.95, 0.7, 0);
+  couch.add(armL);
+  const armR = box(0.35, 0.7, 1.5, '#6aa8d8');
+  armR.position.set(1.95, 0.7, 0);
+  couch.add(armR);
+  // Fixed couch pillows (decorative, not pushable)
+  const cp1 = box(0.9, 0.45, 0.25, '#ffb4a2');
+  cp1.position.set(-0.9, 0.85, -0.25);
+  couch.add(cp1);
+  const cp2 = box(0.9, 0.45, 0.25, '#ffd6a5');
+  cp2.position.set(0.9, 0.85, -0.25);
+  couch.add(cp2);
+  couch.position.set(0, 0, -4.2);
+  g.add(couch);
+  addStaticAABB({ x: 0, y: 0.55, z: -4.2 }, 1.95, 0.7, 0.72); // softer couch
+
+  // Coffee table
+  const table = new THREE.Group();
+  const top = box(2.2, 0.12, 1.1, '#c4a882');
+  top.position.y = 0.48;
+  table.add(top);
+  for (const [lx, lz] of [[-0.9, -0.4], [0.9, -0.4], [-0.9, 0.4], [0.9, 0.4]]) {
+    const leg = box(0.12, 0.48, 0.12, '#a88868');
+    leg.position.set(lx, 0.24, lz);
+    table.add(leg);
+  }
+  table.position.set(0, 0, -1.2);
+  g.add(table);
+  addStaticAABB({ x: 0, y: 0.3, z: -1.2 }, 0.98, 0.35, 0.48); // softer table
+
+  // TV stand + TV
+  const stand = box(2.8, 0.55, 0.7, '#8b7355');
+  stand.position.set(4.2, 0.28, -4.5);
+  g.add(stand);
+  addStaticAABB({ x: 4.2, y: 0.4, z: -4.5 }, 1.28, 0.55, 0.34);
+  const tv = box(2.2, 1.3, 0.12, '#2a2a32', { metalness: 0.4, roughness: 0.4 });
+  tv.position.set(4.2, 1.25, -4.55);
+  g.add(tv);
+  const screen = box(1.95, 1.05, 0.04, '#5a9fd4', { roughness: 0.3 });
+  screen.position.set(4.2, 1.25, -4.48);
+  g.add(screen);
+  addStaticAABB({ x: 4.2, y: 1.2, z: -4.55 }, 1.05, 0.75, 0.16);
+
+  // Bookshelf left
+  const shelf = box(1.2, 2.2, 0.45, '#d4b896');
+  shelf.position.set(-5.5, 1.1, -4.5);
+  g.add(shelf);
+  addStaticAABB({ x: -5.5, y: 1.1, z: -4.5 }, 0.55, 1.15, 0.24);
+  const bookColors = ['#e85d4c', '#5cb88a', '#4a90d9', '#f0c040', '#9b7ed9'];
+  bookColors.forEach((c, i) => {
+    const b = box(0.22, 0.55, 0.35, c);
+    b.position.set(-5.85 + i * 0.22, 0.55, -4.45);
+    g.add(b);
+  });
+
+  // Side table near couch
+  const side = box(0.7, 0.55, 0.7, '#c4a882');
+  side.position.set(-3.2, 0.28, -4.0);
+  g.add(side);
+  addStaticAABB({ x: -3.2, y: 0.35, z: -4.0 }, 0.32, 0.4, 0.32);
+  const lampBase = cyl(0.12, 0.18, 0.35, '#eee8e0');
+  lampBase.position.set(-3.2, 0.73, -4.0);
+  g.add(lampBase);
+  const shade = cyl(0.28, 0.35, 0.35, '#ffe8c8', { roughness: 0.8 });
+  shade.position.set(-3.2, 1.05, -4.0);
+  g.add(shade);
+
+  // Plant pot
+  const pot = cyl(0.22, 0.18, 0.4, '#e07060');
+  pot.position.set(5.5, 0.2, 3.5);
+  g.add(pot);
+  const plant = sphere(0.4, '#6cbc7a', { roughness: 0.9 });
+  plant.position.set(5.5, 0.7, 3.5);
+  g.add(plant);
+  addStaticAABB({ x: 5.5, y: 0.45, z: 3.5 }, 0.28, 0.55, 0.28);
+
+  // Toy chest
+  const chest = box(1.6, 0.7, 0.9, '#e8a04a');
+  chest.position.set(-5.2, 0.35, 3.8);
+  g.add(chest);
+  const lid = box(1.65, 0.1, 0.95, '#d49040');
+  lid.position.set(-5.2, 0.75, 3.8);
+  g.add(lid);
+  addStaticAABB({ x: -5.2, y: 0.4, z: 3.8 }, 0.72, 0.45, 0.42);
+
+  // Walls as static (inner bounds)
+  const wallThick = 0.15;
+  const halfW = ROOM.w / 2 - 0.25;
+  const halfD = ROOM.d / 2 - 0.25;
+  // We'll use room bounds in physics instead of wall AABBs
+
+  return g;
+}
+
+// ---------- Pushables ----------
+const pushables = [];
+
+function makePushable(mesh, radius, mass = 0.6) {
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.traverse?.((ch) => {
+    if (ch.isMesh) { ch.castShadow = true; ch.receiveShadow = true; }
+  });
+  const obj = {
+    mesh,
+    radius,
+    mass,
+    vx: 0,
+    vz: 0,
+    y: mesh.position.y,
+    _sparkCool: 0,
+  };
+  pushables.push(obj);
+  return obj;
+}
+
+function buildToys() {
+  const g = new THREE.Group();
+  const pastel = ['#ffb4a2', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#bdb2ff', '#ffc6ff', '#a0c4ff'];
+
+  // Soft blocks
+  const blockPos = [
+    [-2.5, 0.25, 1.5], [ -2.1, 0.25, 1.8], [-2.3, 0.55, 1.6],
+    [2.8, 0.25, 2.2], [3.1, 0.25, 2.0], [2.9, 0.55, 2.1],
+    [1.2, 0.25, 3.5], [-4, 0.25, 1], [3.5, 0.25, -0.2],
+  ];
+  blockPos.forEach((p, i) => {
+    const s = 0.4 + (i % 3) * 0.05;
+    const m = box(s, s, s, pastel[i % pastel.length], { roughness: 0.85 });
+    m.position.set(p[0], p[1], p[2]);
+    m.rotation.y = (i * 0.7) % Math.PI;
+    g.add(m);
+    makePushable(m, s * 0.65, 0.5);
+  });
+
+  // Balls
+  const ballData = [
+    [1.5, 0.28, 1.2, 0.28, '#ff8fab'],
+    [-1.8, 0.32, 2.5, 0.32, '#80ed99'],
+    [0.5, 0.22, 3.2, 0.22, '#72efdd'],
+    [4.0, 0.3, 1.5, 0.3, '#ffd60a'],
+    [-3.5, 0.25, 2.8, 0.25, '#c77dff'],
+  ];
+  ballData.forEach(([x, y, z, r, c]) => {
+    const m = sphere(r, c, { roughness: 0.55, seg: 14 });
+    m.position.set(x, y, z);
+    g.add(m);
+    makePushable(m, r, 0.4);
+  });
+
+  // Pillows (flat boxes)
+  const pillows = [
+    [-1.2, 0.12, 0.8, 0.9, 0.2, 0.7, '#ffc8dd'],
+    [2.0, 0.12, 0.3, 0.8, 0.18, 0.6, '#bde0fe'],
+    [-0.3, 0.12, 2.8, 0.7, 0.22, 0.7, '#cdb4db'],
+    [3.8, 0.12, 2.8, 0.85, 0.2, 0.55, '#ffafcc'],
+  ];
+  pillows.forEach(([x, y, z, w, h, d, c]) => {
+    const m = box(w, h, d, c, { roughness: 0.95 });
+    m.position.set(x, y, z);
+    m.rotation.y = Math.random() * 0.5;
+    g.add(m);
+    makePushable(m, Math.max(w, d) * 0.45, 0.35);
+  });
+
+  // Stuffed-toy blobs (squishy spheres + ears)
+  function stuffedAnimal(x, z, bodyColor, earColor) {
+    const body = sphere(0.38, bodyColor, { roughness: 0.9, seg: 12 });
+    body.position.set(x, 0.38, z);
+    g.add(body);
+    makePushable(body, 0.4, 0.55);
+    // ears are decorative children — attach to body so they move
+    const earL = sphere(0.14, earColor, { roughness: 0.9, seg: 8 });
+    earL.position.set(-0.22, 0.32, 0);
+    body.add(earL);
+    const earR = sphere(0.14, earColor, { roughness: 0.9, seg: 8 });
+    earR.position.set(0.22, 0.32, 0);
+    body.add(earR);
+    const nose = sphere(0.08, '#333', { roughness: 0.5, seg: 6 });
+    nose.position.set(0, 0.05, 0.35);
+    body.add(nose);
+  }
+  stuffedAnimal(-3.8, -0.5, '#f4a261', '#e76f51');
+  stuffedAnimal(2.2, -2.8, '#90dbf4', '#00b4d8');
+  stuffedAnimal(-1.5, 3.6, '#ffcfd2', '#ff8fab');
+  stuffedAnimal(5.0, 0.5, '#b8f2e6', '#98f5e1');
+  stuffedAnimal(0.8, -3.5, '#e2cfc4', '#d4a373');
+
+  // --- Extra silly pushables (scattered, leave drive lanes open) ---
+
+  // Giant floor pillow
+  {
+    const m = box(1.6, 0.28, 1.1, '#ff9ecd', { roughness: 0.98 });
+    m.position.set(-4.6, 0.14, -2.2);
+    m.rotation.y = 0.35;
+    g.add(m);
+    makePushable(m, 0.85, 0.45);
+  }
+
+  // Rubber duck–ish (yellow blob + beak)
+  {
+    const body = sphere(0.36, '#ffe66d', { roughness: 0.55, seg: 12 });
+    body.position.set(4.6, 0.36, -2.4);
+    g.add(body);
+    const head = sphere(0.24, '#ffe66d', { roughness: 0.55, seg: 10 });
+    head.position.set(0, 0.28, 0.22);
+    body.add(head);
+    const beak = cyl(0.06, 0.1, 0.18, '#ff9f1c', { roughness: 0.5, seg: 8 });
+    beak.rotation.x = Math.PI / 2;
+    beak.position.set(0, 0.02, 0.28);
+    head.add(beak);
+    const eyeL = sphere(0.04, '#222', { roughness: 0.4, seg: 6 });
+    eyeL.position.set(-0.1, 0.06, 0.18);
+    head.add(eyeL);
+    const eyeR = sphere(0.04, '#222', { roughness: 0.4, seg: 6 });
+    eyeR.position.set(0.1, 0.06, 0.18);
+    head.add(eyeR);
+    makePushable(body, 0.42, 0.4);
+  }
+
+  // Stackable-looking rings / donuts
+  function toyRing(x, z, color, r = 0.38) {
+    const m = new THREE.Mesh(
+      new THREE.TorusGeometry(r, r * 0.28, 10, 22),
+      mat(color, { roughness: 0.7 })
+    );
+    m.rotation.x = Math.PI / 2;
+    m.position.set(x, r * 0.32, z);
+    m.castShadow = true;
+    m.receiveShadow = true;
+    g.add(m);
+    makePushable(m, r * 0.95, 0.35);
+  }
+  toyRing(-2.8, -3.2, '#ff6b6b', 0.4);
+  toyRing(3.2, 3.6, '#4ecdc4', 0.36);
+  toyRing(0.2, -1.6, '#ffe66d', 0.34);
+
+  // Beach ball (big, very light)
+  {
+    const m = sphere(0.55, '#ff6b6b', { roughness: 0.4, seg: 16 });
+    m.position.set(-0.8, 0.55, -4.2);
+    const band = new THREE.Mesh(
+      new THREE.SphereGeometry(0.552, 16, 8, 0, Math.PI * 2, 0.7, 0.55),
+      mat('#fffef5', { roughness: 0.4 })
+    );
+    m.add(band);
+    const band2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.553, 16, 8, 0, Math.PI * 2, 1.9, 0.45),
+      mat('#4a90d9', { roughness: 0.4 })
+    );
+    m.add(band2);
+    g.add(m);
+    makePushable(m, 0.55, 0.22);
+  }
+
+  // Plush star
+  {
+    const proxy = sphere(0.22, '#ffe066', { roughness: 0.9, seg: 10 });
+    for (let i = 0; i < 5; i++) {
+      const tip = cyl(0.02, 0.15, 0.3, '#ffd60a', { roughness: 0.9, seg: 6 });
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      tip.position.set(Math.cos(a) * 0.26, Math.sin(a) * 0.26, 0);
+      tip.rotation.z = a + Math.PI / 2;
+      tip.rotation.x = Math.PI / 2;
+      proxy.add(tip);
+    }
+    proxy.position.set(5.2, 0.34, 2.8);
+    g.add(proxy);
+    makePushable(proxy, 0.4, 0.4);
+  }
+
+  // Plush heart
+  {
+    const holder = new THREE.Group();
+    const c1 = sphere(0.26, '#ff6b9d', { roughness: 0.92, seg: 10 });
+    c1.position.set(-0.14, 0.08, 0);
+    const c2 = sphere(0.26, '#ff6b9d', { roughness: 0.92, seg: 10 });
+    c2.position.set(0.14, 0.08, 0);
+    const tip = cyl(0.02, 0.28, 0.42, '#ff6b9d', { roughness: 0.92, seg: 8 });
+    tip.rotation.x = Math.PI;
+    tip.position.set(0, -0.18, 0);
+    holder.add(c1, c2, tip);
+    holder.position.set(-5.0, 0.38, 1.8);
+    g.add(holder);
+    // makePushable expects mesh.position — Groups work the same for x/z
+    makePushable(holder, 0.42, 0.38);
+  }
+
+  // Cardboard box that slides
+  {
+    const m = box(0.7, 0.55, 0.7, '#d4a574', { roughness: 0.95 });
+    m.position.set(1.8, 0.28, -3.8);
+    m.rotation.y = 0.25;
+    const flap = box(0.68, 0.08, 0.35, '#c49564', { roughness: 0.95 });
+    flap.position.set(0, 0.3, 0.12);
+    m.add(flap);
+    const tape = box(0.15, 0.02, 0.72, '#e8dcc8', { roughness: 0.8 });
+    tape.position.set(0, 0.285, 0);
+    m.add(tape);
+    g.add(m);
+    makePushable(m, 0.48, 0.5);
+  }
+
+  // Soft cone "party hat" toy
+  {
+    const m = cyl(0.02, 0.32, 0.55, '#bdb2ff', { roughness: 0.85, seg: 12 });
+    m.position.set(-3.2, 0.28, 3.8);
+    const pom = sphere(0.1, '#ffc6ff', { roughness: 0.9, seg: 8 });
+    pom.position.set(0, 0.32, 0);
+    m.add(pom);
+    g.add(m);
+    makePushable(m, 0.34, 0.3);
+  }
+
+  // Little soft cylinder "juice cup"
+  {
+    const m = cyl(0.22, 0.2, 0.4, '#9bf6ff', { roughness: 0.7, seg: 14 });
+    m.position.set(4.2, 0.2, 0.2);
+    const straw = cyl(0.03, 0.03, 0.35, '#ff8fab', { roughness: 0.6, seg: 6 });
+    straw.position.set(0.08, 0.3, 0);
+    m.add(straw);
+    g.add(m);
+    makePushable(m, 0.28, 0.32);
+  }
+
+  return g;
+}
+
+// ---------- Bronco ----------
+const bronco = {
+  group: new THREE.Group(),
+  bodyParts: [],
+  roofParts: [],
+  accentParts: [],
+  wheels: [], // { group, tire, rim, baseY, wx, wz }
+  x: 0,
+  z: 2.5,
+  yaw: 0,
+  vx: 0,
+  vz: 0,
+  speed: 0,
+  halfW: 0.55,
+  halfL: 0.95,
+  halfH: 0.45,
+  radius: 0.85, // collision radius
+};
+
+let custom = { ...DEFAULT_CUSTOM };
+
+function loadCustom() {
+  custom = { ...DEFAULT_CUSTOM };
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        if (typeof parsed.body === 'string') custom.body = parsed.body;
+        if (typeof parsed.roof === 'string') custom.roof = parsed.roof;
+        if (typeof parsed.wheel === 'string') custom.wheel = parsed.wheel;
+        if (WHEEL_SIZE_IDS.includes(parsed.wheelSize)) custom.wheelSize = parsed.wheelSize;
+      }
+    } else {
+      // Migrate / ignore old single-color key
+      const old = localStorage.getItem(OLD_STORAGE_KEY);
+      if (old) {
+        const legacy = {
+          classic: '#3a7ec4', red: '#e85d4c', green: '#5cb88a',
+          yellow: '#f0c040', purple: '#9b7ed9', orange: '#f0a05a',
+        };
+        if (legacy[old]) custom.body = legacy[old];
+        try { localStorage.removeItem(OLD_STORAGE_KEY); } catch (_) {}
+      }
+    }
+  } catch (_) {}
+  return custom;
+}
+
+function saveCustom() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      body: custom.body,
+      roof: custom.roof,
+      wheel: custom.wheel,
+      wheelSize: custom.wheelSize,
+    }));
+  } catch (_) {}
+}
+
+function buildBronco() {
+  const g = bronco.group;
+  while (g.children.length) g.remove(g.children[0]);
+  bronco.bodyParts = [];
+  bronco.roofParts = [];
+  bronco.accentParts = [];
+  bronco.wheels = [];
+
+  const bodyColor = DEFAULT_CUSTOM.body;
+  const roofColor = DEFAULT_CUSTOM.roof;
+  const accent = '#f0f0f0';
+
+  // Chassis / main body (boxy SUV)
+  const body = box(1.05, 0.55, 1.7, bodyColor, { roughness: 0.45, metalness: 0.15 });
+  body.position.set(0, 0.55, 0);
+  g.add(body);
+  bronco.bodyParts.push(body);
+
+  // Cabin / greenhouse
+  const cabin = box(0.95, 0.5, 0.95, bodyColor, { roughness: 0.45, metalness: 0.12 });
+  cabin.position.set(0, 1.0, -0.15);
+  g.add(cabin);
+  bronco.bodyParts.push(cabin);
+
+  // Hood slope hint
+  const hood = box(1.0, 0.12, 0.55, bodyColor, { roughness: 0.4, metalness: 0.15 });
+  hood.position.set(0, 0.78, 0.55);
+  hood.rotation.x = -0.15;
+  g.add(hood);
+  bronco.bodyParts.push(hood);
+
+  // Roof (independently recolorable)
+  const roof = box(0.88, 0.06, 0.85, roofColor, { roughness: 0.5 });
+  roof.position.set(0, 1.28, -0.15);
+  g.add(roof);
+  bronco.roofParts.push(roof);
+
+  // Beltline stripe follows roof for a friendly two-tone
+  const stripe = box(1.08, 0.08, 1.65, roofColor, { roughness: 0.5 });
+  stripe.position.set(0, 0.48, 0);
+  g.add(stripe);
+  bronco.roofParts.push(stripe);
+
+  // Grille
+  const grille = box(0.7, 0.28, 0.06, '#2a2a2a', { metalness: 0.5, roughness: 0.4 });
+  grille.position.set(0, 0.55, 0.88);
+  g.add(grille);
+  // Grille bars
+  for (let i = -2; i <= 2; i++) {
+    const bar = box(0.04, 0.22, 0.04, '#c0c0c0', { metalness: 0.7, roughness: 0.35 });
+    bar.position.set(i * 0.12, 0.55, 0.92);
+    g.add(bar);
+  }
+  // Bronco-ish badge
+  const badge = box(0.22, 0.1, 0.03, accent);
+  badge.position.set(0, 0.72, 0.9);
+  g.add(badge);
+  bronco.accentParts.push(badge);
+
+  // Headlights
+  const hlL = cyl(0.1, 0.1, 0.08, '#fffde8', { roughness: 0.2, metalness: 0.3, seg: 12 });
+  hlL.rotation.x = Math.PI / 2;
+  hlL.position.set(-0.35, 0.55, 0.9);
+  g.add(hlL);
+  const hlR = hlL.clone();
+  hlR.position.x = 0.35;
+  g.add(hlR);
+
+  // Tail lights
+  const tlL = box(0.18, 0.12, 0.06, '#e85d4c', { roughness: 0.4, metalness: 0.2 });
+  tlL.position.set(-0.4, 0.55, -0.88);
+  g.add(tlL);
+  const tlR = tlL.clone();
+  tlR.position.x = 0.4;
+  g.add(tlR);
+
+  // Bumpers (fixed light accent)
+  const bumpF = box(1.05, 0.14, 0.16, accent, { roughness: 0.55 });
+  bumpF.position.set(0, 0.32, 0.92);
+  g.add(bumpF);
+  bronco.accentParts.push(bumpF);
+  const bumpR = box(1.05, 0.14, 0.16, accent, { roughness: 0.55 });
+  bumpR.position.set(0, 0.32, -0.92);
+  g.add(bumpR);
+  bronco.accentParts.push(bumpR);
+
+  // Fender flares / wheel arches hint
+  for (const [sx, sz] of [[-0.55, 0.55], [0.55, 0.55], [-0.55, -0.55], [0.55, -0.55]]) {
+    const flare = box(0.12, 0.28, 0.45, bodyColor, { roughness: 0.5 });
+    flare.position.set(sx, 0.42, sz);
+    g.add(flare);
+    bronco.bodyParts.push(flare);
+  }
+
+  // Chunky tires + rims (per-wheel materials so recolor is shared via applyCustomization)
+  const tireGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.22, 16);
+  const rimGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.24, 12);
+  const accentRingGeo = new THREE.TorusGeometry(0.2, 0.035, 8, 20);
+  for (const [wx, wz] of [[-0.52, 0.55], [0.52, 0.55], [-0.52, -0.55], [0.52, -0.55]]) {
+    const wheel = new THREE.Group();
+    const tireMat = mat('#1a1a1a', { roughness: 0.92 });
+    const rimMat = mat('#3a3a3a', { metalness: 0.55, roughness: 0.4 });
+    const accentMat = mat('#3a3a3a', { metalness: 0.35, roughness: 0.5 });
+    const tire = new THREE.Mesh(tireGeo, tireMat);
+    tire.rotation.z = Math.PI / 2;
+    tire.castShadow = true;
+    wheel.add(tire);
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    rim.rotation.z = Math.PI / 2;
+    rim.castShadow = true;
+    wheel.add(rim);
+    // Sidewall / lip accent so wheel color reads clearly for kids
+    const ring = new THREE.Mesh(accentRingGeo, accentMat);
+    ring.rotation.y = Math.PI / 2;
+    ring.castShadow = true;
+    wheel.add(ring);
+    const baseY = 0.28;
+    wheel.position.set(wx, baseY, wz);
+    g.add(wheel);
+    bronco.wheels.push({ group: wheel, tire, rim, ring, baseY, wx, wz });
+  }
+
+  // Side mirrors
+  const mirL = box(0.08, 0.08, 0.12, accent);
+  mirL.position.set(-0.55, 0.95, 0.25);
+  g.add(mirL);
+  bronco.accentParts.push(mirL);
+  const mirR = mirL.clone();
+  mirR.position.x = 0.55;
+  g.add(mirR);
+  bronco.accentParts.push(mirR);
+
+  g.position.set(bronco.x, 0, bronco.z);
+  scene.add(g);
+  applyCustomization(false);
+  return g;
+}
+
+function darkenHex(hex, amount) {
+  const c = new THREE.Color(hex);
+  c.multiplyScalar(1 - amount);
+  return c;
+}
+
+function applyCustomization(persist = true) {
+  const bodyCol = custom.body || DEFAULT_CUSTOM.body;
+  const roofCol = custom.roof || DEFAULT_CUSTOM.roof;
+  const wheelCol = custom.wheel || DEFAULT_CUSTOM.wheel;
+  const sizeId = WHEEL_SIZE_IDS.includes(custom.wheelSize) ? custom.wheelSize : 'normal';
+  custom.wheelSize = sizeId;
+
+  bronco.bodyParts.forEach((m) => { m.material.color.set(bodyCol); });
+  bronco.roofParts.forEach((m) => { m.material.color.set(roofCol); });
+
+  const scale = WHEEL_SIZE_SCALE[sizeId] || 1;
+  const tireCol = darkenHex(wheelCol, 0.55);
+  // Keep tires readable: mostly dark with a hint of wheel color
+  tireCol.lerp(new THREE.Color('#151515'), 0.55);
+
+  bronco.wheels.forEach((w) => {
+    w.rim.material.color.set(wheelCol);
+    if (w.ring) w.ring.material.color.set(wheelCol);
+    w.tire.material.color.copy(tireCol);
+    w.group.scale.setScalar(scale);
+    w.group.position.y = w.baseY * scale;
+  });
+
+  if (persist) saveCustom();
+  syncGarageUI();
+}
+
+// ---------- Garage UI ----------
+let garagePart = 'body'; // body | roof | wheel
+
+const PART_COLORS = {
+  body: BODY_COLORS,
+  roof: ROOF_COLORS,
+  wheel: WHEEL_COLORS,
+};
+
+function renderActiveSwatches() {
+  const wrap = document.getElementById('activeSwatches');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const colors = PART_COLORS[garagePart] || BODY_COLORS;
+  const key = garagePart;
+  colors.forEach((hex) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'swatch';
+    btn.dataset.hex = hex;
+    btn.style.background = hex;
+    btn.setAttribute('aria-label', hex);
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      custom[key] = hex;
+      applyCustomization(true);
+    });
+    wrap.appendChild(btn);
+  });
+  const sizeRow = document.getElementById('wheelSizeRow');
+  if (sizeRow) sizeRow.hidden = garagePart !== 'wheel';
+  document.querySelectorAll('.partChip').forEach((chip) => {
+    chip.classList.toggle('active', chip.dataset.part === garagePart);
+  });
+  syncGarageUI();
+}
+
+function syncGarageUI() {
+  const wrap = document.getElementById('activeSwatches');
+  const val = custom[garagePart];
+  if (wrap) {
+    wrap.querySelectorAll('.swatch').forEach((el) => {
+      el.classList.toggle('selected', el.dataset.hex.toLowerCase() === String(val).toLowerCase());
+    });
+  }
+  const label = document.getElementById('wheelSizeLabel');
+  if (label) {
+    const dots = { small: '●○○', normal: '●●○', big: '●●●' };
+    label.textContent = dots[custom.wheelSize] || '●●○';
+  }
+}
+
+function buildGarageUI() {
+  document.querySelectorAll('.partChip').forEach((chip) => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      garagePart = chip.dataset.part || 'body';
+      renderActiveSwatches();
+    });
+  });
+
+  document.getElementById('wheelSizeMinus').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const i = Math.max(0, WHEEL_SIZE_IDS.indexOf(custom.wheelSize) - 1);
+    custom.wheelSize = WHEEL_SIZE_IDS[i];
+    applyCustomization(true);
+  });
+  document.getElementById('wheelSizePlus').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const i = Math.min(WHEEL_SIZE_IDS.length - 1, WHEEL_SIZE_IDS.indexOf(custom.wheelSize) + 1);
+    custom.wheelSize = WHEEL_SIZE_IDS[i];
+    applyCustomization(true);
+  });
+  // garageResetBtn: long-press bound after bindHoldAction (see bottom)
+  document.getElementById('garageHomeBtn').addEventListener('click', () => showStart());
+  document.getElementById('garageDriveBtn').addEventListener('click', () => startPlay());
+  renderActiveSwatches();
+}
+
+// ---------- Controls ----------
+const input = { sx: 0, sz: 0, tiltX: 0, tiltZ: 0, useTilt: false, go: false, goBurst: 0 };
+
+// First-drive cues + unstuck state
+let playElapsed = 0;
+let goFirstBurstUsed = false;
+let cueActive = false;
+let stuckTimer = 0;
+let softBounceCd = 0;
+let softBounceFails = 0;
+let autoUnstuckDone = false;
+let helpArmed = false;
+let helpHold = 0;
+let lastPushNx = 0;
+let lastPushNz = 0;
+let playStartX = 0;
+let playStartZ = 0;
+let driveSuccess = false;
+let camNudgeT = 0;
+let goArrowTimer = 0;
+
+function setupStick() {
+  const zone = document.getElementById('stickZone');
+  const knob = document.getElementById('stickKnob');
+  let active = false;
+  let pid = null;
+
+  function setKnob(nx, ny) {
+    const max = zone.clientWidth * 0.36;
+    const dx = nx * max;
+    const dy = ny * max;
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  function read(clientX, clientY) {
+    const rect = zone.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = (clientX - cx) / (rect.width / 2);
+    let dy = (clientY - cy) / (rect.height / 2);
+    const mag = Math.hypot(dx, dy);
+    if (mag > 1) { dx /= mag; dy /= mag; }
+    // deadzone
+    const dead = STICK_DEAD;
+    let ox = 0, oy = 0;
+    if (mag > dead) {
+      const scale = (mag - dead) / (1 - dead);
+      ox = (dx / mag) * scale;
+      oy = (dy / mag) * scale;
+    }
+    input.sx = ox;
+    input.sz = oy; // forward is -screen Y in stick → we map later
+    setKnob(ox, oy);
+  }
+
+  function end() {
+    active = false;
+    pid = null;
+    input.sx = 0;
+    input.sz = 0;
+    setKnob(0, 0);
+  }
+
+  zone.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    active = true;
+    pid = e.pointerId;
+    zone.setPointerCapture(pid);
+    read(e.clientX, e.clientY);
+  });
+  zone.addEventListener('pointermove', (e) => {
+    if (!active || e.pointerId !== pid) return;
+    e.preventDefault();
+    read(e.clientX, e.clientY);
+  });
+  zone.addEventListener('pointerup', end);
+  zone.addEventListener('pointercancel', end);
+}
+
+function setupTilt() {
+  window.addEventListener('deviceorientation', (e) => {
+    if (e.gamma == null || e.beta == null) return;
+    input.useTilt = true;
+    // Portrait: gamma = left/right, beta = forward/back (around 45–90 resting)
+    // Landscape: axes swap-ish — normalize with screen orientation
+    const orient = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+    let lr = e.gamma; // left-right
+    let fb = e.beta;  // front-back
+
+    if (orient === 90) {
+      lr = e.beta;
+      fb = -e.gamma;
+    } else if (orient === -90 || orient === 270) {
+      lr = -e.beta;
+      fb = e.gamma;
+    } else if (orient === 180) {
+      lr = -e.gamma;
+      fb = -e.beta;
+    }
+
+    // Resting tablet on lap ~ beta 45–70; use deviation from ~55
+    const restBeta = 55;
+    let tx = lr;
+    let tz = fb - restBeta;
+
+    // Clamp
+    tx = Math.max(-TILT_CLAMP, Math.min(TILT_CLAMP, tx));
+    tz = Math.max(-TILT_CLAMP, Math.min(TILT_CLAMP, tz));
+
+    // Deadzone
+    if (Math.abs(tx) < TILT_DEAD) tx = 0;
+    else tx = (tx - Math.sign(tx) * TILT_DEAD) / (TILT_CLAMP - TILT_DEAD);
+    if (Math.abs(tz) < TILT_DEAD) tz = 0;
+    else tz = (tz - Math.sign(tz) * TILT_DEAD) / (TILT_CLAMP - TILT_DEAD);
+
+    input.tiltX = Math.max(-1, Math.min(1, tx));
+    input.tiltZ = Math.max(-1, Math.min(1, tz * 0.85));
+  }, true);
+}
+
+async function requestMotionPermission() {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const r = await DeviceOrientationEvent.requestPermission();
+      return r === 'granted';
+    }
+  } catch (_) {}
+  return true; // non-iOS or already available
+}
+
+function setDriveCues(on) {
+  cueActive = on;
+  const pad = document.getElementById('goPad');
+  const stick = document.getElementById('stickBase');
+  if (pad) pad.classList.toggle('cue', on);
+  if (stick) stick.classList.toggle('cue', on);
+  if (!on) setGoArrowOverlay(false);
+}
+
+function setGoArrowOverlay(on) {
+  const el = document.getElementById('goArrowOverlay');
+  if (el) el.classList.toggle('show', !!on);
+}
+
+
+function setupGoPad() {
+  const pad = document.getElementById('goPad');
+  if (!pad) return;
+  let pid = null;
+  function setGo(on) {
+    input.go = on;
+    pad.classList.toggle('held', on);
+  }
+  function down(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    pid = e.pointerId;
+    try { pad.setPointerCapture(pid); } catch (_) {}
+    // First poke: forward burst, but do NOT clear cues until real motion
+    if (!goFirstBurstUsed) {
+      goFirstBurstUsed = true;
+      input.goBurst = 1.15;
+      bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.85);
+    }
+    setGo(true);
+  }
+  function up(e) {
+    if (pid != null && e.pointerId !== pid) return;
+    pid = null;
+    setGo(false);
+  }
+  pad.addEventListener('pointerdown', down);
+  pad.addEventListener('pointerup', up);
+  pad.addEventListener('pointercancel', up);
+  pad.addEventListener('lostpointercapture', () => setGo(false));
+}
+
+function setupHelpBtn() {
+  const btn = document.getElementById('helpBtn');
+  if (!btn) return;
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    doHelpUnstuck();
+  });
+}
+
+function setHelpVisible(on) {
+  helpArmed = on;
+  if (on) helpHold = Math.max(helpHold, 5.5);
+  const btn = document.getElementById('helpBtn');
+  if (btn) btn.classList.toggle('show', on || helpHold > 0);
+}
+
+function doHelpUnstuck(opts) {
+  const fromAuto = !!(opts && opts.fromAuto);
+  // Spin yaw ~90–180° away from wall / toward room center
+  const toCenterX = -bronco.x;
+  const toCenterZ = -bronco.z;
+  const angToCenter = Math.atan2(toCenterX, toCenterZ);
+  let delta = angToCenter - bronco.yaw;
+  while (delta > Math.PI) delta -= Math.PI * 2;
+  while (delta < -Math.PI) delta += Math.PI * 2;
+  const mag = Math.abs(delta);
+  // Prefer a big kid-friendly spin in the helpful direction
+  const spin = Math.sign(delta || 1) * (mag < 0.9 ? (Math.PI * 0.5 + Math.random() * 0.4) : Math.min(Math.PI, Math.max(Math.PI * 0.5, mag)));
+  bronco.yaw += spin;
+  // Nudge toward rug center
+  const dist = Math.hypot(bronco.x, bronco.z);
+  const deeplyStuck = dist > 4.2 || (Math.abs(bronco.x) > ROOM.w / 2 - 1.6 && Math.abs(bronco.z) > ROOM.d / 2 - 1.6);
+  const nudge = deeplyStuck ? 1.35 : 0.75;
+  const len = Math.hypot(toCenterX, toCenterZ) || 1;
+  bronco.x += (toCenterX / len) * nudge;
+  bronco.z += (toCenterZ / len) * nudge;
+  // Soft recenter toward rug if cornered
+  if (deeplyStuck) {
+    bronco.x += (0 - bronco.x) * 0.22;
+    bronco.z += (0.4 - bronco.z) * 0.22;
+  }
+  const w = resolveWalls(bronco.x, bronco.z, bronco.radius * 0.7);
+  bronco.x = w.x; bronco.z = w.z;
+  const st = resolveStatic(bronco.x, bronco.z, bronco.radius * 0.55);
+  bronco.x = st.x; bronco.z = st.z;
+  bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.55);
+  bronco.group.position.set(bronco.x, 0, bronco.z);
+  bronco.group.rotation.y = bronco.yaw;
+  stuckTimer = 0;
+  softBounceCd = 0.45;
+  softBounceFails = 0;
+  // Bigger sparkles + brief camera nudge for cause/effect
+  spawnSparkles(bronco.x, 0.75, bronco.z, 16);
+  camNudgeT = 0.42;
+  if (fromAuto) {
+    // Auto-unstuck once this jam; keep Spin! visible so kids learn it for next jam
+    setHelpVisible(true);
+    helpHold = Math.max(helpHold, 4.5);
+  } else {
+    setHelpVisible(false);
+  }
+}
+
+function getDriveInput(dt) {
+  let x = 0;
+  let z = 0;
+  // Stick takes priority when active
+  const stickMag = Math.hypot(input.sx, input.sz);
+  if (stickMag > 0.02) {
+    // Stick: up (negative sz) = forward
+    x = input.sx;
+    z = -input.sz;
+  } else if (input.useTilt) {
+    x = input.tiltX; // already -1..1
+    z = -input.tiltZ; // tilt forward → drive forward
+  }
+  // Big GO pad: hold for continuous forward; stick can still steer
+  if (input.go) {
+    z = Math.max(z, 0.95);
+  }
+  // First-tap burst residual
+  if (input.goBurst > 0) {
+    z = Math.max(z, Math.min(1.2, 0.85 + input.goBurst * 0.35));
+    input.goBurst = Math.max(0, input.goBurst - (dt || 0.016) * 1.8);
+  }
+  return { x, z };
+}
+
+// ---------- Physics ----------
+function resolveWalls(x, z, radius) {
+  const hw = ROOM.w / 2 - 0.3 - radius;
+  const hd = ROOM.d / 2 - 0.3 - radius;
+  let px = x, pz = z;
+  let nx = 0, nz = 0;
+  if (x > hw) { px = hw; nx -= 1; }
+  else if (x < -hw) { px = -hw; nx += 1; }
+  if (z > hd) { pz = hd; nz -= 1; }
+  else if (z < -hd) { pz = -hd; nz += 1; }
+  const len = Math.hypot(nx, nz);
+  if (len > 0) { nx /= len; nz /= len; }
+  return { x: px, z: pz, nx, nz, hit: len > 0 };
+}
+
+function circleAABB(cx, cz, r, aabb) {
+  const nearestX = Math.max(aabb.min.x, Math.min(cx, aabb.max.x));
+  const nearestZ = Math.max(aabb.min.z, Math.min(cz, aabb.max.z));
+  const dx = cx - nearestX;
+  const dz = cz - nearestZ;
+  const distSq = dx * dx + dz * dz;
+  if (distSq >= r * r) return null;
+  const dist = Math.sqrt(distSq) || 0.0001;
+  const overlap = r - dist;
+  return { nx: dx / dist, nz: dz / dist, overlap };
+}
+
+function resolveStatic(x, z, radius) {
+  let px = x, pz = z;
+  let anx = 0, anz = 0, hits = 0;
+  for (const aabb of staticAABBs) {
+    // Expand AABB slightly in Y ignore — 2D floor plane
+    const hit = circleAABB(px, pz, radius, aabb);
+    if (hit) {
+      px += hit.nx * hit.overlap;
+      pz += hit.nz * hit.overlap;
+      anx += hit.nx;
+      anz += hit.nz;
+      hits++;
+    }
+  }
+  const len = Math.hypot(anx, anz);
+  if (len > 0) { anx /= len; anz /= len; }
+  return { x: px, z: pz, nx: anx, nz: anz, hit: hits > 0 };
+}
+
+function yawAwayFromNormal(nx, nz, dt) {
+  if (!nx && !nz) return;
+  // Desired facing = away from wall (along push normal projected to yaw space)
+  const desired = Math.atan2(nx, nz);
+  let delta = desired - bronco.yaw;
+  while (delta > Math.PI) delta -= Math.PI * 2;
+  while (delta < -Math.PI) delta += Math.PI * 2;
+  const turn = Math.max(-2.8, Math.min(2.8, delta)) * Math.min(1, dt * 3.2);
+  bronco.yaw += turn;
+}
+
+function updateBronco(dt) {
+  const drive = getDriveInput(dt);
+  // Low sensitivity overall
+  const steer = drive.x;
+  const throttle = drive.z;
+
+  if (softBounceCd > 0) softBounceCd -= dt;
+
+  // Floaty arcade: accelerate in facing direction, gentle turn when moving or steering
+  const targetSpeed = throttle * MAX_SPEED;
+  if (Math.abs(throttle) > 0.05 || Math.abs(steer) > 0.05) {
+    bronco.speed += (targetSpeed - bronco.speed) * Math.min(1, ACCEL * dt * 0.35);
+  } else {
+    bronco.speed *= Math.max(0, 1 - FRICTION * dt * 0.55);
+    if (Math.abs(bronco.speed) < 0.05) bronco.speed = 0;
+  }
+
+  // Turn mostly when rolling — reduces wall-spin for toddlers
+  const turnBoost = 0.28 + Math.min(1, Math.abs(bronco.speed) / MAX_SPEED) * 0.72;
+  bronco.yaw -= steer * TURN_RATE * turnBoost * dt;
+
+  const c = Math.cos(bronco.yaw);
+  const s = Math.sin(bronco.yaw);
+  bronco.vx = s * bronco.speed;
+  bronco.vz = c * bronco.speed;
+
+  let nx = bronco.x + bronco.vx * dt;
+  let nz = bronco.z + bronco.vz * dt;
+
+  const w = resolveWalls(nx, nz, bronco.radius * 0.7);
+  nx = w.x; nz = w.z;
+  // Smaller furniture radius so Bronco glances off couch/table more than wedges
+  const st = resolveStatic(nx, nz, bronco.radius * 0.55);
+  nx = st.x; nz = st.z;
+
+  // Slight bounce on furniture contact — deflect rather than dig in
+  if (st.hit) {
+    const glance = 0.10 + Math.min(0.18, Math.abs(bronco.speed) * 0.06);
+    nx += st.nx * glance;
+    nz += st.nz * glance;
+    const inward = bronco.vx * (-st.nx) + bronco.vz * (-st.nz);
+    if (inward > 0) {
+      bronco.vx += st.nx * inward * 0.9;
+      bronco.vz += st.nz * inward * 0.9;
+      bronco.speed *= 0.78;
+    }
+    yawAwayFromNormal(st.nx, st.nz, dt * 0.65);
+  }
+
+  // Accumulate contact normal (wall + furniture)
+  let pnx = 0, pnz = 0;
+  if (w.hit) { pnx += w.nx; pnz += w.nz; }
+  if (st.hit) { pnx += st.nx; pnz += st.nz; }
+  const plen = Math.hypot(pnx, pnz);
+  if (plen > 0.001) {
+    lastPushNx = pnx / plen;
+    lastPushNz = pnz / plen;
+  }
+
+  // If blocked heavily, kill speed a bit + track stuck
+  const moved = Math.hypot(nx - bronco.x, nz - bronco.z);
+  const want = Math.abs(bronco.speed) * dt;
+  if (want > 0.001 && moved < want * 0.3) {
+    bronco.speed *= 0.55;
+  }
+
+  const pressingIn = input.go || Math.abs(throttle) > 0.15 || Math.abs(bronco.speed) > 0.05;
+  const lightInput = Math.abs(throttle) > 0.05 || Math.abs(steer) > 0.12 || input.go || input.goBurst > 0 || Math.abs(bronco.speed) > 0.02;
+  const nearEdge = Math.abs(bronco.x) > ROOM.w / 2 - 1.8 || Math.abs(bronco.z) > ROOM.d / 2 - 1.8;
+  const nearCorner = nearEdge && (w.hit || st.hit || plen > 0.001);
+
+  // Arm / accumulate stuck while contacting with drive intent
+  if (plen > 0.001 && pressingIn) {
+    stuckTimer += dt;
+  } else if (nearCorner && lightInput) {
+    // Near corner (wall+furniture / nearEdge): accumulate even with light input
+    stuckTimer += dt;
+  } else if (plen > 0.001) {
+    // Still touching — decay slowly so soft bounces don't wipe progress
+    stuckTimer = Math.max(0, stuckTimer - dt * 0.12);
+  } else {
+    stuckTimer = Math.max(0, stuckTimer - dt * 1.1);
+    if (stuckTimer < 0.05) {
+      softBounceFails = 0;
+      autoUnstuckDone = false;
+    }
+  }
+
+  // Soft bounce after ~0.25s stuck — must NOT reset stuckTimer
+  if (stuckTimer >= 0.25 && softBounceCd <= 0 && plen > 0.001) {
+    const push = 0.55 + Math.min(0.55, stuckTimer * 0.35);
+    nx += lastPushNx * push;
+    nz += lastPushNz * push;
+    yawAwayFromNormal(lastPushNx, lastPushNz, 0.2);
+    bronco.speed = Math.max(bronco.speed, MAX_SPEED * 0.35);
+    softBounceCd = 0.28;
+    softBounceFails += 1;
+    setHelpVisible(true);
+    const w2 = resolveWalls(nx, nz, bronco.radius * 0.7);
+    nx = w2.x; nz = w2.z;
+    const st2 = resolveStatic(nx, nz, bronco.radius * 0.55);
+    nx = st2.x; nz = st2.z;
+  } else if (stuckTimer >= 0.25 && softBounceCd <= 0 && (nearEdge || nearCorner)) {
+    yawAwayFromNormal(-bronco.x, -bronco.z, 0.25);
+    const len = Math.hypot(bronco.x, bronco.z) || 1;
+    nx += (-bronco.x / len) * 0.4;
+    nz += (-bronco.z / len) * 0.4;
+    softBounceCd = 0.3;
+    softBounceFails += 1;
+    setHelpVisible(true);
+  }
+
+  // After 2 failed soft bounces (~0.8s), auto Spin once; keep button for next jam
+  if (softBounceFails >= 2 && stuckTimer >= 0.8 && !autoUnstuckDone) {
+    autoUnstuckDone = true;
+    doHelpUnstuck({ fromAuto: true });
+    // apply post-unstuck position into nx/nz for this frame
+    nx = bronco.x;
+    nz = bronco.z;
+  }
+
+  // Arm Help: contact + intent ≥0.35s, or near-corner light input ≥0.6s
+  if (plen > 0.001 && pressingIn && stuckTimer >= 0.35) setHelpVisible(true);
+  if (nearCorner && lightInput && stuckTimer >= 0.6) setHelpVisible(true);
+
+  if (helpHold > 0) {
+    helpHold = Math.max(0, helpHold - dt);
+    const btn = document.getElementById('helpBtn');
+    if (btn) btn.classList.toggle('show', helpHold > 0 || helpArmed);
+    if (helpHold <= 0 && stuckTimer < 0.2) helpArmed = false;
+  }
+
+  bronco.x = nx;
+  bronco.z = nz;
+
+  bronco.group.position.set(bronco.x, 0, bronco.z);
+  bronco.group.rotation.y = bronco.yaw;
+  // Always upright — no pitch/roll
+
+  // Spin wheels
+  const spin = bronco.speed * dt * 2.2;
+  if (bronco.wheels) {
+    bronco.wheels.forEach((wh) => { wh.group.rotation.x += spin; });
+  }
+
+  // Push toys
+  pushToys(dt);
+}
+
+function pushToys(dt) {
+  const bx = bronco.x;
+  const bz = bronco.z;
+  const br = bronco.radius * 0.75;
+
+  for (const p of pushables) {
+    if (p._sparkCool > 0) p._sparkCool -= dt;
+    // Integrate velocity with friction
+    p.vx *= Math.max(0, 1 - 5 * dt);
+    p.vz *= Math.max(0, 1 - 5 * dt);
+    if (Math.hypot(p.vx, p.vz) < 0.02) { p.vx = 0; p.vz = 0; }
+
+    let px = p.mesh.position.x + p.vx * dt;
+    let pz = p.mesh.position.z + p.vz * dt;
+
+    // Bronco collision
+    let dx = px - bx;
+    let dz = pz - bz;
+    let dist = Math.hypot(dx, dz);
+    const minD = br + p.radius;
+    if (dist < minD && dist > 0.0001) {
+      const overlap = minD - dist;
+      const nx = dx / dist;
+      const nz = dz / dist;
+      px += nx * overlap;
+      pz += nz * overlap;
+      // Impart velocity from bronco (soft, low mass feel)
+      const push = Math.max(0.8, Math.abs(bronco.speed)) * 1.8 / Math.max(0.35, p.mass);
+      p.vx += nx * push * 0.55 + bronco.vx * 0.35;
+      p.vz += nz * push * 0.55 + bronco.vz * 0.35;
+      // Cap push speed
+      const spd = Math.hypot(p.vx, p.vz);
+      if (spd > 5) { p.vx *= 5 / spd; p.vz *= 5 / spd; }
+      // Soft pastel sparkles at contact (visual only, capped pool)
+      if (!p._sparkCool) p._sparkCool = 0;
+      if (p._sparkCool <= 0 && Math.abs(bronco.speed) > 0.35 && spd > 0.6) {
+        spawnSparkles(px, (p.y || 0.3) + 0.25, pz, 6 + ((Math.random() * 4) | 0));
+        p._sparkCool = 0.28;
+      }
+    } else if (dist < 0.0001) {
+      px += 0.1;
+    }
+
+    // Toy-toy soft separation (cheap pairwise nearby)
+    for (const o of pushables) {
+      if (o === p) continue;
+      const ox = o.mesh.position.x;
+      const oz = o.mesh.position.z;
+      let ddx = px - ox;
+      let ddz = pz - oz;
+      let dd = Math.hypot(ddx, ddz);
+      const md = p.radius + o.radius;
+      if (dd < md && dd > 0.0001) {
+        const ov = (md - dd) * 0.5;
+        const nx = ddx / dd;
+        const nz = ddz / dd;
+        px += nx * ov;
+        pz += nz * ov;
+      }
+    }
+
+    // Static furniture
+    const st = resolveStatic(px, pz, p.radius);
+    px = st.x; pz = st.z;
+
+    // Walls
+    const w = resolveWalls(px, pz, p.radius);
+    px = w.x; pz = w.z;
+
+    p.mesh.position.x = px;
+    p.mesh.position.z = pz;
+    // Keep Y (upright / resting height)
+    p.mesh.position.y = p.y;
+    // Gentle spin for balls
+    if (p.mesh.geometry && p.mesh.geometry.type === 'SphereGeometry') {
+      p.mesh.rotation.x += p.vz * dt * 2;
+      p.mesh.rotation.z -= p.vx * dt * 2;
+    }
+  }
+}
+
+// ---------- Camera ----------
+const camTarget = new THREE.Vector3();
+const camPos = new THREE.Vector3(0, 4, 8);
+
+function clampCamInsideRoom(pos, margin) {
+  const hw = ROOM.w / 2 - margin;
+  const hd = ROOM.d / 2 - margin;
+  pos.x = Math.max(-hw, Math.min(hw, pos.x));
+  pos.z = Math.max(-hd, Math.min(hd, pos.z));
+  return pos;
+}
+
+function updateCamera(dt) {
+  const backIdeal = 4.2;
+  const upIdeal = 2.8;
+  const c = Math.cos(bronco.yaw);
+  const s = Math.sin(bronco.yaw);
+
+  // Near-wall amount
+  const wallPad = 2.0;
+  const nearWallX = Math.max(0, Math.abs(bronco.x) - (ROOM.w / 2 - wallPad));
+  const nearWallZ = Math.max(0, Math.abs(bronco.z) - (ROOM.d / 2 - wallPad));
+  const nearWall = Math.min(1, Math.max(nearWallX, nearWallZ) / wallPad);
+
+  // Facing into a wall? (blank-wall stare guard)
+  const edgeX = ROOM.w / 2 - 2.4;
+  const edgeZ = ROOM.d / 2 - 2.4;
+  const facingWall =
+    (s > 0.45 && bronco.x > edgeX) ||
+    (s < -0.45 && bronco.x < -edgeX) ||
+    (c > 0.45 && bronco.z > edgeZ) ||
+    (c < -0.45 && bronco.z < -edgeZ);
+  const faceAmt = facingWall ? 1 : nearWall * 0.55;
+
+  // When near/facing wall: pull back toward room center, raise cam — never leave kids on blank wall
+  let back = backIdeal * (1 - 0.35 * nearWall);
+  let up = upIdeal + 1.15 * nearWall + 1.1 * faceAmt;
+  // Bias camera orbit toward room center instead of behind-truck into wall
+  const centerBias = 0.35 + 0.85 * faceAmt + 0.4 * nearWall;
+  let desired = new THREE.Vector3(
+    bronco.x - s * back * (1 - 0.55 * faceAmt) + (-bronco.x) * centerBias * 0.22,
+    up,
+    bronco.z - c * back * (1 - 0.55 * faceAmt) + (-bronco.z) * centerBias * 0.22
+  );
+  // Extra pull toward room center when facing wall
+  if (faceAmt > 0.2) {
+    const clen = Math.hypot(bronco.x, bronco.z) || 1;
+    desired.x += (-bronco.x / clen) * (1.2 * faceAmt);
+    desired.z += (-bronco.z / clen) * (1.2 * faceAmt);
+    desired.y = Math.max(desired.y, 3.2 + faceAmt * 1.4);
+    // Slightly longer shot so toys stay in frame
+    back = Math.max(back, 3.2);
+  }
+  clampCamInsideRoom(desired, 0.85);
+
+  // If still too close to Bronco after clamp, lift and nudge toward room center
+  const dx = desired.x - bronco.x;
+  const dz = desired.z - bronco.z;
+  const dist = Math.hypot(dx, dz);
+  if (dist < 2.0 || faceAmt > 0.5) {
+    const towardCenterX = -bronco.x * 0.22;
+    const towardCenterZ = -bronco.z * 0.22;
+    const wantDist = faceAmt > 0.5 ? 3.0 : 2.4;
+    desired.x = bronco.x + (dist > 0.01 ? (dx / dist) * wantDist : towardCenterX) + towardCenterX;
+    desired.z = bronco.z + (dist > 0.01 ? (dz / dist) * wantDist : towardCenterZ) + towardCenterZ;
+    desired.y = Math.max(desired.y, 3.6 + faceAmt * 0.8);
+    clampCamInsideRoom(desired, 0.85);
+  }
+
+  // Look slightly toward room center when near walls so toys stay visible
+  const lookBias = 0.35 + 0.9 * faceAmt;
+  const look = new THREE.Vector3(
+    bronco.x + s * 0.45 * (1 - 0.7 * faceAmt) - bronco.x * 0.08 * lookBias,
+    0.75 + 0.55 * nearWall + 0.5 * faceAmt,
+    bronco.z + c * 0.45 * (1 - 0.7 * faceAmt) - bronco.z * 0.08 * lookBias
+  );
+  const k = 1 - Math.pow(0.001, dt);
+  camPos.lerp(desired, Math.min(1, k * 3.2));
+  clampCamInsideRoom(camPos, 0.75);
+  camPos.y = Math.max(1.8, camPos.y);
+  // Brief Spin! camera nudge for cause/effect
+  if (camNudgeT > 0) {
+    const nt = camNudgeT;
+    camNudgeT = Math.max(0, camNudgeT - dt);
+    const amp = (nt / 0.42) * 0.55;
+    const toC = Math.hypot(bronco.x, bronco.z) || 1;
+    camPos.x += (-bronco.x / toC) * amp * 0.35;
+    camPos.z += (-bronco.z / toC) * amp * 0.35;
+    camPos.y += amp * 0.45;
+    camPos.x += Math.sin(nt * 28) * amp * 0.12;
+  }
+  camTarget.lerp(look, Math.min(1, k * 4));
+  camera.position.copy(camPos);
+  camera.lookAt(camTarget);
+}
+
+// ---------- Resize / prevent gestures ----------
+function onResize() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+}
+window.addEventListener('resize', onResize);
+window.addEventListener('orientationchange', () => setTimeout(onResize, 120));
+
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+// Keyboard fallback for desktop testing
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowUp' || e.key === 'w') input.sz = -1;
+  if (e.key === 'ArrowDown' || e.key === 's') input.sz = 1;
+  if (e.key === 'ArrowLeft' || e.key === 'a') input.sx = -1;
+  if (e.key === 'ArrowRight' || e.key === 'd') input.sx = 1;
+});
+window.addEventListener('keyup', (e) => {
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'ArrowDown' || e.key === 's') input.sz = 0;
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'ArrowRight' || e.key === 'd') input.sx = 0;
+});
+
+// ---------- Boot / screens ----------
+scene.add(buildRoom());
+scene.add(buildFurniture());
+scene.add(buildToys());
+initSparkles();
+loadCustom();
+buildBronco();
+buildGarageUI();
+setupStick();
+setupGoPad();
+setupHelpBtn();
+setupTilt();
+
+let mode = 'start'; // 'start' | 'customize' | 'play'
+let last = performance.now();
+let hintHidden = false;
+let garageSpin = 0;
+
+function showStart() {
+  mode = 'start';
+  helpHold = 0;
+  stuckTimer = 0;
+  softBounceFails = 0;
+  autoUnstuckDone = false;
+  driveSuccess = false;
+  camNudgeT = 0;
+  goArrowTimer = 0;
+  restoreGaragePos();
+  setDriveCues(false);
+  setGoArrowOverlay(false);
+  setHelpVisible(false);
+  stuckTimer = 0;
+  input.go = false;
+  input.goBurst = 0;
+  document.getElementById('start').classList.remove('hide');
+  document.getElementById('garage').classList.remove('show');
+  document.getElementById('garage').setAttribute('aria-hidden', 'true');
+  document.getElementById('hud').classList.remove('show');
+  bronco.group.rotation.y = bronco.yaw;
+  // Soft-stop driving velocity when returning home
+  bronco.vx = 0;
+  bronco.vz = 0;
+  bronco.speed = 0;
+}
+
+const garageSavedPos = { x: 0, z: 0, yaw: 0, saved: false };
+
+function showGarage() {
+  mode = 'customize';
+  garageSpin = 0;
+  saveCustom();
+  document.getElementById('start').classList.add('hide');
+  document.getElementById('garage').classList.add('show');
+  document.getElementById('garage').setAttribute('aria-hidden', 'false');
+  document.getElementById('hud').classList.remove('show');
+  bronco.vx = 0;
+  bronco.vz = 0;
+  bronco.speed = 0;
+  // Park on the rug for a clear live showcase (restore on leave)
+  if (!garageSavedPos.saved) {
+    garageSavedPos.x = bronco.x;
+    garageSavedPos.z = bronco.z;
+    garageSavedPos.yaw = bronco.yaw;
+    garageSavedPos.saved = true;
+  }
+  bronco.x = 0;
+  bronco.z = 0.4;
+  bronco.yaw = 0;
+  bronco.group.position.set(bronco.x, 0, bronco.z);
+  syncGarageUI();
+}
+
+function restoreGaragePos() {
+  if (!garageSavedPos.saved) return;
+  bronco.x = garageSavedPos.x;
+  bronco.z = garageSavedPos.z;
+  bronco.yaw = garageSavedPos.yaw;
+  bronco.group.position.set(bronco.x, 0, bronco.z);
+  bronco.group.rotation.y = bronco.yaw;
+  garageSavedPos.saved = false;
+}
+
+async function startPlay() {
+  saveCustom();
+  applyCustomization(true);
+  await requestMotionPermission();
+  restoreGaragePos();
+  mode = 'play';
+  playElapsed = 0;
+  goFirstBurstUsed = false;
+  driveSuccess = false;
+  playStartX = bronco.x;
+  playStartZ = bronco.z;
+  input.goBurst = 0;
+  stuckTimer = 0;
+  softBounceCd = 0;
+  softBounceFails = 0;
+  autoUnstuckDone = false;
+  helpHold = 0;
+  camNudgeT = 0;
+  goArrowTimer = 3.0;
+  setHelpVisible(false);
+  setDriveCues(true);
+  setGoArrowOverlay(true);
+  document.getElementById('start').classList.add('hide');
+  document.getElementById('garage').classList.remove('show');
+  document.getElementById('garage').setAttribute('aria-hidden', 'true');
+  document.getElementById('hud').classList.add('show');
+  const hint = document.getElementById('hint');
+  if (hint) {
+    hint.style.display = '';
+    hint.style.opacity = '0.75';
+  }
+  hintHidden = false;
+  bronco.group.rotation.y = bronco.yaw;
+  const c = Math.cos(bronco.yaw);
+  const s = Math.sin(bronco.yaw);
+  camPos.set(bronco.x - s * 4.2, 2.6, bronco.z - c * 4.2);
+  camTarget.set(bronco.x, 0.6, bronco.z);
+  camera.position.copy(camPos);
+  // Short wordless-friendly hint; fade quick — GO pulse is the real cue
+  setTimeout(() => {
+    const h = document.getElementById('hint');
+    if (h) h.style.opacity = '0';
+    setTimeout(() => { if (h) h.style.display = 'none'; }, 500);
+    hintHidden = true;
+  }, 3500);
+}
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  if (mode === 'play') {
+    playElapsed += dt;
+    // Giant ▲ overlay for first 3s
+    if (goArrowTimer > 0) {
+      goArrowTimer -= dt;
+      if (goArrowTimer <= 0 || driveSuccess) setGoArrowOverlay(false);
+    }
+    // Track first successful move (>1.5 units from play start) or meaningful speed
+    if (!driveSuccess) {
+      const disp = Math.hypot(bronco.x - playStartX, bronco.z - playStartZ);
+      if (disp > 1.5 || Math.abs(bronco.speed) > MAX_SPEED * 0.4) {
+        driveSuccess = true;
+      }
+    }
+    // Keep .cue ≥12s OR until proven successful move — never on pointerdown alone
+    if (cueActive && (driveSuccess || playElapsed > 12)) {
+      setDriveCues(false);
+    }
+    updateBronco(dt);
+    updateSparkles(dt);
+    updateCamera(dt);
+  } else if (mode === 'customize') {
+    // Close showcase orbit — truck fills the open area above the paint panel
+    garageSpin += dt * 0.7;
+    bronco.group.rotation.y = bronco.yaw + garageSpin;
+    bronco.group.position.set(bronco.x, 0, bronco.z);
+    const t = now * 0.00045;
+    const bx = bronco.x;
+    const bz = bronco.z;
+    const radius = 3.15;
+    const height = 1.75;
+    camera.position.set(bx + Math.sin(t) * radius, height, bz + Math.cos(t) * radius);
+    camera.lookAt(bx, 0.55, bz);
+  } else {
+    // Idle orbit — frame Bronco so start overlay shows him clearly
+    bronco.group.rotation.y = bronco.yaw + now * 0.00015;
+    const t = now * 0.0003;
+    const bx = bronco.x, bz = bronco.z;
+    camera.position.set(bx + Math.sin(t) * 6.2, 3.6, bz + Math.cos(t) * 6.2);
+    camera.lookAt(bx, 0.55, bz);
+  }
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(frame);
+
+// ---------- Protected actions (avoid accidental home/reset) ----------
+function bindHoldAction(el, opts) {
+  if (!el) return;
+  const holdMs = opts.holdMs || 700;
+  const doubleTapMs = opts.doubleTapMs || 0;
+  const onFire = opts.onFire;
+  const ring = el.querySelector('.holdRing');
+  let holding = false;
+  let startT = 0;
+  let raf = 0;
+  let lastTapT = 0;
+  let fired = false;
+  let pid = null;
+
+  function setHold(p) {
+    if (ring) ring.style.setProperty('--hold', String(Math.max(0, Math.min(100, p * 100))));
+  }
+  function clearHold() {
+    holding = false;
+    fired = false;
+    pid = null;
+    el.classList.remove('holding');
+    setHold(0);
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+  function tick() {
+    if (!holding) return;
+    const p = (performance.now() - startT) / holdMs;
+    setHold(p);
+    if (p >= 1) {
+      fired = true;
+      clearHold();
+      onFire();
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function onDown(e) {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // Double-tap shortcut (Home from play)
+    if (doubleTapMs > 0) {
+      const now = performance.now();
+      if (now - lastTapT <= doubleTapMs) {
+        lastTapT = 0;
+        clearHold();
+        onFire();
+        return;
+      }
+      lastTapT = now;
+    }
+    holding = true;
+    fired = false;
+    startT = performance.now();
+    pid = e.pointerId;
+    el.classList.add('holding');
+    setHold(0);
+    try { el.setPointerCapture(pid); } catch (_) {}
+    raf = requestAnimationFrame(tick);
+  }
+  function onUp(e) {
+    if (pid != null && e.pointerId != null && e.pointerId !== pid) return;
+    // Release before threshold = cancel (single tap does nothing)
+    if (!fired) clearHold();
+  }
+  el.addEventListener('pointerdown', onDown);
+  el.addEventListener('pointerup', onUp);
+  el.addEventListener('pointercancel', onUp);
+  el.addEventListener('lostpointercapture', () => { if (holding && !fired) clearHold(); });
+  // Block native click so accidental taps never fire
+  el.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+}
+
+document.getElementById('driveBtn').addEventListener('click', () => startPlay());
+document.getElementById('customizeBtn').addEventListener('click', () => showGarage());
+bindHoldAction(document.getElementById('homeBtn'), {
+  holdMs: 700,
+  doubleTapMs: 400,
+  onFire: () => showStart(),
+});
+bindHoldAction(document.getElementById('garageResetBtn'), {
+  holdMs: 600,
+  onFire: () => {
+    custom = { ...DEFAULT_CUSTOM };
+    applyCustomization(true);
+  },
+});
+  </script>
+</body>
+</html>
