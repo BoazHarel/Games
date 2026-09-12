@@ -1843,8 +1843,114 @@ const BRONCO_HORSE_PNG_B64 =
   "d+UA+K+sI+grp9GMbwTe8GGeS8VomqsdnY4ANO/BtfvKgz30ihBfh/sajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj" +
   "0WjeNP8f3TMaZd/jdksAAAAASUVORK5CYII=";
 
-function makeBroncoHorseTexture() {
-  const S = 256;
+function hexToRgb255(hex) {
+  const c = new THREE.Color(hex);
+  return [Math.round(c.r * 255), Math.round(c.g * 255), Math.round(c.b * 255)];
+}
+
+function roofLuminance(hex) {
+  const c = new THREE.Color(hex);
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+}
+
+/** Paint colors that stay readable on any garage roof swatch (true paint, not a board). */
+function horsePaintColorsForRoof(roofHex) {
+  const L = roofLuminance(roofHex);
+  // Near-white: dark silhouette (cream outline would vanish on white).
+  if (L > 0.78) return { fill: '#1a1520', stroke: '#0c0a10' };
+  // Yellow / peach / light tinted: dark fill + bright cream outline (outline reads on yellow).
+  if (L > 0.42) return { fill: '#1a1520', stroke: '#fff6e4' };
+  // Dark roofs: classic cream fill + dark outline.
+  return { fill: '#f3eee3', stroke: '#1a1520' };
+}
+
+const horsePaint = {
+  canvas: null,
+  ctx: null,
+  tex: null,
+  img: null,
+  size: 512,
+};
+
+function paintBroncoHorseToCanvas(fillHex, strokeHex) {
+  const S = horsePaint.size;
+  const ctx = horsePaint.ctx;
+  if (!ctx || !horsePaint.tex) return;
+  ctx.clearRect(0, 0, S, S);
+  const fill = hexToRgb255(fillHex);
+  const stroke = hexToRgb255(strokeHex);
+
+  const tmp = document.createElement('canvas');
+  tmp.width = S;
+  tmp.height = S;
+  const tctx = tmp.getContext('2d');
+  tctx.clearRect(0, 0, S, S);
+  if (horsePaint.img && horsePaint.img.naturalWidth) {
+    tctx.drawImage(horsePaint.img, 0, 0, S, S);
+  } else {
+    drawBroncoHorseFallback(tctx, S, '#f3eee3', '#1a1520');
+  }
+
+  const src = tctx.getImageData(0, 0, S, S);
+  const s = src.data;
+  const mask = new Uint8Array(S * S);
+  // Recolor cream→fill, dark→stroke; keep internal linework
+  for (let i = 0, p = 0; i < s.length; i += 4, p++) {
+    if (s[i + 3] < 18) {
+      s[i + 3] = 0;
+      continue;
+    }
+    mask[p] = 1;
+    const lum = 0.2126 * s[i] + 0.7152 * s[i + 1] + 0.0722 * s[i + 2];
+    if (lum < 110) {
+      s[i] = stroke[0]; s[i + 1] = stroke[1]; s[i + 2] = stroke[2];
+    } else {
+      s[i] = fill[0]; s[i + 1] = fill[1]; s[i + 2] = fill[2];
+    }
+    if (s[i + 3] > 40) s[i + 3] = 255;
+  }
+
+  // Fat outer outline ring for toy-scale chase-cam read (does not erase internals)
+  const outlinePx = Math.max(5, Math.round(S * 0.018));
+  const out = ctx.createImageData(S, S);
+  const d = out.data;
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      const p = y * S + x;
+      const i = p * 4;
+      let near = 0;
+      if (!mask[p]) {
+        for (let dy = -outlinePx; dy <= outlinePx && !near; dy++) {
+          const yy = y + dy;
+          if (yy < 0 || yy >= S) continue;
+          for (let dx = -outlinePx; dx <= outlinePx; dx++) {
+            if (dx * dx + dy * dy > outlinePx * outlinePx) continue;
+            const xx = x + dx;
+            if (xx < 0 || xx >= S) continue;
+            if (mask[yy * S + xx]) { near = 1; break; }
+          }
+        }
+      }
+      if (mask[p]) {
+        d[i] = s[i]; d[i + 1] = s[i + 1]; d[i + 2] = s[i + 2]; d[i + 3] = s[i + 3];
+      } else if (near) {
+        d[i] = stroke[0]; d[i + 1] = stroke[1]; d[i + 2] = stroke[2]; d[i + 3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+  horsePaint.tex.needsUpdate = true;
+}
+
+function updateRoofHorsePaint(roofHex) {
+  if (!horsePaint.tex || !horsePaint.ctx) return;
+  const c = horsePaintColorsForRoof(roofHex);
+  paintBroncoHorseToCanvas(c.fill, c.stroke);
+}
+
+function makeBroncoHorseTexture(roofHex) {
+  const S = 512;
+  horsePaint.size = S;
   const canvas = document.createElement('canvas');
   canvas.width = S;
   canvas.height = S;
@@ -1853,32 +1959,38 @@ function makeBroncoHorseTexture() {
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
+  tex.anisotropy = 8;
+  tex.needsUpdate = true;
+
+  horsePaint.canvas = canvas;
+  horsePaint.ctx = ctx;
+  horsePaint.tex = tex;
+
+  const colors = horsePaintColorsForRoof(roofHex || DEFAULT_CUSTOM.roof);
+  drawBroncoHorseFallback(ctx, S, colors.fill, colors.stroke);
   tex.needsUpdate = true;
 
   const img = new Image();
-  img.onload = () => {
-    ctx.clearRect(0, 0, S, S);
-    ctx.drawImage(img, 0, 0, S, S);
-    tex.needsUpdate = true;
+  horsePaint.img = img;
+  const apply = () => {
+    const roof = (typeof custom !== 'undefined' && custom.roof) ? custom.roof : (roofHex || DEFAULT_CUSTOM.roof);
+    const c = horsePaintColorsForRoof(roof);
+    paintBroncoHorseToCanvas(c.fill, c.stroke);
   };
+  img.onload = apply;
   img.onerror = () => {
-    // Fallback: draw bucking/rearing Bronco-style pony (cream + dark outline, no board)
-    drawBroncoHorseFallback(ctx, S);
+    const roof = (typeof custom !== 'undefined' && custom.roof) ? custom.roof : (roofHex || DEFAULT_CUSTOM.roof);
+    const c = horsePaintColorsForRoof(roof);
+    drawBroncoHorseFallback(ctx, S, c.fill, c.stroke);
     tex.needsUpdate = true;
   };
   img.src = 'data:image/png;base64,' + BRONCO_HORSE_PNG_B64;
-  // Sync path when data-URL decodes immediately
-  if (img.complete && img.naturalWidth) {
-    ctx.clearRect(0, 0, S, S);
-    ctx.drawImage(img, 0, 0, S, S);
-    tex.needsUpdate = true;
-  }
+  if (img.complete && img.naturalWidth) apply();
   return tex;
 }
 
 /** Vector fallback if PNG fails — rearing Bronco pony, transparent bg. */
-function drawBroncoHorseFallback(ctx, S) {
+function drawBroncoHorseFallback(ctx, S, fillHex = '#f3eee3', strokeHex = '#1a1520') {
   ctx.clearRect(0, 0, S, S);
   ctx.save();
   ctx.translate(S * 0.50, S * 0.52);
@@ -1927,10 +2039,10 @@ function drawBroncoHorseFallback(ctx, S) {
     ctx.closePath();
   };
   path();
-  ctx.fillStyle = '#f3eee3';
+  ctx.fillStyle = fillHex;
   ctx.fill();
-  ctx.strokeStyle = '#1a1520';
-  ctx.lineWidth = 7;
+  ctx.strokeStyle = strokeHex;
+  ctx.lineWidth = 11;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   path();
@@ -1938,7 +2050,7 @@ function drawBroncoHorseFallback(ctx, S) {
   // eye
   ctx.beginPath();
   ctx.arc(58, -52, 3.2, 0, Math.PI * 2);
-  ctx.fillStyle = '#1a1520';
+  ctx.fillStyle = strokeHex;
   ctx.fill();
   ctx.restore();
 }
@@ -2207,7 +2319,7 @@ function buildBronco() {
     wellBevel.castShadow = false;
     g.add(wellBevel);
 
-    // Bridge under rear glass / above spare — continuous body for horse paint
+    // Bridge under rear glass / above spare — continuous hatch body (spare-only rear)
     const bridge = box(0.86, 0.10, 0.12, bodyColor, { roughness: 0.40, metalness: 0.14 });
     bridge.position.set(0, 0.905, -0.910);
     g.add(bridge); bronco.bodyParts.push(bridge);
@@ -2232,20 +2344,32 @@ function buildBronco() {
     bronco.spare = { group: spare, tire: spareTire, rim: spareRim, ring: spareRing };
   }
 
+  // ROOF: big flush painted Bronco horse (not a floating plaque / board)
   {
-    const horseTex = makeBroncoHorseTexture();
+    const horseTex = makeBroncoHorseTexture(roofColor);
+    // Large toy-scale mark centered on roof, under rails (paint sits on roof skin)
     const horse = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.34, 0.32),
-      new THREE.MeshStandardMaterial({
-        map: horseTex, transparent: true, alphaTest: 0.18,
-        roughness: 0.85, metalness: 0.0, side: THREE.FrontSide,
-        depthWrite: true,
+      new THREE.PlaneGeometry(0.56, 0.54),
+      // Unlit = true painted mark (no lighting edge that reads as a raised plaque)
+      new THREE.MeshBasicMaterial({
+        map: horseTex,
+        transparent: true,
+        alphaTest: 0.22,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -4,
+        polygonOffsetUnits: -4,
       })
     );
-    horse.castShadow = false; horse.receiveShadow = false;
-    horse.rotation.y = Math.PI;
-    horse.renderOrder = 2;
-    horse.position.set(0, 0.905, -0.971);
+    horse.castShadow = false;
+    horse.receiveShadow = false;
+    // Flat on roof facing up. Sequential rotates keep the decal above the skin (not buried).
+    horse.position.set(0, 1.3588, -0.10);
+    horse.rotation.set(0, 0, 0);
+    horse.rotateX(-Math.PI / 2); // plane faces +Y
+    horse.rotateZ(-Math.PI / 2); // image-left (-X) → vehicle-forward (+Z)
+    horse.renderOrder = 3;
     g.add(horse);
     bronco.horseLogo = horse;
   }
@@ -2271,6 +2395,7 @@ function applyCustomization(persist = true) {
 
   bronco.bodyParts.forEach((m) => { m.material.color.set(bodyCol); });
   bronco.roofParts.forEach((m) => { m.material.color.set(roofCol); });
+  updateRoofHorsePaint(roofCol);
 
   const scale = WHEEL_SIZE_SCALE[sizeId] || 1;
   const tireCol = darkenHex(wheelCol, 0.55);
@@ -3337,6 +3462,10 @@ bindHoldAction(document.getElementById('garageResetBtn'), {
   },
 });
   
+
+
+
+
 
 </script>
 </body>
