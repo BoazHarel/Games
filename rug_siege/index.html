@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rug Siege</title>
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #f3efe4;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+#wrap {
+  position: absolute;
+  overflow: hidden;
+}
+#stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 896px;
+  height: 706px;
+  transform-origin: top left;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#top, #preview, #boardbox, #dock { width: 896px; box-sizing: border-box; }
+#top {
+  height: 32px;
+  background: #2a2620;
+  color: #f0e8d8;
+  font: 15px system-ui;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 14px;
+}
+#preview {
+  height: 36px;
+  background: #3a342c;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  overflow: hidden;
+}
+#nextlbl {
+  color: #9c9286;
+  font: 13px system-ui;
+  margin-right: 4px;
+  flex: 0 0 auto;
+}
+.prev {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+}
+.prev canvas { width: 26px; height: 26px; display: block; }
+.prev.marked { outline: 2px solid #e6c34a; outline-offset: -2px; }
+.gapbadge {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: #e6c34a;
+  color: #2a2620;
+  font: 700 7px/8px system-ui;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.prev.hasgap .gapbadge { display: block; }
+#boardbox { position: relative; height: 560px; }
+#board, #chipLayer {
+  display: block;
+  width: 896px;
+  height: 560px;
+}
+#chipLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
+  visibility: hidden;
+}
+#end {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+}
+#endmsg {
+  font: 600 30px system-ui;
+  color: #fffaf0;
+  text-shadow: 0 2px 0 #1c1914, 0 0 6px #1c1914;
+}
+#endbtns { display: flex; gap: 8px; }
+#end button {
+  pointer-events: auto;
+  font: 15px system-ui;
+  background: #2a2620;
+  color: #f0e8d8;
+  border: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+#dock {
+  height: 78px;
+  background: #2a2620;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+.toy, #start, #speeds { flex-shrink: 0; }
+.toy {
+  width: 58px;
+  height: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 2px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #f0e8d8;
+  cursor: pointer;
+  outline: none;
+}
+.toy canvas { width: 28px; height: 28px; display: block; }
+.toyname { font: 10px/11px system-ui; }
+.toycost { font: 11px/12px system-ui; display: inline-block; }
+.toy.sel { outline: 1px solid #f0e8d8; outline-offset: -1px; }
+#line {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #f0e8d8;
+  font: 12px/1.3 system-ui;
+}
+#start {
+  height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  margin: 0;
+  border: 0;
+  background: #4a8a4a;
+  color: #f3fff3;
+  font: 14px system-ui;
+  cursor: pointer;
+}
+#speeds { display: flex; flex-direction: column; gap: 2px; }
+.spd {
+  margin: 0;
+  border: 0;
+  background: #4a443c;
+  color: #f0e8d8;
+  font: 11px/14px system-ui;
+  padding: 1px 6px;
+  min-width: 36px;
+  min-height: 32px;
+  cursor: pointer;
+}
+.spd.on { background: #8c8378; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+.shake { animation: shake 0.3s linear; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <div id="top">
+      <span id="gold">$110</span>
+      <span id="lives">♥ 20</span>
+      <span id="wave">wave 1/24</span>
+    </div>
+    <div id="preview"><span id="nextlbl">next:</span></div>
+    <div id="boardbox">
+      <canvas id="board" width="896" height="560"></canvas>
+      <canvas id="chipLayer" width="896" height="560"></canvas>
+      <div id="end">
+        <div id="endmsg"></div>
+        <div id="endbtns">
+          <button type="button" id="retry">retry</button>
+          <button type="button" id="stop">stop</button>
+        </div>
+      </div>
+    </div>
+    <div id="dock">
+      <button type="button" class="toy" data-type="marble">
+        <canvas width="56" height="56"></canvas>
+        <span class="toyname">Marble</span>
+        <span class="toycost">50</span>
+      </button>
+      <button type="button" class="toy" data-type="pillow">
+        <canvas width="56" height="56"></canvas>
+        <span class="toyname">Pillow</span>
+        <span class="toycost">90</span>
+      </button>
+      <button type="button" class="toy" data-type="fan">
+        <canvas width="56" height="56"></canvas>
+        <span class="toyname">Fan</span>
+        <span class="toycost">70</span>
+      </button>
+      <button type="button" class="toy" data-type="band">
+        <canvas width="56" height="56"></canvas>
+        <span class="toyname">Band</span>
+        <span class="toycost">120</span>
+      </button>
+      <div id="line"></div>
+      <button type="button" id="start">Start</button>
+      <div id="speeds">
+        <button type="button" id="sp1" class="spd on">1x</button>
+        <button type="button" id="sp2" class="spd">2x</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="sim.js"></script>
+<script src="draw.js"></script>
+<script src="draw-merge.js"></script>
+<script>
+(function () {
+  var COST = { marble: 50, pillow: 90, fan: 70, band: 120 };
+  var UP = { marble: 80, pillow: 140, fan: 100, band: 170 };
+
+  var wrap = document.getElementById('wrap');
+  var stage = document.getElementById('stage');
+  var board = document.getElementById('board');
+  var chipLayer = document.getElementById('chipLayer');
+  var ctx = board.getContext('2d');
+  var chipCtx = chipLayer.getContext('2d');
+  var goldEl = document.getElementById('gold');
+  var livesEl = document.getElementById('lives');
+  var waveEl = document.getElementById('wave');
+  var previewEl = document.getElementById('preview');
+  var lineEl = document.getElementById('line');
+  var startBtn = document.getElementById('start');
+  var sp1 = document.getElementById('sp1');
+  var sp2 = document.getElementById('sp2');
+  var endEl = document.getElementById('end');
+  var endMsg = document.getElementById('endmsg');
+  var stopBtn = document.getElementById('stop');
+  var retryBtn = document.getElementById('retry');
+
+  var state = RugSim.fresh();
+  var selectedDock = null;
+  var selectedId = null;
+  var hoverToy = null;
+  var hoverC = -1;
+  var hoverR = -1;
+  var acc = 0;
+  var last = 0;
+  var fx = [];
+  var chipShakeUntil = 0;
+  var chipShaking = false;
+  var prevSig = null;
+
+  var toys = document.querySelectorAll('.toy');
+  for (var i = 0; i < toys.length; i++) {
+    (function (btn) {
+      var type = btn.getAttribute('data-type');
+      RugDraw.paintIcon(btn.querySelector('canvas'), 'tower', type);
+      btn.addEventListener('mouseenter', function () { hoverToy = type; });
+      btn.addEventListener('pointerdown', function () { hoverToy = type; });
+      btn.addEventListener('mouseleave', function () { if (hoverToy === type) hoverToy = null; });
+      btn.addEventListener('click', function () {
+        selectedId = null;
+        selectedDock = selectedDock === type ? null : type;
+      });
+    })(toys[i]);
+  }
+
+  RugDraw.hookSprites(function () {
+    var b;
+    for (b = 0; b < toys.length; b++) {
+      RugDraw.paintIcon(toys[b].querySelector('canvas'), 'tower', toys[b].getAttribute('data-type'));
+    }
+    prevSig = null;
+  });
+
+  function frozen() {
+    return state.phase === 'won' || state.phase === 'lost' || state.phase === 'stopped';
+  }
+
+  function selectedTower() {
+    if (selectedId == null) return null;
+    var towers = state.towers || [];
+    for (var i = 0; i < towers.length; i++) {
+      if (towers[i].id === selectedId) return towers[i];
+    }
+    selectedId = null;
+    return null;
+  }
+
+  function inBoard(c, r) {
+    return c >= 0 && r >= 0 && c < 16 && r < 10;
+  }
+
+  function boardPos(e) {
+    var rect = board.getBoundingClientRect();
+    var px = (e.clientX - rect.left) / rect.width * 896;
+    var py = (e.clientY - rect.top) / rect.height * 560;
+    return { px: px, py: py, c: Math.floor(px / 56), r: Math.floor(py / 56) };
+  }
+
+  function shakePrice(type) {
+    var el = document.querySelector('.toy[data-type="' + type + '"] .toycost');
+    if (!el) return;
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+  }
+
+  function shakeChip() {
+    chipShakeUntil = performance.now() + 300;
+    chipShaking = false;
+  }
+
+  function woodGhost() {
+    if (frozen() || !selectedDock) return null;
+    if (!inBoard(hoverC, hoverR)) return null;
+    if (RugSim.cellKind(hoverC, hoverR) !== 'wood') return null;
+    if (RugSim.towerAt(state, hoverC, hoverR)) return null;
+    return { id: -1, type: selectedDock, c: hoverC, r: hoverR, upgraded: false };
+  }
+
+  var press = null;
+  var blockClick = false;
+  var blockClickTimer = 0;
+  var shakeMerge = null;
+
+  function armBlockClick() {
+    blockClick = true;
+    if (blockClickTimer) clearTimeout(blockClickTimer);
+    blockClickTimer = setTimeout(function () {
+      blockClick = false;
+      blockClickTimer = 0;
+    }, 700);
+  }
+
+  function hitBox(p, box) {
+    var slop = 8;
+    return !!(box && p.px >= box.x - slop && p.px <= box.x + box.w + slop &&
+      p.py >= box.y - slop && p.py <= box.y + box.h + slop);
+  }
+
+  function mergeOffers(sel) {
+    var out = [];
+    var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    var i, tw, rec;
+    if (!sel) return out;
+    for (i = 0; i < dirs.length; i++) {
+      tw = RugSim.towerAt(state, sel.c + dirs[i][0], sel.r + dirs[i][1]);
+      if (!tw) continue;
+      rec = RugSim.pair(sel.type, tw.type);
+      if (!rec) continue;
+      out.push({ c: tw.c, r: tw.r, type: rec.type, cost: rec.cost });
+    }
+    return out;
+  }
+
+  function doMerge(sel, c, r) {
+    var res = RugSim.merge(state, sel.id, c, r);
+    if (res && res.ok) selectedId = null;
+    else if (res && res.reason === 'gold') {
+      shakeMerge = { c: c, r: r };
+      shakeChip();
+    }
+  }
+
+  function cellAction(p) {
+    var sel, offers, i, tw, rec, placed;
+    if (frozen()) return;
+    sel = selectedTower();
+    if (sel && UP[sel.type] != null && !sel.upgraded && hitBox(p, RugDraw.chipBox(sel.c, sel.r))) {
+      var up = RugSim.upgrade(state, sel.id);
+      if (up && !up.ok && up.reason === 'gold') {
+        shakeMerge = null;
+        shakeChip();
+      }
+      return;
+    }
+    offers = mergeOffers(sel);
+    for (i = 0; i < offers.length; i++) {
+      if (hitBox(p, RugDraw.mergeChipBox(offers[i].c, offers[i].r))) {
+        doMerge(sel, offers[i].c, offers[i].r);
+        return;
+      }
+    }
+    if (!inBoard(p.c, p.r)) return;
+    tw = RugSim.towerAt(state, p.c, p.r);
+    if (tw) {
+      if (sel && sel.id !== tw.id) {
+        rec = RugSim.pair(sel.type, tw.type);
+        if (rec && ((sel.r === tw.r && Math.abs(sel.c - tw.c) === 1) ||
+            (sel.c === tw.c && Math.abs(sel.r - tw.r) === 1))) {
+          doMerge(sel, tw.c, tw.r);
+          return;
+        }
+      }
+      if (selectedId === tw.id) selectedId = null;
+      else {
+        selectedId = tw.id;
+        selectedDock = null;
+      }
+      return;
+    }
+    if (RugSim.cellKind(p.c, p.r) === 'wood') {
+      if (selectedDock) {
+        placed = RugSim.place(state, selectedDock, p.c, p.r);
+        if (placed && !placed.ok && placed.reason === 'gold') shakePrice(selectedDock);
+      } else if (selectedId != null) selectedId = null;
+    }
+  }
+
+  function trySell(c, r) {
+    var tower, sold;
+    if (frozen() || !inBoard(c, r)) return;
+    tower = RugSim.towerAt(state, c, r);
+    if (!tower) return;
+    sold = RugSim.sell(state, c, r);
+    if (sold && sold.ok && selectedId === tower.id) selectedId = null;
+  }
+
+  stage.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  board.addEventListener('pointerdown', function (e) {
+    var p;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    p = boardPos(e);
+    hoverC = p.c;
+    hoverR = p.r;
+    if (press && press.timer) clearTimeout(press.timer);
+    press = { x: e.clientX, y: e.clientY, id: e.pointerId, c: p.c, r: p.r, sold: false, timer: 0 };
+    press.timer = setTimeout(function () {
+      if (!press || press.sold) return;
+      press.sold = true;
+      armBlockClick();
+      trySell(press.c, press.r);
+    }, 450);
+    if (e.pointerType !== 'mouse') e.preventDefault();
+    if (board.setPointerCapture) {
+      try { board.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+  });
+  board.addEventListener('pointermove', function (e) {
+    var p = boardPos(e);
+    var dx, dy;
+    hoverC = p.c;
+    hoverR = p.r;
+    if (!press || e.pointerId !== press.id || press.sold) return;
+    dx = e.clientX - press.x;
+    dy = e.clientY - press.y;
+    if (dx * dx + dy * dy > 100 && press.timer) {
+      clearTimeout(press.timer);
+      press.timer = 0;
+    }
+  });
+  board.addEventListener('pointerup', function (e) {
+    var p, touch;
+    if (!press || e.pointerId !== press.id) return;
+    if (press.timer) clearTimeout(press.timer);
+    p = boardPos(e);
+    touch = e.pointerType === 'touch' || e.pointerType === 'pen';
+    if (touch && !press.sold) cellAction(p);
+    if (touch || press.sold) armBlockClick();
+    press = null;
+    hoverC = p.c;
+    hoverR = p.r;
+  });
+  board.addEventListener('pointercancel', function () {
+    if (press && press.timer) clearTimeout(press.timer);
+    press = null;
+    hoverC = -1;
+    hoverR = -1;
+  });
+  board.addEventListener('pointerleave', function (e) {
+    if (e.pointerType === 'mouse') {
+      hoverC = -1;
+      hoverR = -1;
+    }
+  });
+
+  board.addEventListener('click', function (e) {
+    if (blockClick) {
+      blockClick = false;
+      if (blockClickTimer) clearTimeout(blockClickTimer);
+      blockClickTimer = 0;
+      return;
+    }
+    if (e.button !== 0 || e.ctrlKey) return;
+    cellAction(boardPos(e));
+  });
+
+  board.addEventListener('contextmenu', function (e) {
+    var p;
+    e.preventDefault();
+    p = boardPos(e);
+    armBlockClick();
+    trySell(p.c, p.r);
+  });
+
+  startBtn.addEventListener('click', function () {
+    if (state.phase === 'idle') RugSim.startWave(state);
+  });
+  sp1.addEventListener('click', function () {
+    if (state.phase === 'idle' || state.phase === 'march') RugSim.setSpeed(state, 1);
+  });
+  sp2.addEventListener('click', function () {
+    if (state.phase === 'idle' || state.phase === 'march') RugSim.setSpeed(state, 2);
+  });
+  stopBtn.addEventListener('click', function () {
+    RugSim.stop(state);
+    stopBtn.hidden = true;
+  });
+  retryBtn.addEventListener('click', function () {
+    state = RugSim.fresh();
+    selectedDock = null;
+    selectedId = null;
+    hoverToy = null;
+    acc = 0;
+    fx.length = 0;
+    chipShakeUntil = 0;
+    chipShaking = false;
+    prevSig = null;
+    chipLayer.classList.remove('shake');
+    chipLayer.style.visibility = 'hidden';
+    var shaking = document.querySelectorAll('.toycost.shake');
+    for (var s = 0; s < shaking.length; s++) shaking[s].classList.remove('shake');
+  });
+
+  function harvest(now) {
+    var ev = state.events;
+    if (!ev || !ev.length) return;
+    for (var i = 0; i < ev.length; i++) {
+      var e = ev[i];
+      if (!e) continue;
+      if (e.t === 'beam') {
+        fx.push({
+          t: 'beam',
+          kind: e.kind,
+          x0: e.x0, y0: e.y0, x1: e.x1, y1: e.y1,
+          born: now,
+          dur: e.kind === 'band' ? 0.35 : 0.12
+        });
+      } else if (e.t === 'splash') {
+        fx.push({ t: 'splash', x: e.x, y: e.y, r: e.r, born: now, dur: 0.2 });
+      } else if (e.t === 'pop') {
+        fx.push({ t: 'pop', x: e.x, y: e.y, n: e.n, born: now, dur: 0.6 });
+      } else if (e.t === 'roll') {
+        fx.push({ t: 'roll', x0: e.x0, y0: e.y0, x1: e.x1, y1: e.y1, born: now, dur: 0.25 });
+      }
+    }
+    ev.length = 0;
+  }
+
+  function fadeAlpha(now, f) {
+    return 1 - (now - f.born) / (f.dur * 1000);
+  }
+
+  function syncPreview() {
+    var items = RugSim.preview(state) || [];
+    var sig = '';
+    for (var i = 0; i < items.length; i++) sig += (i ? '\n' : '') + items[i].type;
+    if (sig !== prevSig) {
+      prevSig = sig;
+      var old = previewEl.querySelectorAll('.prev');
+      for (var r = 0; r < old.length; r++) old[r].remove();
+      for (var j = 0; j < items.length; j++) {
+        var d = document.createElement('div');
+        d.className = 'prev';
+        var c = document.createElement('canvas');
+        c.width = 56;
+        c.height = 56;
+        var g = document.createElement('span');
+        g.className = 'gapbadge';
+        g.textContent = 'gap';
+        d.appendChild(c);
+        d.appendChild(g);
+        previewEl.appendChild(d);
+        RugDraw.paintIcon(c, 'marcher', items[j].type);
+      }
+    }
+    var nodes = previewEl.querySelectorAll('.prev');
+    for (var k = 0; k < nodes.length; k++) {
+      var it = items[k];
+      nodes[k].classList.toggle('marked', !!(it && it.marked));
+      nodes[k].classList.toggle('hasgap', !!(it && it.gapChip));
+    }
+  }
+
+  function syncHud() {
+    goldEl.textContent = '$' + state.gold;
+    livesEl.textContent = '♥ ' + state.lives;
+    waveEl.textContent = 'wave ' + RugSim.displayWave(state) + '/24';
+    var lineType = hoverToy || selectedDock;
+    if (!lineType) lineEl.textContent = '';
+    else {
+      var text = RugSim.dockLine(lineType);
+      lineEl.textContent = text == null ? '' : String(text);
+    }
+    for (var i = 0; i < toys.length; i++) {
+      var type = toys[i].getAttribute('data-type');
+      toys[i].classList.toggle('sel', selectedDock === type);
+      toys[i].querySelector('.toycost').style.opacity = state.gold >= COST[type] ? '1' : '0.4';
+    }
+    startBtn.style.visibility = state.phase === 'idle' ? 'visible' : 'hidden';
+    var spd = state.speed == null ? 1 : state.speed;
+    sp1.classList.toggle('on', spd === 1);
+    sp2.classList.toggle('on', spd === 2);
+    if (frozen()) {
+      endEl.style.display = 'flex';
+      endMsg.textContent = state.outcome === 'win' ? 'you held the rug.' : 'they got through.';
+      stopBtn.hidden = state.phase === 'stopped';
+    } else {
+      endEl.style.display = 'none';
+    }
+    syncPreview();
+  }
+
+  function syncCanvasSize() {
+    var dpr = window.devicePixelRatio || 1;
+    var w = Math.round(896 * dpr);
+    var h = Math.round(560 * dpr);
+    if (board.width !== w || board.height !== h) {
+      board.width = w;
+      board.height = h;
+      chipLayer.width = w;
+      chipLayer.height = h;
+    }
+    return dpr;
+  }
+
+  function drawFxKind(now, kind) {
+    for (var i = 0; i < fx.length; i++) {
+      var f = fx[i];
+      if (f.t !== kind) continue;
+      var alpha = fadeAlpha(now, f);
+      if (kind === 'beam') RugDraw.drawBeam(ctx, f.kind, f.x0, f.y0, f.x1, f.y1, alpha);
+      else RugDraw.drawSplash(ctx, f.x, f.y, f.r, alpha);
+    }
+  }
+
+  function frame(now) {
+    var realDelta = last ? (now - last) / 1000 : 0;
+    last = now;
+    if (!(realDelta > 0)) realDelta = 0;
+    if (realDelta > 0.25) realDelta = 0.25;
+
+    harvest(now);
+    acc += realDelta * (state.phase === 'march' ? state.speed : 0);
+    var stepDt = 1 / 60;
+    while (acc >= stepDt && state.phase === 'march') {
+      RugSim.step(state, stepDt);
+      acc -= stepDt;
+    }
+    if (state.phase !== 'march') acc = 0;
+    harvest(now);
+
+    var dpr = syncCanvasSize();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, 896, 560);
+
+    RugDraw.drawRoom(ctx);
+    RugDraw.drawScuffs(ctx, state.scuffs);
+
+    var ghost = woodGhost();
+    var sel = selectedTower();
+    if (ghost) RugDraw.drawRing(ctx, ghost.c, ghost.r, RugSim.rangeOf(ghost));
+    else if (sel) RugDraw.drawRing(ctx, sel.c, sel.r, RugSim.rangeOf(sel));
+
+    var spin = (now / 1000) * Math.PI * 2;
+    var towers = state.towers || [];
+    for (var t = 0; t < towers.length; t++) {
+      RugDraw.drawTower(ctx, towers[t], {
+        alpha: 1,
+        spin: towers[t].type === 'fan' ? spin : 0
+      });
+    }
+    if (ghost) {
+      RugDraw.drawTower(ctx, ghost, {
+        alpha: state.gold >= COST[ghost.type] ? 0.85 : 0.35,
+        spin: ghost.type === 'fan' ? spin : 0
+      });
+    }
+
+    var proj = state.projectiles || [];
+    for (var p = 0; p < proj.length; p++) {
+      var shot = proj[p];
+      var u = 0;
+      if (shot.travel > 0) u = shot.age / shot.travel;
+      if (u < 0) u = 0;
+      else if (u > 1) u = 1;
+      RugDraw.drawPillow(ctx, shot.x + (shot.tx - shot.x) * u, shot.y + (shot.ty - shot.y) * u, 1);
+    }
+
+    for (var n = fx.length - 1; n >= 0; n--) {
+      if (now - fx[n].born >= fx[n].dur * 1000) fx.splice(n, 1);
+    }
+    drawFxKind(now, 'beam');
+    drawFxKind(now, 'splash');
+    for (var ri = 0; ri < fx.length; ri++) {
+      var roll = fx[ri];
+      var ra;
+      if (roll.t !== 'roll') continue;
+      ra = fadeAlpha(now, roll);
+      if (ra <= 0) continue;
+      ctx.save();
+      ctx.globalAlpha = ra;
+      ctx.strokeStyle = '#e8a15a';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(roll.x0 * 56, roll.y0 * 56);
+      ctx.lineTo(roll.x1 * 56, roll.y1 * 56);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    var enemies = state.enemies || [];
+    for (var m = 0; m < enemies.length; m++) {
+      var en = enemies[m];
+      RugDraw.drawMarcher(ctx, en, RugSim.posAlong(en.progress), {
+        slowed: en.slow < 1,
+        alpha: 1
+      });
+    }
+
+    var offers = mergeOffers(sel);
+    var oi;
+    if (sel && UP[sel.type] != null && !sel.upgraded) {
+      var cost = UP[sel.type];
+      var afford = state.gold >= cost;
+      if (!shakeMerge && now < chipShakeUntil) {
+        if (!chipShaking) {
+          chipShaking = true;
+          chipLayer.classList.remove('shake');
+          void chipLayer.offsetWidth;
+          chipLayer.classList.add('shake');
+        }
+        chipLayer.style.visibility = 'visible';
+        chipCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        chipCtx.clearRect(0, 0, 896, 560);
+        RugDraw.drawChip(chipCtx, sel.c, sel.r, cost, afford);
+      } else {
+        if (!shakeMerge) {
+          chipShaking = false;
+          chipLayer.classList.remove('shake');
+          chipLayer.style.visibility = 'hidden';
+        }
+        RugDraw.drawChip(ctx, sel.c, sel.r, cost, afford);
+      }
+    } else if (!shakeMerge) {
+      chipShaking = false;
+      chipLayer.classList.remove('shake');
+      chipLayer.style.visibility = 'hidden';
+    }
+    for (oi = 0; oi < offers.length; oi++) {
+      var of = offers[oi];
+      var ofAff = state.gold >= of.cost;
+      var ofShake = shakeMerge && shakeMerge.c === of.c && shakeMerge.r === of.r && now < chipShakeUntil;
+      if (ofShake) {
+        if (!chipShaking) {
+          chipShaking = true;
+          chipLayer.classList.remove('shake');
+          void chipLayer.offsetWidth;
+          chipLayer.classList.add('shake');
+        }
+        chipLayer.style.visibility = 'visible';
+        chipCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        chipCtx.clearRect(0, 0, 896, 560);
+        RugDraw.drawMergeChip(chipCtx, of.c, of.r, of.type, of.cost, ofAff);
+      } else {
+        RugDraw.drawMergeChip(ctx, of.c, of.r, of.type, of.cost, ofAff);
+      }
+    }
+    if (shakeMerge && now >= chipShakeUntil) shakeMerge = null;
+
+    for (var q = 0; q < fx.length; q++) {
+      var pop = fx[q];
+      if (pop.t !== 'pop') continue;
+      var k = (now - pop.born) / (pop.dur * 1000);
+      if (k < 0) k = 0;
+      RugDraw.drawPop(ctx, pop.x, pop.y - (24 * k) / 56, '+' + pop.n, 1 - k);
+    }
+
+    syncHud();
+    requestAnimationFrame(frame);
+  }
+
+  function fit() {
+    var vv = window.visualViewport;
+    var vw = vv ? vv.width : window.innerWidth;
+    var vh = vv ? vv.height : window.innerHeight;
+    var ox = vv ? vv.offsetLeft : 0;
+    var oy = vv ? vv.offsetTop : 0;
+    var s = Math.min(1, vw / 896, vh / 706);
+    var w = 896 * s;
+    var h = 706 * s;
+    wrap.style.width = w + 'px';
+    wrap.style.height = h + 'px';
+    wrap.style.left = (ox + (vw - w) / 2) + 'px';
+    wrap.style.top = (oy + (vh - h) / 2) + 'px';
+    stage.style.transform = 'scale(' + s + ')';
+  }
+
+  window.addEventListener('resize', fit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fit);
+    window.visualViewport.addEventListener('scroll', fit);
+  }
+  fit();
+  syncHud();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+
