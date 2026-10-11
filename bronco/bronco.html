@@ -2,26 +2,121 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#3FA9F5">
     <title>Bronco Off-Road Adventure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lilita+One&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bronco-body: #FF9900; /* Default Cyber Orange */
+            --bronco-roof: #F8F9FA; /* Default White */
+
+            --ink: #2B1D14;
+            --cream: #FFF8EC;
+            --sun: #FFD23F;
+            --orange: #FF8A1F;
+            --go: #3FC35A;
+            --go-dark: #23913C;
+            --sky-top: #3FA9F5;
+            --title-font: 'Lilita One', 'Arial Black', 'Trebuchet MS', sans-serif;
+            --ui-font: 'Fredoka', 'Trebuchet MS', 'Segoe UI', sans-serif;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden; /* Prevent scrolling */
-            background-color: #87CEEB; /* Sky blue */
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Kid-friendly font */
+            background-color: var(--sky-top);
+            font-family: var(--ui-font);
             touch-action: none; /* Prevent default touch actions like pinch-zoom */
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
 
         #game-container {
             position: relative;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #8B4513 50%, #654321 100%); /* Simple sky/ground gradient fallback */
             overflow: hidden;
+            /* Golden-hour sky. Terrain + hills are drawn on canvases above this. */
+            background:
+                radial-gradient(ellipse 60% 45% at 72% 30%, rgba(255, 244, 196, 0.55), rgba(255, 244, 196, 0) 70%),
+                linear-gradient(180deg, #3FA9F5 0%, #6EC3F7 30%, #A9E0FA 52%, #FFE9BE 72%, #FFD49A 100%);
+        }
+
+        #game-container.shake { animation: shake 0.42s cubic-bezier(.36, .07, .19, .97) both; }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 1px, 0); }
+            20%, 80% { transform: translate3d(5px, -3px, 0); }
+            30%, 50%, 70% { transform: translate3d(-9px, 4px, 0); }
+            40%, 60% { transform: translate3d(9px, -4px, 0); }
+        }
+
+        /* ---------- Sky decoration (behind the hills) ---------- */
+        .sun {
+            position: absolute;
+            z-index: 0;
+            left: 70%;
+            top: 12%;
+            width: clamp(90px, 16vmin, 170px);
+            height: clamp(90px, 16vmin, 170px);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .sun-rays {
+            position: absolute;
+            inset: -70%;
+            border-radius: 50%;
+            background: repeating-conic-gradient(from 0deg, rgba(255, 246, 200, 0.42) 0deg 9deg, rgba(255, 246, 200, 0) 9deg 22.5deg);
+            -webkit-mask: radial-gradient(circle, #000 25%, transparent 68%);
+            mask: radial-gradient(circle, #000 25%, transparent 68%);
+            animation: sunspin 70s linear infinite;
+        }
+        .sun-glow {
+            position: absolute;
+            inset: -45%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 240, 170, 0.8) 0%, rgba(255, 230, 150, 0.25) 45%, rgba(255, 230, 150, 0) 70%);
+        }
+        .sun-disc {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 35%, #FFFBE0 0%, #FFE680 45%, #FFC93C 100%);
+            box-shadow: 0 0 0 6px rgba(255, 236, 150, 0.45);
+        }
+        @keyframes sunspin { to { transform: rotate(360deg); } }
+
+        .far-cloud {
+            position: absolute;
+            z-index: 0;
+            left: 0;
+            width: 160px;
+            height: 96px;
+            opacity: 0.75;
+            pointer-events: none;
+            animation: drift linear infinite;
+            will-change: transform;
+        }
+        @keyframes drift {
+            from { transform: translate3d(110vw, 0, 0) scale(var(--s, 1)); }
+            to { transform: translate3d(-260px, 0, 0) scale(var(--s, 1)); }
+        }
+
+        /* Parallax hill layers (pre-rendered canvases, moved with transforms only) */
+        .parallax {
+            position: absolute;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            will-change: transform;
         }
 
         /* The Bronco container */
@@ -35,20 +130,58 @@
             transform-origin: 50% 100%; /* Rotate from the center-bottom (between wheels) */
             will-change: transform;
         }
+        .bronco-inner {
+            position: absolute;
+            inset: 0;
+            transform-origin: 50% 100%;
+        }
+        .bronco-inner svg { overflow: visible; display: block; }
 
         /* Wheels spinning animation */
         @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .wheel-spin {
-            animation: spin 0.5s linear infinite;
+            animation: spin 0.46s linear infinite;
             transform-origin: 0px 0px; /* Fixed axis to the exact center of the SVG wheel group */
+        }
+
+        /* Little suspension bounce while driving */
+        .driving .chassis { animation: bob 0.24s ease-in-out infinite alternate; }
+        .crashed .chassis { animation: none; }
+        @keyframes bob {
+            from { transform: translateY(0); }
+            to { transform: translateY(-1.6px); }
+        }
+
+        /* Dizzy stars after a bump */
+        .dizzy {
+            position: absolute;
+            left: 50%;
+            top: -8px;
+            width: 0;
+            height: 0;
+            display: none;
+        }
+        .crashed .dizzy { display: block; }
+        .dizzy span {
+            position: absolute;
+            left: -11px;
+            top: -11px;
+            width: 22px;
+            height: 22px;
+            animation: orbit 1.1s linear infinite;
+        }
+        .dizzy span:nth-child(2) { animation-delay: -0.37s; }
+        .dizzy span:nth-child(3) { animation-delay: -0.73s; }
+        @keyframes orbit {
+            0% { transform: translate(-44px, 0) scale(0.8); }
+            25% { transform: translate(0, 8px) scale(1.1); }
+            50% { transform: translate(44px, 0) scale(0.8); }
+            75% { transform: translate(0, -8px) scale(0.6); }
+            100% { transform: translate(-44px, 0) scale(0.8); }
         }
 
         /* Interactive Elements (Obstacles/Collectibles) */
@@ -58,7 +191,9 @@
             left: 0;
             z-index: 5;
             will-change: transform;
+            transform-origin: 50% 100%;
         }
+        .obstacle svg, .collectible svg, .cloud svg { overflow: visible; display: block; }
 
         .cloud {
             position: absolute;
@@ -67,11 +202,28 @@
             width: 100px;
             height: 60px;
             z-index: 1;
-            opacity: 0.8;
+            opacity: 0.95;
             will-change: transform;
+            pointer-events: none;
         }
 
-        /* UI Overlays */
+        /* Bug wing flapping */
+        .flap-y { animation: flapY 0.11s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+        .flap-x { animation: flapX 0.22s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 50%; }
+        @keyframes flapY { from { transform: scaleY(1); } to { transform: scaleY(0.4); } }
+        @keyframes flapX { from { transform: scaleX(1); } to { transform: scaleX(0.3); } }
+
+        #fx-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        /* ---------- HUD ---------- */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -83,217 +235,465 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px;
+            padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 14px max(14px, env(safe-area-inset-left));
             box-sizing: border-box;
         }
 
-        .score-board {
-            font-size: 36px;
-            color: #FFF;
-            text-shadow: 2px 2px 4px #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-            font-weight: bold;
-            pointer-events: auto;
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
         }
 
-        /* Start/Game Over Screens */
+        .score-board {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.2vmin, 12px);
+            padding: clamp(4px, 0.9vmin, 8px) clamp(14px, 2.4vmin, 22px) clamp(4px, 0.9vmin, 8px) clamp(5px, 0.9vmin, 8px);
+            background: linear-gradient(180deg, rgba(43, 29, 20, 0.78), rgba(43, 29, 20, 0.62));
+            border: 3px solid rgba(255, 255, 255, 0.85);
+            border-radius: 999px;
+            box-shadow: 0 5px 0 rgba(43, 29, 20, 0.35), 0 10px 22px rgba(0, 0, 0, 0.18);
+            color: #FFF;
+            pointer-events: auto;
+        }
+        .hud-icon {
+            width: clamp(34px, 6.4vmin, 54px);
+            height: clamp(34px, 6.4vmin, 54px);
+            flex: none;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+        }
+        .hud-icon svg { width: 100%; height: 100%; overflow: visible; }
+        .hud-text { display: flex; flex-direction: column; line-height: 1; }
+        .hud-label {
+            font-family: var(--ui-font);
+            font-weight: 600;
+            font-size: clamp(11px, 1.8vmin, 15px);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+        .hud-num {
+            font-family: var(--title-font);
+            font-size: clamp(26px, 5vmin, 42px);
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+            text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+        }
+        #score-display {
+            display: inline-block;
+            transition: transform 0.12s ease-out;
+            transform-origin: 50% 60%;
+        }
+
+        .toast {
+            position: absolute;
+            left: 50%;
+            top: 22%;
+            transform: translate(-50%, -50%) scale(0);
+            font-family: var(--title-font);
+            font-size: clamp(34px, 8vmin, 72px);
+            color: var(--sun);
+            letter-spacing: 0.03em;
+            -webkit-text-stroke: 3px var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 0 6px 0 var(--ink), 0 12px 24px rgba(0, 0, 0, 0.25);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .toast.show { animation: toast 1.3s cubic-bezier(.2, .9, .3, 1.2) forwards; }
+        @keyframes toast {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-8deg); opacity: 0; }
+            18% { transform: translate(-50%, -50%) scale(1.15) rotate(3deg); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); opacity: 1; }
+            78% { transform: translate(-50%, -60%) scale(1) rotate(0); opacity: 1; }
+            100% { transform: translate(-50%, -90%) scale(0.9); opacity: 0; }
+        }
+
+        /* ---------- Menus ---------- */
         .overlay-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
             z-index: 30;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--ink);
             text-align: center;
             pointer-events: auto; /* Catch clicks */
+            box-sizing: border-box;
+            padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+            background:
+                radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255, 236, 190, 0.18), rgba(255, 236, 190, 0) 70%),
+                linear-gradient(180deg, rgba(20, 40, 90, 0.40), rgba(40, 20, 10, 0.55));
         }
 
-        .overlay-screen h1 {
-            font-size: 48px;
-            text-shadow: 3px 3px 0 #000;
-            margin-bottom: 20px;
+        .menu-card {
+            position: relative;
+            box-sizing: border-box;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 45%),
+                linear-gradient(180deg, #FFFDF6, #FFEFD2);
+            border: 5px solid var(--ink);
+            border-radius: clamp(22px, 4vmin, 40px);
+            box-shadow: 0 10px 0 var(--ink), 0 24px 50px rgba(0, 0, 0, 0.35);
+            animation: cardIn 0.5s cubic-bezier(.2, 1.3, .4, 1) both;
+        }
+        @keyframes cardIn {
+            from { transform: translateY(40px) scale(0.85); opacity: 0; }
+            to { transform: none; opacity: 1; }
+        }
+
+        .title {
+            margin: 0;
+            font-family: var(--title-font);
+            font-weight: 400;
+            line-height: 0.95;
+            color: var(--orange);
+            letter-spacing: 0.02em;
+            -webkit-text-stroke: 0.09em var(--ink);
+            paint-order: stroke fill;
+            text-shadow: 0 0.09em 0 var(--ink);
+        }
+        .title .alt { color: #3FA9F5; display: inline-block; animation: wobble 2.6s ease-in-out infinite; }
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg) translateY(-2px); }
+        }
+
+        /* Start screen layout: stacked in portrait, side-by-side in landscape */
+        .start-card {
+            width: min(94vw, 600px);
+            padding: clamp(14px, 3vmin, 30px);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(8px, 2vmin, 20px);
+            align-items: center;
+        }
+        .start-hero { display: flex; flex-direction: column; align-items: center; }
+        .start-card .title { font-size: clamp(30px, 9vw, 64px); }
+
+        .preview-stage {
+            position: relative;
+            width: min(78vw, 440px, 52vh);
+            aspect-ratio: 200 / 132;
+            margin-top: clamp(4px, 1.5vmin, 14px);
+        }
+        .preview-ground {
+            position: absolute;
+            left: -6%;
+            right: -6%;
+            bottom: 0;
+            height: 16%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 50% 35%, #7EDB5A 0%, #4FB446 55%, #2E8B3E 100%);
+            box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.12);
+        }
+        .preview-shadow {
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            bottom: 4%;
+            height: 8%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(20, 40, 10, 0.45), rgba(20, 40, 10, 0) 70%);
+        }
+        .preview-bronco {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            aspect-ratio: 200 / 120;
+            transform-origin: 50% 100%;
+            animation: idle 1.6s ease-in-out infinite;
+        }
+        .preview-bronco svg { width: 100%; height: 100%; overflow: visible; display: block; }
+        .preview-bronco .chassis { animation: bob 0.9s ease-in-out infinite alternate; }
+        @keyframes idle {
+            0%, 100% { transform: translateY(1.5%); }
+            50% { transform: translateY(0); }
+        }
+        .splat {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            border-radius: 50%;
+            border: 3px solid var(--ink);
+            pointer-events: none;
+            animation: splat 0.7s cubic-bezier(.2, .8, .3, 1) forwards;
+        }
+        @keyframes splat {
+            0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+        }
+
+        .start-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(8px, 1.8vmin, 16px);
+        }
+
+        .color-section {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.65);
+            padding: clamp(8px, 1.6vmin, 14px) clamp(8px, 1.6vmin, 16px) clamp(10px, 2vmin, 16px);
+            border-radius: clamp(16px, 3vmin, 26px);
+            border: 3px solid rgba(43, 29, 20, 0.15);
+        }
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--ui-font);
+            font-weight: 700;
+            font-size: clamp(16px, 3.2vmin, 26px);
+            color: var(--ink);
+        }
+        .section-label svg { width: 1.3em; height: 1.3em; }
+
+        .color-row {
+            display: flex;
+            justify-content: center;
+            gap: clamp(8px, 2vmin, 16px);
+            margin-top: clamp(6px, 1.2vmin, 10px);
+        }
+
+        .color-swatch {
+            position: relative;
+            width: clamp(40px, 10.5vw, 70px);
+            height: clamp(40px, 10.5vw, 70px);
+            border-radius: 50%;
+            border: 4px solid var(--ink);
+            box-shadow: 0 5px 0 var(--ink), inset 0 -7px 0 rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+            transition: transform 0.18s cubic-bezier(.3, 1.6, .5, 1), box-shadow 0.18s;
+            flex: none;
+        }
+        .color-swatch::after {
+            content: '';
+            position: absolute;
+            left: 18%;
+            top: 12%;
+            width: 34%;
+            height: 26%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.75);
+            transform: rotate(-25deg);
+        }
+        .color-swatch:active { transform: scale(0.9); }
+
+        .swatch-selected {
+            transform: translateY(-4px) scale(1.14);
+            box-shadow: 0 0 0 5px #FFF, 0 0 0 9px var(--sun), 0 9px 0 4px rgba(43, 29, 20, 0.6), inset 0 -7px 0 rgba(0, 0, 0, 0.18);
         }
 
         .big-button {
-            background-color: #FFD700;
-            border: 4px solid #FFA500;
-            border-radius: 30px;
-            padding: 20px 40px;
-            font-size: 32px;
-            font-family: inherit;
-            color: #333;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4em;
+            background: linear-gradient(180deg, #6EE07F 0%, var(--go) 55%, #31AE4C 100%);
+            border: 5px solid var(--ink);
+            border-radius: 999px;
+            padding: 0.38em 1.25em 0.42em;
+            font-size: clamp(26px, 5.4vmin, 46px);
+            font-family: var(--title-font);
+            letter-spacing: 0.04em;
+            color: #FFF;
+            -webkit-text-stroke: 0.08em var(--ink);
+            paint-order: stroke fill;
             cursor: pointer;
-            box-shadow: 0 8px 0 #DAA520, 0 15px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.1s;
+            box-shadow: 0 8px 0 var(--ink), 0 16px 26px rgba(0, 0, 0, 0.3), inset 0 4px 0 rgba(255, 255, 255, 0.45);
+            transition: transform 0.08s, box-shadow 0.08s;
+            animation: pulse 1.4s ease-in-out infinite;
+            touch-action: manipulation;
+        }
+        .big-button svg { width: 1em; height: 1em; flex: none; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .big-button:active {
+            animation: none;
             transform: translateY(8px);
-            box-shadow: 0 0 0 #DAA520, 0 5px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 var(--ink), 0 5px 10px rgba(0, 0, 0, 0.3), inset 0 4px 0 rgba(255, 255, 255, 0.45);
+        }
+
+        @media (orientation: landscape) {
+            .start-card {
+                width: min(96vw, 1060px);
+                grid-template-columns: 1.08fr 1fr;
+                gap: clamp(10px, 3vmin, 34px);
+            }
+            .start-card .title { font-size: clamp(28px, min(9vh, 6vw), 70px); }
+            .preview-stage { width: min(42vw, 470px, 62vh); }
+            .color-swatch { width: clamp(38px, min(10vh, 6.5vw), 70px); height: clamp(38px, min(10vh, 6.5vw), 70px); }
+        }
+        @media (orientation: landscape) and (max-height: 480px) {
+            .menu-card { border-width: 4px; box-shadow: 0 6px 0 var(--ink), 0 14px 30px rgba(0, 0, 0, 0.35); }
+            .big-button { border-width: 4px; box-shadow: 0 6px 0 var(--ink), 0 10px 18px rgba(0, 0, 0, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.45); }
+            .color-swatch { border-width: 3px; box-shadow: 0 4px 0 var(--ink), inset 0 -5px 0 rgba(0, 0, 0, 0.18); }
+            .swatch-selected { box-shadow: 0 0 0 4px #FFF, 0 0 0 7px var(--sun), inset 0 -5px 0 rgba(0, 0, 0, 0.18); }
+        }
+
+        /* Game over */
+        .over-card {
+            width: min(92vw, 560px);
+            padding: clamp(18px, 4vmin, 40px) clamp(16px, 4vmin, 40px) clamp(20px, 4vmin, 36px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(8px, 2vmin, 18px);
+        }
+        #game-over-screen { animation: fadeIn 0.35s ease-out 0.45s both; }
+        #game-over-screen .menu-card { animation-delay: 0.45s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .over-card .title { font-size: clamp(40px, 10vmin, 80px); color: #FF5A4E; }
+        .final-row {
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 2vmin, 18px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 3px solid rgba(43, 29, 20, 0.15);
+            border-radius: 999px;
+            padding: 6px clamp(16px, 3vmin, 28px) 6px 8px;
+        }
+        .final-star { width: clamp(56px, 11vmin, 92px); height: clamp(56px, 11vmin, 92px); animation: starBob 1.4s ease-in-out infinite; }
+        .final-star svg { width: 100%; height: 100%; overflow: visible; }
+        @keyframes starBob {
+            0%, 100% { transform: rotate(-8deg) scale(1); }
+            50% { transform: rotate(8deg) scale(1.08); }
+        }
+        .final-text {
+            margin: 0;
+            font-family: var(--ui-font);
+            font-weight: 700;
+            font-size: clamp(22px, 4.6vmin, 38px);
+            color: var(--ink);
+        }
+        #final-score {
+            display: inline-block;
+            font-family: var(--title-font);
+            font-weight: 400;
+            font-size: 1.5em;
+            color: var(--orange);
+            -webkit-text-stroke: 0.06em var(--ink);
+            paint-order: stroke fill;
+            min-width: 1ch;
+        }
+        .over-card .big-button { font-size: clamp(22px, 4.6vmin, 38px); margin-top: 6px; }
+        .tap-hint {
+            font-weight: 600;
+            font-size: clamp(14px, 2.6vmin, 20px);
+            color: rgba(43, 29, 20, 0.6);
+            animation: fadeIn 0.4s ease-out 1.45s both;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* Particle effects */
-        .dirt-particle {
-            position: absolute;
-            background-color: #8B4513;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 15;
-            animation: fly-backwards 0.5s ease-out forwards;
-        }
-
-        @keyframes fly-backwards {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50px, -20px) scale(0);
-                opacity: 0;
-            }
-        }
-
-        :root {
-            --bronco-body: #FF9900; /* Default Cyber Orange */
-            --bronco-roof: #F8F9FA; /* Default White */
-        }
-
-        .color-section {
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.4);
-        }
-
-        .color-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .color-swatch {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 5px solid #FFF;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .color-swatch:active {
-            transform: scale(0.9);
-        }
-
-        .swatch-selected {
-            border-color: #FFD700;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px #FFD700;
+        @media (prefers-reduced-motion: reduce) {
+            .sun-rays, .far-cloud, .big-button, .title .alt, .preview-bronco { animation: none !important; }
         }
     </style>
 </head>
 <body>
 
+<!-- Shared SVG paint definitions (gradients / clips) used by every sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+        <linearGradient id="bx-bodyshade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.5"/>
+            <stop offset="0.22" stop-color="#fff" stop-opacity="0.1"/>
+            <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0.3"/>
+        </linearGradient>
+        <linearGradient id="bx-roofshade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0.45"/>
+            <stop offset="0.3" stop-color="#fff" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0.18"/>
+        </linearGradient>
+        <linearGradient id="bx-glass" x1="0" y1="0" x2="0.35" y2="1">
+            <stop offset="0" stop-color="#BFE6FF"/>
+            <stop offset="0.45" stop-color="#5FA3DA"/>
+            <stop offset="1" stop-color="#25507E"/>
+        </linearGradient>
+        <radialGradient id="bx-rim" cx="0.4" cy="0.35" r="0.75">
+            <stop offset="0" stop-color="#FFFFFF"/>
+            <stop offset="0.45" stop-color="#C9CFD8"/>
+            <stop offset="1" stop-color="#7A8291"/>
+        </radialGradient>
+        <radialGradient id="bx-lamp" cx="0.4" cy="0.35" r="0.7">
+            <stop offset="0" stop-color="#FFFFFF"/>
+            <stop offset="0.6" stop-color="#FFF6C2"/>
+            <stop offset="1" stop-color="#FFD866"/>
+        </radialGradient>
+        <clipPath id="bx-winclip">
+            <rect x="23" y="25.5" width="27" height="26" rx="3"/>
+            <rect x="55" y="25.5" width="31" height="26" rx="3"/>
+            <path d="M91,25.5 L103,25.5 Q106.5,25.5 108,28.5 L119.5,51.5 L91,51.5 Z"/>
+        </clipPath>
+
+        <radialGradient id="st-fill" cx="0.42" cy="0.35" r="0.7">
+            <stop offset="0" stop-color="#FFF7B0"/>
+            <stop offset="0.5" stop-color="#FFD43B"/>
+            <stop offset="1" stop-color="#FFA41B"/>
+        </radialGradient>
+        <radialGradient id="st-glow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#FFF3A0" stop-opacity="0.85"/>
+            <stop offset="0.55" stop-color="#FFE066" stop-opacity="0.3"/>
+            <stop offset="1" stop-color="#FFE066" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="rk-fill" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stop-color="#C3CBD8"/>
+            <stop offset="0.5" stop-color="#8E98AB"/>
+            <stop offset="1" stop-color="#5E6779"/>
+        </linearGradient>
+        <radialGradient id="md-fill" cx="0.5" cy="0.4" r="0.6">
+            <stop offset="0" stop-color="#8A5530"/>
+            <stop offset="0.7" stop-color="#6A3C1E"/>
+            <stop offset="1" stop-color="#4B2912"/>
+        </radialGradient>
+        <linearGradient id="cl-shade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFFFFF"/>
+            <stop offset="0.6" stop-color="#FFFFFF"/>
+            <stop offset="1" stop-color="#D6E9FA"/>
+        </linearGradient>
+    </defs>
+</svg>
+
 <div id="game-container">
 
-    <!-- Background Layers -->
+    <!-- Sky decoration -->
+    <div class="sun" aria-hidden="true"><div class="sun-rays"></div><div class="sun-glow"></div><div class="sun-disc"></div></div>
+    <div id="far-clouds" aria-hidden="true"></div>
+
+    <!-- Parallax hills (drawn once, scrolled with GPU transforms) -->
+    <canvas id="layer-far" class="parallax"></canvas>
+    <canvas id="layer-mid" class="parallax"></canvas>
+    <canvas id="layer-near" class="parallax"></canvas>
+
+    <!-- Background Layers (the playable terrain) -->
     <canvas id="bg-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
 
-    <!-- The Hero: A stylized Ford Bronco SVG -->
+    <!-- The Hero: A stylized Ford Bronco SVG (markup is generated by script below) -->
     <div id="bronco" class="driving">
-        <svg viewBox="0 0 200 120" width="100%" height="100%">
-            <!-- Spare Tire (Back) -->
-            <rect x="5" y="35" width="20" height="45" rx="5" fill="#222"/>
-            <circle cx="15" cy="57" r="10" fill="#555"/>
-            <circle cx="15" cy="57" r="4" fill="#888"/>
-
-            <!-- Cabin (White Top) -->
-            <path d="M 25,20 L 115,20 L 130,50 L 25,50 Z" fill="var(--bronco-roof)" stroke="#DDDDDD" stroke-width="1"/>
-
-            <!-- Window cutouts (Side) -->
-            <path d="M 32,25 L 70,25 L 70,45 L 32,45 Z" fill="#87CEEB"/>
-            <path d="M 75,25 L 110,25 L 122,45 L 75,45 Z" fill="#87CEEB"/>
-
-            <!-- Side Mirror -->
-            <rect x="122" y="42" width="8" height="6" rx="2" fill="#222"/>
-
-            <!-- Main Body (Cyber Orange) -->
-            <path d="M 25,50 L 130,50 L 180,50 L 180,85 L 25,85 Z" fill="var(--bronco-body)"/>
-
-            <!-- Bronco Door/Side styling lines -->
-            <line x1="25" y1="55" x2="180" y2="55" stroke="#E68A00" stroke-width="2"/>
-            <line x1="72" y1="50" x2="72" y2="85" stroke="#E68A00" stroke-width="2"/> <!-- Door seam -->
-
-            <!-- Front Grille Area & Headlight -->
-            <rect x="175" y="52" width="8" height="30" fill="#222222"/>
-            <rect x="180" y="55" width="5" height="24" fill="#DDDDDD"/> <!-- Silver Grille Trim -->
-            <circle cx="181" cy="62" r="5" fill="#FFFFFF"/> <!-- Round Headlight -->
-            <circle cx="181" cy="62" r="2" fill="#FFFFCC"/>
-            <circle cx="181" cy="74" r="2" fill="#FFA500"/> <!-- Turn signal -->
-
-            <!-- Taillight -->
-            <rect x="23" y="55" width="4" height="15" fill="#FF0000" rx="1"/>
-
-            <!-- Bumpers -->
-            <rect x="182" y="78" width="8" height="8" rx="2" fill="#444444"/>
-            <rect x="20" y="78" width="8" height="8" rx="2" fill="#444444"/>
-
-            <!-- Fenders (Wheel Arches) -->
-            <path d="M 35,85 A 22,22 0 0,1 75,85" fill="none" stroke="#222" stroke-width="6"/>
-            <path d="M 130,85 A 22,22 0 0,1 170,85" fill="none" stroke="#222" stroke-width="6"/>
-
-            <!-- "BRONCO" Text -->
-            <text x="76" y="70" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="12"
-                  fill="#FFFFFF" letter-spacing="1">BRONCO
-            </text>
-
-            <!-- Bucking Bronco Logo (Above Rear Wheel) -->
-            <image href="https://1000logos.net/wp-content/uploads/2022/12/Ford-Bronco-Emblem.png" x="42" y="52"
-                   width="24" height="16" preserveAspectRatio="xMidYMid meet"/>
-
-            <!-- Front Wheel (Wrapped in a positioning group so the spin animation applies cleanly) -->
-            <g transform="translate(150, 85)">
-                <g id="wheel-front">
-                    <circle cx="0" cy="0" r="20" fill="#222"/>
-                    <!-- Chunky tread effect -->
-                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
-                    <circle cx="0" cy="0" r="11" fill="#444"/>
-                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
-                    <!-- Hubcap details -->
-                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
-                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="0" r="2" fill="#111"/>
-                </g>
-            </g>
-
-            <!-- Back Wheel -->
-            <g transform="translate(55, 85)">
-                <g id="wheel-back">
-                    <circle cx="0" cy="0" r="20" fill="#222"/>
-                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
-                    <circle cx="0" cy="0" r="11" fill="#444"/>
-                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
-                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
-                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="0" r="2" fill="#111"/>
-                </g>
-            </g>
-        </svg>
+        <div class="bronco-inner" id="bronco-inner"></div>
     </div>
 
     <!-- Container for dynamic objects -->
@@ -301,115 +701,254 @@
     <div id="objects-container"
          style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
 
+    <!-- Particles / juice -->
+    <canvas id="fx-canvas"></canvas>
+
     <!-- User Interface Layer -->
     <div id="ui-layer">
-        <div style="display: flex; justify-content: space-between; width: 100%;">
-            <div class="score-board">Stars: <span id="score-display">0</span></div>
-            <div class="score-board">Speed: <span id="speed-display">1</span>x</div>
+        <div class="hud-row">
+            <div class="score-board" id="star-pill">
+                <span class="hud-icon" id="hud-star-icon"></span>
+                <span class="hud-text"><span class="hud-label">Stars</span><span class="hud-num"><span id="score-display">0</span></span></span>
+            </div>
+            <div class="score-board" id="speed-pill">
+                <span class="hud-icon">
+                    <svg viewBox="0 0 40 40" aria-hidden="true">
+                        <circle cx="20" cy="22" r="17" fill="#2B1D14"/>
+                        <path d="M6,26 A14.5,14.5 0 1 1 34,26" fill="none" stroke="#FFF" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M6,26 A14.5,14.5 0 0 1 12,11" fill="none" stroke="#3FC35A" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M28,11 A14.5,14.5 0 0 1 34,26" fill="none" stroke="#FF5A4E" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M20,23 L29,13" stroke="#FFD23F" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="20" cy="23" r="4" fill="#FFD23F" stroke="#2B1D14" stroke-width="1.5"/>
+                    </svg>
+                </span>
+                <span class="hud-text"><span class="hud-label">Speed</span><span class="hud-num"><span id="speed-display">1</span>x</span></span>
+            </div>
         </div>
+        <div id="toast" class="toast">Faster!</div>
         <!-- Instruction removed as requested -->
     </div>
 
     <!-- Screens -->
     <div id="start-screen" class="overlay-screen">
-        <h1 style="margin-top: 10px; margin-bottom: 10px;">Paint Your Bronco!</h1>
+        <div class="menu-card start-card">
+            <div class="start-hero">
+                <h1 class="title">Paint Your <span class="alt">Bronco!</span></h1>
 
-        <!-- Big Preview Bronco -->
-        <div style="width: 300px; height: 180px; margin-bottom: 10px;">
-            <svg viewBox="0 0 200 120" width="100%" height="100%">
-                <rect x="5" y="35" width="20" height="45" rx="5" fill="#222"/>
-                <circle cx="15" cy="57" r="10" fill="#555"/>
-                <circle cx="15" cy="57" r="4" fill="#888"/>
-                <path d="M 25,20 L 115,20 L 130,50 L 25,50 Z" fill="var(--bronco-roof)" stroke="#DDDDDD"
-                      stroke-width="1"/>
-                <path d="M 32,25 L 70,25 L 70,45 L 32,45 Z" fill="#87CEEB"/>
-                <path d="M 75,25 L 110,25 L 122,45 L 75,45 Z" fill="#87CEEB"/>
-                <rect x="122" y="42" width="8" height="6" rx="2" fill="#222"/>
-                <path d="M 25,50 L 130,50 L 180,50 L 180,85 L 25,85 Z" fill="var(--bronco-body)"/>
-                <line x1="25" y1="55" x2="180" y2="55" stroke="#E68A00" stroke-width="2"/>
-                <line x1="72" y1="50" x2="72" y2="85" stroke="#E68A00" stroke-width="2"/>
-                <rect x="175" y="52" width="8" height="30" fill="#222222"/>
-                <rect x="180" y="55" width="5" height="24" fill="#DDDDDD"/>
-                <circle cx="181" cy="62" r="5" fill="#FFFFFF"/>
-                <circle cx="181" cy="62" r="2" fill="#FFFFCC"/>
-                <circle cx="181" cy="74" r="2" fill="#FFA500"/>
-                <rect x="23" y="55" width="4" height="15" fill="#FF0000" rx="1"/>
-                <rect x="182" y="78" width="8" height="8" rx="2" fill="#444444"/>
-                <rect x="20" y="78" width="8" height="8" rx="2" fill="#444444"/>
-                <path d="M 35,85 A 22,22 0 0,1 75,85" fill="none" stroke="#222" stroke-width="6"/>
-                <path d="M 130,85 A 22,22 0 0,1 170,85" fill="none" stroke="#222" stroke-width="6"/>
-                <text x="76" y="70" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="12"
-                      fill="#FFFFFF" letter-spacing="1">BRONCO
-                </text>
-                <image href="https://1000logos.net/wp-content/uploads/2022/12/Ford-Bronco-Emblem.png" x="42" y="52"
-                       width="24" height="16" preserveAspectRatio="xMidYMid meet"/>
-                <g transform="translate(150, 85)">
-                    <circle cx="0" cy="0" r="20" fill="#222"/>
-                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
-                    <circle cx="0" cy="0" r="11" fill="#444"/>
-                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
-                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
-                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="0" r="2" fill="#111"/>
-                </g>
-                <g transform="translate(55, 85)">
-                    <circle cx="0" cy="0" r="20" fill="#222"/>
-                    <circle cx="0" cy="0" r="17" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="5,3"/>
-                    <circle cx="0" cy="0" r="11" fill="#444"/>
-                    <circle cx="0" cy="0" r="8" fill="#CCCCCC"/>
-                    <circle cx="0" cy="-5" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="5" r="1.5" fill="#333"/>
-                    <circle cx="-5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="5" cy="0" r="1.5" fill="#333"/>
-                    <circle cx="0" cy="0" r="2" fill="#111"/>
-                </g>
-            </svg>
-        </div>
+                <!-- Big Preview Bronco -->
+                <div class="preview-stage" id="preview-stage">
+                    <div class="preview-ground"></div>
+                    <div class="preview-shadow"></div>
+                    <div class="preview-bronco" id="preview-bronco"></div>
+                </div>
+            </div>
 
-        <div class="color-section">
-            <div style="font-size: 28px; font-weight: bold; text-shadow: 2px 2px 0 #000;">🚗 Body Color</div>
-            <div class="color-row">
-                <div class="color-swatch swatch-selected" style="background-color: #FF9900;" data-color="#FF9900"
-                     data-part="body"></div>
-                <div class="color-swatch" style="background-color: #FF2222;" data-color="#FF2222"
-                     data-part="body"></div>
-                <div class="color-swatch" style="background-color: #22CC22;" data-color="#22CC22"
-                     data-part="body"></div>
-                <div class="color-swatch" style="background-color: #2288FF;" data-color="#2288FF"
-                     data-part="body"></div>
-                <div class="color-swatch" style="background-color: #FF69B4;" data-color="#FF69B4"
-                     data-part="body"></div>
+            <div class="start-controls">
+                <div class="color-section">
+                    <div class="section-label">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4,15 L4,10 Q4,8 6,8 L15,8 L19,10 Q21,10.5 21,13 L21,15 Z" fill="var(--bronco-body)" stroke="#2B1D14" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8" cy="16" r="2.6" fill="#2B1D14"/><circle cx="17" cy="16" r="2.6" fill="#2B1D14"/></svg>
+                        Body Color
+                    </div>
+                    <div class="color-row">
+                        <div class="color-swatch swatch-selected" style="background-color: #FF9900;" data-color="#FF9900"
+                             data-part="body" aria-label="Orange body"></div>
+                        <div class="color-swatch" style="background-color: #FF2222;" data-color="#FF2222"
+                             data-part="body" aria-label="Red body"></div>
+                        <div class="color-swatch" style="background-color: #22CC22;" data-color="#22CC22"
+                             data-part="body" aria-label="Green body"></div>
+                        <div class="color-swatch" style="background-color: #2288FF;" data-color="#2288FF"
+                             data-part="body" aria-label="Blue body"></div>
+                        <div class="color-swatch" style="background-color: #FF69B4;" data-color="#FF69B4"
+                             data-part="body" aria-label="Pink body"></div>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="section-label">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3,17 L3,9 Q3,6 6,6 L16,6 Q18,6 19,8 L22,17 Z" fill="var(--bronco-roof)" stroke="#2B1D14" stroke-width="1.8" stroke-linejoin="round"/><rect x="5.5" y="9" width="5" height="5" rx="1" fill="#5FA3DA"/><rect x="12.5" y="9" width="4.5" height="5" rx="1" fill="#5FA3DA"/></svg>
+                        Roof Color
+                    </div>
+                    <div class="color-row">
+                        <div class="color-swatch swatch-selected" style="background-color: #F8F9FA;" data-color="#F8F9FA"
+                             data-part="roof" aria-label="White roof"></div>
+                        <div class="color-swatch" style="background-color: #222222;" data-color="#222222"
+                             data-part="roof" aria-label="Black roof"></div>
+                        <div class="color-swatch" style="background-color: #8B4513;" data-color="#8B4513"
+                             data-part="roof" aria-label="Brown roof"></div>
+                        <div class="color-swatch" style="background-color: #FFD700;" data-color="#FFD700"
+                             data-part="roof" aria-label="Yellow roof"></div>
+                    </div>
+                </div>
+
+                <button class="big-button" id="start-btn">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#2B1D14" stroke-width="5"/><circle cx="12" cy="12" r="9.5" fill="none" stroke="#FFF" stroke-width="2.6"/><path d="M3,11 L21,11 M12,12 L12,21" stroke="#2B1D14" stroke-width="5"/><path d="M3,11 L21,11 M12,12 L12,21" stroke="#FFF" stroke-width="2.6"/><circle cx="12" cy="12" r="3" fill="#FFF" stroke="#2B1D14" stroke-width="1.6"/></svg>
+                    DRIVE!
+                </button>
             </div>
         </div>
-
-        <div class="color-section">
-            <div style="font-size: 28px; font-weight: bold; text-shadow: 2px 2px 0 #000;">🏠 Roof Color</div>
-            <div class="color-row">
-                <div class="color-swatch swatch-selected" style="background-color: #F8F9FA;" data-color="#F8F9FA"
-                     data-part="roof"></div>
-                <div class="color-swatch" style="background-color: #222222;" data-color="#222222"
-                     data-part="roof"></div>
-                <div class="color-swatch" style="background-color: #8B4513;" data-color="#8B4513"
-                     data-part="roof"></div>
-                <div class="color-swatch" style="background-color: #FFD700;" data-color="#FFD700"
-                     data-part="roof"></div>
-            </div>
-        </div>
-
-        <button class="big-button" id="start-btn" style="margin-top: 5px;">DRIVE!</button>
     </div>
 
     <div id="game-over-screen" class="overlay-screen hidden">
-        <h1>Bumpy Ride!</h1>
-        <p style="font-size: 32px;">You got <span id="final-score">0</span> stars!</p>
-        <button class="big-button" id="restart-btn" style="margin-top: 20px;">Paint & Drive Again!</button>
+        <div class="menu-card over-card">
+            <h1 class="title">Bumpy Ride!</h1>
+            <div class="final-row">
+                <div class="final-star" id="final-star"></div>
+                <p class="final-text">You got <span id="final-score">0</span> stars!</p>
+            </div>
+            <button class="big-button" id="restart-btn">Paint &amp; Drive Again!</button>
+            <div class="tap-hint">or tap anywhere</div>
+        </div>
     </div>
 
 </div>
 
 <script>
+    /* =====================================================================
+       ART: sprite markup (pure presentation)
+       ===================================================================== */
+
+    const INK = '#2B1D14';
+
+    // Chunky cream bucking-bronco mark with a dark outline (drawn twice: outline pass + fill pass)
+    function horseMark(x, y, s, fill, stroke) {
+        const parts = (col, extra) => `
+            <g fill="${col}" stroke="${col}" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3,22 Q2,15 7,13" fill="none" stroke-width="${3 + extra}"/>
+                <ellipse cx="15" cy="18" rx="9" ry="5.6" transform="rotate(-28 15 18)" stroke-width="${extra}"/>
+                <path d="M9,21 L6.5,30.5 M13,22.5 L13.5,30.5" fill="none" stroke-width="${2.9 + extra}"/>
+                <path d="M20,13 L25.5,14.5 L25,19.5 M19,16 L23.5,19.5 L22,23" fill="none" stroke-width="${2.6 + extra}"/>
+                <path d="M19.5,12.5 L24,4.5" fill="none" stroke-width="${5.6 + extra}"/>
+                <path d="M23.5,5 L30,8" fill="none" stroke-width="${4.4 + extra}"/>
+                <path d="M22.4,4.6 L22.6,1" fill="none" stroke-width="${1.9 + extra}"/>
+                <path d="M18.6,9 L21.5,2.6" fill="none" stroke-width="${2 + extra}"/>
+            </g>`;
+        return `<g transform="translate(${x},${y}) scale(${s})">${parts(stroke, 2.6)}${parts(fill, 0)}</g>`;
+    }
+
+    function broncoMarkup(live) {
+        const bodyD = 'M11,64 Q11,57 18,57 L124,57 L181,59.5 Q190,60.5 190.5,68 L191,88 Q191,94 185,94 L178,94 A26,26 0 0 0 126,94 L78,94 A26,26 0 0 0 26,94 L17,94 Q11,94 11,88 Z';
+        const roofD = 'M17,58 L17,27 Q17,19 25,19 L103,19 Q110,19 113,25 L129,58 Z';
+        const wheel = (cx, id) => `
+            <g transform="translate(${cx},97)">
+                <g ${id ? `id="${id}"` : ''}>
+                    <circle r="22.5" fill="#1C1C22"/>
+                    <circle r="20" fill="none" stroke="#3A3A45" stroke-width="5" stroke-dasharray="5 3.378"/>
+                    <circle r="15.6" fill="#26262E"/>
+                    <circle r="12.6" fill="url(#bx-rim)" stroke="#1C1C22" stroke-width="1.4"/>
+                    <g fill="#3B414D">
+                        <circle cx="0" cy="-7.4" r="2.7"/><circle cx="7.04" cy="-2.29" r="2.7"/>
+                        <circle cx="4.35" cy="5.99" r="2.7"/><circle cx="-4.35" cy="5.99" r="2.7"/>
+                        <circle cx="-7.04" cy="-2.29" r="2.7"/>
+                    </g>
+                    <circle r="3.8" fill="#6B7383" stroke="#2A2E36" stroke-width="1.2"/>
+                </g>
+                <path d="M-14,-9 A17,17 0 0 1 -2,-16.8" fill="none" stroke="#fff" stroke-opacity="0.18" stroke-width="2.5" stroke-linecap="round"/>
+            </g>`;
+        return `
+        <svg viewBox="0 0 200 120" width="100%" height="100%" aria-hidden="true">
+            <g class="chassis">
+                <!-- Spare tire on the tailgate -->
+                <rect x="-1" y="44" width="14" height="44" rx="6" fill="#1C1C22" stroke="${INK}" stroke-width="2"/>
+                <rect x="2.5" y="50" width="7" height="32" rx="3.5" fill="#3A3A45"/>
+                <rect x="9" y="58" width="5" height="16" rx="1.5" fill="#55555F"/>
+
+                <!-- Roof rack -->
+                <rect x="28" y="12.5" width="74" height="4" rx="2" fill="#2B2B33"/>
+                <rect x="34" y="15" width="3.5" height="5.5" fill="#2B2B33"/>
+                <rect x="92" y="15" width="3.5" height="5.5" fill="#2B2B33"/>
+
+                <!-- Cabin / hard top (Roof color) -->
+                <path d="${roofD}" fill="var(--bronco-roof)" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="${roofD}" fill="url(#bx-roofshade)"/>
+
+                <!-- Windows -->
+                <g fill="url(#bx-glass)" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round">
+                    <rect x="23" y="25.5" width="27" height="26" rx="3"/>
+                    <rect x="55" y="25.5" width="31" height="26" rx="3"/>
+                    <path d="M91,25.5 L103,25.5 Q106.5,25.5 108,28.5 L119.5,51.5 L91,51.5 Z"/>
+                </g>
+                <g clip-path="url(#bx-winclip)" fill="#FFFFFF" opacity="0.4">
+                    <path d="M33,24 L42,24 L30,53 L21,53 Z"/>
+                    <path d="M45,24 L48,24 L36,53 L33,53 Z"/>
+                    <path d="M68,24 L78,24 L66,53 L56,53 Z"/>
+                    <path d="M81,24 L84,24 L72,53 L69,53 Z"/>
+                    <path d="M101,24 L110,24 L98,53 L89,53 Z"/>
+                </g>
+
+                <!-- Side mirror -->
+                <path d="M118,53 L123,53" stroke="${INK}" stroke-width="2.5"/>
+                <rect x="121" y="45" width="9" height="8.5" rx="2.5" fill="#2B2B33" stroke="${INK}" stroke-width="1.5"/>
+
+                <!-- Main Body (paintable) -->
+                <path d="${bodyD}" fill="var(--bronco-body)"/>
+                <path d="${bodyD}" fill="url(#bx-bodyshade)"/>
+                <path d="M15,62 L124,61.5 L182,64" fill="none" stroke="#FFF" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+
+                <!-- Door seams & handles -->
+                <g stroke="${INK}" stroke-opacity="0.32" stroke-width="1.4" fill="none">
+                    <path d="M53,58 L53,66.5"/>
+                    <path d="M125.5,58 L125.5,70"/>
+                    <path d="M53,72 L90,72 M92,72 L125,72" stroke-opacity="0.14"/>
+                </g>
+                <rect x="57" y="62" width="9" height="3" rx="1.5" fill="${INK}" opacity="0.6"/>
+
+                <!-- Rocker step -->
+                <rect x="80" y="90" width="44" height="6" rx="2.5" fill="#2B2B33" stroke="${INK}" stroke-width="1.2"/>
+
+                <!-- Body outline on top so every paint color reads crisply -->
+                <path d="${bodyD}" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>
+
+                <!-- Bucking Bronco Logo (cream fill, dark outline) -->
+                ${horseMark(92, 58.5, 0.62, '#FFF4D6', INK)}
+
+                <!-- "BRONCO" Text -->
+                <text x="103" y="88" text-anchor="middle" font-family="'Lilita One', 'Arial Black', Impact, sans-serif"
+                      font-size="9" letter-spacing="0.6" fill="#FFFFFF" stroke="${INK}" stroke-width="2.4"
+                      stroke-linejoin="round" paint-order="stroke">BRONCO</text>
+
+                <!-- Grille, headlight & signal -->
+                <rect x="185.5" y="62" width="7" height="24" rx="2.5" fill="#22222A" stroke="${INK}" stroke-width="1.4"/>
+                <circle cx="186.5" cy="68.5" r="6.3" fill="#2B2B33" stroke="${INK}" stroke-width="1.4"/>
+                <circle cx="186.5" cy="68.5" r="4.4" fill="url(#bx-lamp)"/>
+                <circle cx="185.2" cy="67.2" r="1.4" fill="#FFF"/>
+                <rect x="183" y="77" width="7" height="3.6" rx="1.8" fill="#FFA41B" stroke="${INK}" stroke-width="1"/>
+
+                <!-- Taillight -->
+                <rect x="11" y="61" width="5.5" height="17" rx="2" fill="#FF3B3B" stroke="${INK}" stroke-width="1.4"/>
+                <rect x="12.4" y="62.5" width="1.6" height="8" rx="0.8" fill="#FFB3B3"/>
+
+                <!-- Bumpers -->
+                <rect x="175" y="86" width="23" height="10" rx="3.5" fill="#2E2E37" stroke="${INK}" stroke-width="1.6"/>
+                <rect x="177" y="87.6" width="19" height="2.2" rx="1.1" fill="#FFF" opacity="0.16"/>
+                <rect x="190" y="91" width="6" height="4" rx="1.5" fill="#FF3B3B" stroke="${INK}" stroke-width="1"/>
+                <rect x="3" y="86" width="20" height="10" rx="3.5" fill="#2E2E37" stroke="${INK}" stroke-width="1.6"/>
+
+                <!-- Fenders (Wheel flares) -->
+                <path d="M181.5,95 A29.5,29.5 0 0 0 122.5,95" fill="none" stroke="${INK}" stroke-width="9.5" stroke-linecap="round"/>
+                <path d="M181.5,95 A29.5,29.5 0 0 0 122.5,95" fill="none" stroke="#2E2E37" stroke-width="6" stroke-linecap="round"/>
+                <path d="M131,77 A29.5,29.5 0 0 1 166,69.5" fill="none" stroke="#FFF" stroke-opacity="0.18" stroke-width="2" stroke-linecap="round"/>
+                <path d="M81.5,95 A29.5,29.5 0 0 0 22.5,95" fill="none" stroke="${INK}" stroke-width="9.5" stroke-linecap="round"/>
+                <path d="M81.5,95 A29.5,29.5 0 0 0 22.5,95" fill="none" stroke="#2E2E37" stroke-width="6" stroke-linecap="round"/>
+                <path d="M31,77 A29.5,29.5 0 0 1 66,69.5" fill="none" stroke="#FFF" stroke-opacity="0.18" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Wheels (outer group positions, inner group spins) -->
+            ${wheel(152, live ? 'wheel-front' : '')}
+            ${wheel(52, live ? 'wheel-back' : '')}
+        </svg>
+        <div class="dizzy"><span>${MINI_STAR}</span><span>${MINI_STAR}</span><span>${MINI_STAR}</span></div>`;
+    }
+
+    const MINI_STAR = `<svg viewBox="0 0 50 50" width="100%" height="100%"><polygon points="25,3 31.5,17 47,18.5 35.5,29 39,45 25,37 11,45 14.5,29 3,18.5 18.5,17" fill="#FFD43B" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>`;
+
+    // Inject the hero + preview cars before the game logic grabs the wheels
+    document.getElementById('bronco-inner').innerHTML = broncoMarkup(true);
+    document.getElementById('preview-bronco').innerHTML = broncoMarkup(false);
+
+    /* =====================================================================
+       GAME LOGIC (unchanged rules) + rendering hooks
+       ===================================================================== */
+
     // --- Game State & Constants ---
     const GAME_STATE = {
         START: 0,
@@ -474,32 +1013,67 @@
     }
 
     // Asset SVGs (Inline to avoid external requests)
-    const SVG_STAR = `<svg viewBox="0 0 50 50" width="100%" height="100%"><polygon points="25,2 32,16 48,18 36,30 39,46 25,38 11,46 14,30 2,18 18,16" fill="#FFD700" stroke="#DAA520" stroke-width="2"/></svg>`;
-    const SVG_ROCK = `<svg viewBox="0 0 60 40" width="100%" height="100%"><path d="M 10,40 Q 5,20 20,10 Q 35,0 45,15 Q 55,25 50,40 Z" fill="#808080" stroke="#555" stroke-width="2"/></svg>`;
+    const SVG_STAR = `<svg viewBox="0 0 50 50" width="100%" height="100%">
+        <circle cx="25" cy="25" r="34" fill="url(#st-glow)"/>
+        <polygon points="25,3 31.5,17 47,18.5 35.5,29 39,45 25,37 11,45 14.5,29 3,18.5 18.5,17" fill="url(#st-fill)" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M15.5,19.5 L20,18.8 L23,11.5" fill="none" stroke="#FFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+        <ellipse cx="20.5" cy="25" rx="2.2" ry="3" fill="${INK}"/><ellipse cx="29.5" cy="25" rx="2.2" ry="3" fill="${INK}"/>
+        <circle cx="21.2" cy="23.8" r="0.9" fill="#FFF"/><circle cx="30.2" cy="23.8" r="0.9" fill="#FFF"/>
+        <circle cx="16.8" cy="30" r="2.4" fill="#FF7B7B" opacity="0.55"/><circle cx="33.2" cy="30" r="2.4" fill="#FF7B7B" opacity="0.55"/>
+        <path d="M22,30.5 Q25,33.6 28,30.5" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>`;
+    const SVG_ROCK = `<svg viewBox="0 0 60 40" width="100%" height="100%">
+        <ellipse cx="30" cy="39.5" rx="29" ry="4.5" fill="#000" opacity="0.22"/>
+        <path d="M5,39.5 C2,29 8,17 18,11.5 C25,6.5 37,5 46,12 C55,18.5 59,30 55.5,39.5 Z" fill="url(#rk-fill)" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>
+        <path d="M18,11.5 L25,23 L46,12 M25,23 L21,39 M25,23 L43,27 L55,38" fill="none" stroke="#3E4555" stroke-opacity="0.4" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M11,25 C13,18 18,14 24,12.5" fill="none" stroke="#FFF" stroke-opacity="0.75" stroke-width="3" stroke-linecap="round"/>
+        <path d="M33,8.2 C36,4.5 41,4.8 43,9 C40,8 37,8.5 33,8.2 Z" fill="#6CC04A" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="40" cy="31" r="2" fill="#5E6779" opacity="0.6"/><circle cx="34" cy="34" r="1.3" fill="#5E6779" opacity="0.6"/>
+    </svg>`;
 
     // Puddle SVG redesigned to look more like embedded splattered mud
     const SVG_PUDDLE = `<svg viewBox="0 0 100 40" width="100%" height="100%">
-        <path d="M 10,20 Q 20,5 40,15 Q 55,0 75,10 Q 95,25 80,35 Q 60,45 40,35 Q 20,40 5,30 Q -5,15 10,20 Z" fill="#4A3018" opacity="0.9" stroke="#3A2008" stroke-width="1"/>
-        <circle cx="20" cy="15" r="4" fill="#3A2008" />
-        <circle cx="70" cy="20" r="6" fill="#3A2008" />
-        <circle cx="45" cy="25" r="5" fill="#3A2008" />
+        <path d="M6,25 Q4,17 16,15 Q30,10 50,12 Q72,10 86,15 Q98,18 95,26 Q93,34 76,35 Q52,38 28,36 Q8,34 6,25 Z" fill="url(#md-fill)" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M16,21 Q30,15.5 50,16.5 Q70,15.5 84,20" fill="none" stroke="#C08552" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>
+        <ellipse cx="34" cy="24" rx="11" ry="3" fill="#B07A4A" opacity="0.65"/>
+        <ellipse cx="66" cy="27" rx="7" ry="2.2" fill="#B07A4A" opacity="0.5"/>
+        <ellipse cx="31" cy="23.2" rx="4" ry="1.1" fill="#FFF" opacity="0.6"/>
+        <circle cx="52" cy="27" r="2.6" fill="none" stroke="#C08552" stroke-width="1.2" opacity="0.8"/>
+        <circle cx="78" cy="23.5" r="1.8" fill="none" stroke="#C08552" stroke-width="1" opacity="0.8"/>
+        <circle cx="8" cy="12" r="3.2" fill="#6A3C1E" stroke="${INK}" stroke-width="1.4"/>
+        <circle cx="93" cy="10" r="2.6" fill="#6A3C1E" stroke="${INK}" stroke-width="1.4"/>
+        <circle cx="21" cy="7" r="2" fill="#6A3C1E" stroke="${INK}" stroke-width="1.2"/>
     </svg>`;
 
-    const SVG_CLOUD = `<svg viewBox="0 0 100 60" width="100%" height="100%"><path d="M 20,40 Q 10,20 30,20 Q 40,5 60,15 Q 80,5 90,25 Q 100,40 80,50 L 20,50 Z" fill="#FFFFFF" opacity="0.9"/></svg>`;
+    const SVG_CLOUD = `<svg viewBox="0 0 100 60" width="100%" height="100%">
+        <path d="M18,50 C5,50 3,35 15,32.5 C12,20 28,13 37,22 C41,8 63,6 67,21 C75,12 92,18 87,32 C98,34 97,50 84,50 Z" fill="url(#cl-shade)"/>
+        <path d="M22,30 C22,24 28,21 33,24 M45,18 C48,13 56,12 60,16" fill="none" stroke="#FFF" stroke-width="3" stroke-linecap="round"/>
+    </svg>`;
 
     // Fun detailed bug assets
-    const SVG_BEE = `<svg viewBox="0 0 40 30" width="100%" height="100%">
-        <ellipse cx="20" cy="15" rx="15" ry="10" fill="#FFD700" />
-        <path d="M 10,5 L 15,15 M 20,5 L 25,15 M 30,5 L 35,15" stroke="#000" stroke-width="4" />
-        <circle cx="8" cy="12" r="2" fill="#000" />
-        <path d="M 20,10 Q 25,-5 35,5 Q 25,10 20,10" fill="rgba(255,255,255,0.7)" stroke="#AAA" stroke-width="1"/>
+    const SVG_BEE = `<svg viewBox="0 0 50 36" width="100%" height="100%">
+        <g class="flap-y"><ellipse cx="23" cy="8" rx="6.5" ry="9" transform="rotate(-18 23 8)" fill="#E6F6FF" fill-opacity="0.9" stroke="${INK}" stroke-width="1.6"/>
+        <ellipse cx="31" cy="8.5" rx="5.5" ry="8" transform="rotate(14 31 8.5)" fill="#E6F6FF" fill-opacity="0.9" stroke="${INK}" stroke-width="1.6"/></g>
+        <path d="M40,21 L47.5,22 L40,24.5 Z" fill="${INK}"/>
+        <ellipse cx="26" cy="22" rx="15.5" ry="10.5" fill="#FFD23F" stroke="${INK}" stroke-width="2"/>
+        <path d="M23,12 Q19.5,22 23,32 M31.5,12.3 Q28.5,22 31.5,31.7" fill="none" stroke="${INK}" stroke-width="4.2"/>
+        <path d="M15,13.5 Q12,6 7,6.5" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/><circle cx="7" cy="6.5" r="1.8" fill="${INK}"/>
+        <circle cx="16" cy="19.5" r="2.6" fill="${INK}"/><circle cx="16.8" cy="18.6" r="0.9" fill="#FFF"/>
+        <circle cx="14" cy="25" r="2" fill="#FF7B7B" opacity="0.6"/>
+        <path d="M12.5,23 Q15,25.5 18,23.5" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>
     </svg>`;
 
-    const SVG_BUTTERFLY = `<svg viewBox="0 0 40 40" width="100%" height="100%">
-        <path d="M 20,20 Q 5,0 15,15 Q 5,30 20,20" fill="#FF69B4" stroke="#C71585" stroke-width="2"/>
-        <path d="M 20,20 Q 35,0 25,15 Q 35,30 20,20" fill="#FF69B4" stroke="#C71585" stroke-width="2"/>
-        <rect x="18" y="10" width="4" height="20" rx="2" fill="#333" />
-        <path d="M 19,10 Q 15,5 12,2 M 21,10 Q 25,5 28,2" stroke="#333" stroke-width="1.5" fill="none"/>
+    const SVG_BUTTERFLY = `<svg viewBox="0 0 50 40" width="100%" height="100%">
+        <g class="flap-x">
+            <path d="M25,20 C18,4 4,0 4,10 C4,17 13,20 25,20 Z" fill="#FF69B4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M25,20 C32,4 46,0 46,10 C46,17 37,20 25,20 Z" fill="#FF69B4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M25,21 C16,22 8,28 11,34 C14,38 22,31 25,21 Z" fill="#B57BFF" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M25,21 C34,22 42,28 39,34 C36,38 28,31 25,21 Z" fill="#B57BFF" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="12" cy="10" r="3" fill="#FFF" opacity="0.8"/><circle cx="38" cy="10" r="3" fill="#FFF" opacity="0.8"/>
+            <circle cx="17" cy="29" r="2" fill="#FFD23F"/><circle cx="33" cy="29" r="2" fill="#FFD23F"/>
+        </g>
+        <rect x="23" y="10" width="4" height="22" rx="2" fill="${INK}"/>
+        <path d="M24,10.5 Q21,5 18,3 M26,10.5 Q29,5 32,3" stroke="${INK}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
     </svg>`;
 
     // Background scrolling variables
@@ -510,12 +1084,34 @@
     function resize() {
         cw = gameContainer.clientWidth;
         ch = gameContainer.clientHeight;
-        bgCanvas.width = cw;
-        bgCanvas.height = ch;
+        bgCanvas.width = Math.round(cw * DPR);
+        bgCanvas.height = Math.round(ch * DPR);
+        fxCanvas.width = Math.round(cw * DPR);
+        fxCanvas.height = Math.round(ch * DPR);
+        buildScenery();
         drawBackgroundStatic(); // Initial draw
     }
 
     window.addEventListener('resize', resize);
+
+    /* ---------- Rendering state (presentation only) ---------- */
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    const LAYER_DPR = Math.min(window.devicePixelRatio || 1, 1.25);
+    const fxCanvas = document.getElementById('fx-canvas');
+    const fxCtx = fxCanvas.getContext('2d');
+    const layerEls = {
+        far: document.getElementById('layer-far'),
+        mid: document.getElementById('layer-mid'),
+        near: document.getElementById('layer-near')
+    };
+    const PARALLAX = { far: 0.45, mid: 1.0, near: 2.1 }; // multiples of bgScrollX
+    let TILE_W = 1200;
+    let dirtGradient = null;
+    const vis = { px: 0, py: 0, angle: 0, prevJumping: false, offset: 0 };
+    let terrainXs = new Float32Array(0), terrainYs = new Float32Array(0);
+    const GEM_COLORS = [['#5FD3FF', '#2A8FD0'], ['#FF6FB5', '#C93A82'], ['#8BF07A', '#3FA548'], ['#C99BFF', '#7D4FD1']];
+    const FLOWER_COLORS = ['#FFFFFF', '#FFD23F', '#FF7FB0', '#B98CFF'];
+
     resize();
 
     // --- STREAMING_CHUNK:Canvas Drawing Setup... ---
@@ -526,144 +1122,506 @@
             const broncoScreenX = cw * 0.2;
             const startY = getTerrainY(broncoScreenX);
             bronco.y = startY;
-            bronco.element.style.transform = `translate(${broncoScreenX}px, ${startY - bronco.height}px)`;
+            renderBronco(broncoScreenX, true);
+        }
+    }
+
+    /* ---------- Scenery: pre-rendered parallax hill tiles ---------- */
+    function hash(n) {
+        const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+        return s - Math.floor(s);
+    }
+
+    function buildScenery() {
+        TILE_W = Math.ceil(Math.max(cw, 900) / 100) * 100;
+        const T = TILE_W;
+        const TAU = Math.PI * 2;
+        const peak = (x, k, ph) => 1 - Math.abs(Math.sin(Math.PI * k * x / T + ph));
+
+        // Each layer: [top y, painter]
+        const layers = {
+            far: {
+                top: ch * 0.24,
+                paint(ctx) {
+                    const base = ch * 0.56;
+                    const h = (x) => ch * (0.16 * Math.pow(peak(x, 3, 0.4), 1.6) + 0.085 * Math.pow(peak(x, 7, 1.3), 1.3) + 0.012 * Math.sin(TAU * 13 * x / T));
+                    const shape = (dx) => {
+                        ctx.beginPath();
+                        ctx.moveTo(0, ch);
+                        for (let x = 0; x <= 2 * T; x += 6) ctx.lineTo(x, base - h(x + dx));
+                        ctx.lineTo(2 * T, ch);
+                        ctx.closePath();
+                    };
+                    // shadowed faces
+                    const g = ctx.createLinearGradient(0, ch * 0.3, 0, base);
+                    g.addColorStop(0, '#7D8FC9');
+                    g.addColorStop(1, '#9EB3E2');
+                    shape(0);
+                    ctx.fillStyle = g;
+                    ctx.fill();
+                    // lit faces + snow
+                    ctx.save();
+                    shape(0);
+                    ctx.clip();
+                    const g2 = ctx.createLinearGradient(0, ch * 0.3, 0, base);
+                    g2.addColorStop(0, '#A3B5EA');
+                    g2.addColorStop(1, '#BCD0F2');
+                    shape(22);
+                    ctx.fillStyle = g2;
+                    ctx.fill();
+                    // snow caps
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    for (let x = 0; x <= 2 * T; x += 6) {
+                        const zig = Math.sin(TAU * 31 * x / T) * ch * 0.006 + Math.sin(TAU * 9 * x / T) * ch * 0.006;
+                        ctx.lineTo(x, base - ch * 0.155 + zig);
+                    }
+                    ctx.lineTo(2 * T, 0);
+                    ctx.closePath();
+                    ctx.fillStyle = '#CBD8F3';
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.save();
+                    shape(22);
+                    ctx.clip();
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    for (let x = 0; x <= 2 * T; x += 6) {
+                        const zig = Math.sin(TAU * 31 * x / T) * ch * 0.006 + Math.sin(TAU * 9 * x / T) * ch * 0.006;
+                        ctx.lineTo(x, base - ch * 0.155 + zig);
+                    }
+                    ctx.lineTo(2 * T, 0);
+                    ctx.closePath();
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fill();
+                    ctx.restore();
+                    // valley mist
+                    const m = ctx.createLinearGradient(0, base - ch * 0.08, 0, base + ch * 0.04);
+                    m.addColorStop(0, 'rgba(255,246,228,0)');
+                    m.addColorStop(1, 'rgba(255,246,228,0.75)');
+                    ctx.fillStyle = m;
+                    ctx.fillRect(0, base - ch * 0.08, 2 * T, ch);
+                }
+            },
+            mid: {
+                top: ch * 0.4,
+                paint(ctx) {
+                    const base = ch * 0.6;
+                    const y = (x) => base - ch * (0.045 * Math.sin(TAU * 2 * x / T + 1) + 0.03 * Math.sin(TAU * 5 * x / T + 2) + 0.012 * Math.sin(TAU * 11 * x / T) + 0.03);
+                    const g = ctx.createLinearGradient(0, ch * 0.5, 0, ch * 0.75);
+                    g.addColorStop(0, '#8ACB7A');
+                    g.addColorStop(1, '#A9D79A');
+                    ctx.beginPath();
+                    ctx.moveTo(0, ch);
+                    for (let x = 0; x <= 2 * T; x += 8) ctx.lineTo(x, y(x));
+                    ctx.lineTo(2 * T, ch);
+                    ctx.closePath();
+                    ctx.fillStyle = g;
+                    ctx.fill();
+                    // hazy pine forest
+                    const count = Math.round(T / 34);
+                    for (let i = 0; i < count; i++) {
+                        const r = hash(i + 7);
+                        if (r < 0.35) continue;
+                        const tx = (i + hash(i + 50) * 0.8) * (T / count);
+                        const s = ch * (0.035 + hash(i + 90) * 0.035);
+                        for (const ox of [0, T]) {
+                            if (tx + ox > 2 * T + 40) continue;
+                            drawPine(ctx, tx + ox, y(tx) + s * 0.15, s, hash(i + 3) > 0.5 ? '#5FA36A' : '#6BAE6E', '#4F8F5E');
+                        }
+                    }
+                    const m = ctx.createLinearGradient(0, base - ch * 0.02, 0, ch * 0.75);
+                    m.addColorStop(0, 'rgba(255,246,228,0)');
+                    m.addColorStop(1, 'rgba(255,246,228,0.45)');
+                    ctx.fillStyle = m;
+                    ctx.fillRect(0, base - ch * 0.02, 2 * T, ch);
+                }
+            },
+            near: {
+                top: ch * 0.5,
+                paint(ctx) {
+                    const base = ch * 0.68;
+                    const y = (x) => base - ch * (0.05 * Math.sin(TAU * 3 * x / T + 0.5) + 0.025 * Math.sin(TAU * 7 * x / T + 2.2) + 0.03);
+                    const g = ctx.createLinearGradient(0, ch * 0.58, 0, ch);
+                    g.addColorStop(0, '#5DB955');
+                    g.addColorStop(1, '#3E9A48');
+                    ctx.beginPath();
+                    ctx.moveTo(0, ch);
+                    for (let x = 0; x <= 2 * T; x += 8) ctx.lineTo(x, y(x));
+                    ctx.lineTo(2 * T, ch);
+                    ctx.closePath();
+                    ctx.fillStyle = g;
+                    ctx.fill();
+                    // soft top highlight
+                    ctx.beginPath();
+                    for (let x = 0; x <= 2 * T; x += 8) x === 0 ? ctx.moveTo(x, y(x) + 3) : ctx.lineTo(x, y(x) + 3);
+                    ctx.strokeStyle = 'rgba(190,240,140,0.55)';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    // barn, trees, bushes, fences
+                    for (const ox of [0, T]) {
+                        const bx = T * 0.37 + ox;
+                        drawBarn(ctx, bx, y(T * 0.37) + 4, ch * 0.07);
+                    }
+                    const count = Math.round(T / 70);
+                    for (let i = 0; i < count; i++) {
+                        const tx = (i + hash(i + 200)) * (T / count);
+                        if (Math.abs(tx - T * 0.37) < ch * 0.12) continue;
+                        const r = hash(i + 300);
+                        const s = ch * (0.04 + hash(i + 400) * 0.03);
+                        for (const ox of [0, T]) {
+                            const X = tx + ox;
+                            if (r < 0.3) drawRoundTree(ctx, X, y(tx) + 4, s);
+                            else if (r < 0.62) drawPine(ctx, X, y(tx) + s * 0.1, s * 1.15, '#3C8E4A', '#2F7A40');
+                            else if (r < 0.85) drawBush(ctx, X, y(tx) + 3, s * 0.45);
+                            else drawFence(ctx, X, y, s * 0.4);
+                        }
+                    }
+                }
+            }
+        };
+
+        for (const key of ['far', 'mid', 'near']) {
+            const L = layers[key];
+            const el = layerEls[key];
+            const hgt = Math.max(1, ch - L.top);
+            el.width = Math.round(2 * T * LAYER_DPR);
+            el.height = Math.round(hgt * LAYER_DPR);
+            el.style.width = (2 * T) + 'px';
+            el.style.height = hgt + 'px';
+            el.style.top = L.top + 'px';
+            const ctx = el.getContext('2d');
+            ctx.setTransform(LAYER_DPR, 0, 0, LAYER_DPR, 0, -L.top * LAYER_DPR);
+            ctx.clearRect(0, 0, 2 * T, ch);
+            L.paint(ctx);
+        }
+
+        // Dirt gradient for the playable ground (screen space)
+        dirtGradient = bgCtx.createLinearGradient(0, ch * 0.4, 0, ch);
+        dirtGradient.addColorStop(0, '#D49455');
+        dirtGradient.addColorStop(0.35, '#B5713A');
+        dirtGradient.addColorStop(1, '#7A4220');
+
+        // Ambient far clouds (pure decoration, behind hills)
+        const fc = document.getElementById('far-clouds');
+        if (!fc.childElementCount) {
+            const specs = [[8, 0.9, 95, -20], [17, 0.6, 130, -75], [4, 0.5, 160, -120], [24, 0.75, 110, -45]];
+            for (const [top, s, dur, delay] of specs) {
+                const d = document.createElement('div');
+                d.className = 'far-cloud';
+                d.innerHTML = SVG_CLOUD;
+                d.style.top = top + '%';
+                d.style.setProperty('--s', s);
+                d.style.animationDuration = dur + 's';
+                d.style.animationDelay = delay + 's';
+                fc.appendChild(d);
+            }
+        }
+    }
+
+    function drawPine(ctx, x, y, s, light, dark) {
+        ctx.fillStyle = '#6B4A35';
+        ctx.fillRect(x - s * 0.07, y - s * 0.3, s * 0.14, s * 0.32);
+        for (let k = 0; k < 3; k++) {
+            const w = s * (0.42 - k * 0.09), top = y - s * (0.75 + k * 0.38), bot = y - s * (0.2 + k * 0.36);
+            ctx.fillStyle = dark;
+            ctx.beginPath();
+            ctx.moveTo(x, top);
+            ctx.lineTo(x + w, bot);
+            ctx.lineTo(x - w, bot);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = light;
+            ctx.beginPath();
+            ctx.moveTo(x, top);
+            ctx.lineTo(x, bot);
+            ctx.lineTo(x - w, bot);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    function drawRoundTree(ctx, x, y, s) {
+        ctx.fillStyle = '#6B4A35';
+        ctx.fillRect(x - s * 0.08, y - s * 0.6, s * 0.16, s * 0.62);
+        ctx.fillStyle = '#2F8A3E';
+        ctx.beginPath();
+        ctx.arc(x - s * 0.22, y - s * 0.7, s * 0.34, 0, Math.PI * 2);
+        ctx.arc(x + s * 0.22, y - s * 0.68, s * 0.32, 0, Math.PI * 2);
+        ctx.arc(x, y - s * 0.98, s * 0.38, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#4FAE4B';
+        ctx.beginPath();
+        ctx.arc(x - s * 0.1, y - s * 1.05, s * 0.24, 0, Math.PI * 2);
+        ctx.arc(x - s * 0.28, y - s * 0.78, s * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FF6B5A';
+        for (let k = 0; k < 3; k++) {
+            ctx.beginPath();
+            ctx.arc(x + Math.cos(k * 2.1 + 0.4) * s * 0.25, y - s * 0.85 + Math.sin(k * 2.1 + 0.4) * s * 0.18, s * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function drawBush(ctx, x, y, s) {
+        ctx.fillStyle = '#2F8A3E';
+        ctx.beginPath();
+        ctx.arc(x - s * 0.6, y - s * 0.4, s * 0.55, 0, Math.PI * 2);
+        ctx.arc(x + s * 0.6, y - s * 0.4, s * 0.55, 0, Math.PI * 2);
+        ctx.arc(x, y - s * 0.7, s * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#56B34E';
+        ctx.beginPath();
+        ctx.arc(x - s * 0.2, y - s * 0.85, s * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawFence(ctx, x, yFn, s) {
+        ctx.strokeStyle = '#8B5E3C';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = Math.max(2, s * 0.18);
+        const n = 4, gap = s * 1.4;
+        ctx.beginPath();
+        for (let k = 0; k < n; k++) {
+            const px = x + k * gap, py = yFn(px) + 4;
+            ctx.moveTo(px, py);
+            ctx.lineTo(px, py - s * 1.3);
+        }
+        for (const hh of [0.5, 1.0]) {
+            for (let k = 0; k < n; k++) {
+                const px = x + k * gap, py = yFn(px) + 4 - s * hh;
+                k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+        }
+        ctx.stroke();
+    }
+
+    function drawBarn(ctx, x, y, s) {
+        const w = s * 1.5, h = s * 0.95;
+        ctx.fillStyle = '#C8473A';
+        ctx.fillRect(x - w / 2, y - h, w, h);
+        ctx.fillStyle = '#A93A30';
+        ctx.fillRect(x + w * 0.1, y - h, w * 0.4, h);
+        ctx.fillStyle = '#6A4C3A';
+        ctx.beginPath();
+        ctx.moveTo(x - w * 0.6, y - h + 2);
+        ctx.lineTo(x - w * 0.25, y - h - s * 0.55);
+        ctx.lineTo(x + w * 0.25, y - h - s * 0.55);
+        ctx.lineTo(x + w * 0.6, y - h + 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#F4E7D2';
+        ctx.fillRect(x - w * 0.18, y - h * 0.62, w * 0.36, h * 0.62);
+        ctx.strokeStyle = '#C8473A';
+        ctx.lineWidth = Math.max(1.5, s * 0.05);
+        ctx.beginPath();
+        ctx.moveTo(x - w * 0.18, y - h * 0.62);
+        ctx.lineTo(x + w * 0.18, y);
+        ctx.moveTo(x + w * 0.18, y - h * 0.62);
+        ctx.lineTo(x - w * 0.18, y);
+        ctx.stroke();
+        ctx.fillStyle = '#F4E7D2';
+        ctx.fillRect(x - w * 0.08, y - h - s * 0.32, w * 0.16, s * 0.2);
+        // silo
+        ctx.fillStyle = '#D9D2C5';
+        ctx.fillRect(x + w * 0.62, y - h * 1.45, s * 0.42, h * 1.45);
+        ctx.fillStyle = '#B8B0A2';
+        ctx.fillRect(x + w * 0.62 + s * 0.26, y - h * 1.45, s * 0.16, h * 1.45);
+        ctx.fillStyle = '#8E9AAB';
+        ctx.beginPath();
+        ctx.arc(x + w * 0.62 + s * 0.21, y - h * 1.45, s * 0.21, Math.PI, 0);
+        ctx.fill();
+    }
+
+    function positionLayers() {
+        for (const key of ['far', 'mid', 'near']) {
+            const off = ((bgScrollX * PARALLAX[key]) % TILE_W + TILE_W) % TILE_W;
+            layerEls[key].style.transform = `translate3d(${-off}px,0,0)`;
         }
     }
 
     function drawBackgroundLayers() {
-        bgCtx.clearRect(0, 0, cw, ch);
+        positionLayers();
 
-        // 1. Mountains (Background Parallax Layer 1)
-        bgCtx.fillStyle = '#6B8E23';
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, ch * 0.6);
-        for (let x = 0; x <= cw + 200; x += 50) {
-            let y = ch * 0.5 + Math.sin((x + bgScrollX) * 0.01) * 50;
-            bgCtx.lineTo(x, y);
+        const ctx = bgCtx;
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        ctx.clearRect(0, 0, cw, ch);
+
+        // Sample the exact gameplay terrain once per frame
+        const step = 8;
+        const n = Math.ceil((cw + 40) / step) + 1;
+        if (terrainXs.length !== n) {
+            terrainXs = new Float32Array(n);
+            terrainYs = new Float32Array(n);
         }
-        bgCtx.lineTo(cw, ch);
-        bgCtx.lineTo(0, ch);
-        bgCtx.fill();
-
-        // 2. Parallax Trees scattered randomly on the Mountains
-        const treeScroll = bgScrollX * 1.5;
-
-        // We draw trees along consistent segments relative to the background scroll
-        // This ensures they stay locked to the mountains and don't flicker.
-        const segmentWidth = 200;
-        const startSegment = Math.floor(treeScroll / segmentWidth);
-        const segmentsOnScreen = Math.ceil(cw / segmentWidth) + 1;
-
-        for (let i = startSegment; i < startSegment + segmentsOnScreen; i++) {
-            // Predictable pseudo-random placement using the segment index
-            const treeXOffset = (Math.abs(Math.sin(i * 123.45)) * segmentWidth);
-            const worldTreeX = (i * segmentWidth) + treeXOffset;
-
-            // Screen position
-            const screenX = worldTreeX - treeScroll;
-
-            // Get the mountain height at this specific spot so the tree sits firmly on it
-            const mountY = ch * 0.5 + Math.sin((worldTreeX) * 0.01) * 50;
-
-            // Varying tree sizes and slight color differences based on index
-            const sizeMod = 0.5 + (Math.abs(Math.sin(i * 456.78)) * 0.8); // 0.5 to 1.3 scale
-
-            // Draw tree body
-            bgCtx.save();
-            bgCtx.translate(screenX, mountY + 10); // +10 to embed root deeper into the mountain curve
-            bgCtx.scale(sizeMod, sizeMod);
-
-            // Trunk
-            bgCtx.fillStyle = '#5C4033';
-            bgCtx.fillRect(-5, -20, 10, 20);
-
-            // Pine needles
-            bgCtx.fillStyle = (i % 3 === 0) ? '#1A6A1A' : '#228B22'; // Randomize greens
-            bgCtx.beginPath();
-            bgCtx.moveTo(0, -70); // Tip
-            bgCtx.lineTo(20, -10); // Right bottom
-            bgCtx.lineTo(-20, -10); // Left bottom
-            bgCtx.fill();
-
-            bgCtx.restore();
+        for (let i = 0; i < n; i++) {
+            const x = -20 + i * step;
+            terrainXs[i] = x;
+            terrainYs[i] = getTerrainY(x + fgScrollX);
         }
-
-        // 3. Wavy Foreground Ground (Main Playable Area)
-        bgCtx.fillStyle = '#8B4513';
-        bgCtx.beginPath();
-        bgCtx.moveTo(0, ch);
-
-        // Draw the exact wavy line based on our terrain function
-        for (let x = 0; x <= cw + 20; x += 10) {
-            let worldX = x + fgScrollX;
-            bgCtx.lineTo(x, getTerrainY(worldX));
-        }
-
-        bgCtx.lineTo(cw + 20, ch);
-        bgCtx.lineTo(0, ch);
-        bgCtx.fill();
-
-        // 4. Ground top highlight (vibrant grass edge)
-        bgCtx.beginPath();
-        for (let x = 0; x <= cw + 20; x += 10) {
-            let worldX = x + fgScrollX;
-            let y = getTerrainY(worldX);
-            if (x === 0) bgCtx.moveTo(x, y);
-            else bgCtx.lineTo(x, y);
-        }
-        bgCtx.strokeStyle = '#32CD32';
-        bgCtx.lineWidth = 14;
-        bgCtx.lineCap = 'round';
-        bgCtx.lineJoin = 'round';
-        bgCtx.stroke();
-
-        // 5. Fun Terrain Details (Grass Tufts & Fossils)
-        // Ensure details are drawn at consistent world coordinates so they don't blink
-        const detailSpacing = 100;
-        const firstDetailWorldX = Math.floor(fgScrollX / detailSpacing) * detailSpacing;
-
-        for (let worldX = firstDetailWorldX; worldX <= fgScrollX + cw + 50; worldX += detailSpacing) {
-            let x = worldX - fgScrollX; // Convert world coordinate to screen coordinate
-            let groundY = getTerrainY(worldX);
-
-            // Use the consistent worldX to seed the random placement
-            let seed = Math.abs(Math.sin(worldX));
-
-            // Grass Tufts on top
-            if (seed > 0.5) {
-                bgCtx.fillStyle = '#228B22';
-                bgCtx.beginPath();
-                bgCtx.moveTo(x, groundY);
-                bgCtx.lineTo(x - 5, groundY - 15);
-                bgCtx.lineTo(x + 5, groundY - 5);
-                bgCtx.lineTo(x + 10, groundY - 20);
-                bgCtx.lineTo(x + 15, groundY - 2);
-                bgCtx.fill();
+        const xs = terrainXs, ys = terrainYs;
+        const strokeAlong = (dy, wobble, width, color) => {
+            ctx.beginPath();
+            for (let i = 0; i < n; i++) {
+                const y = ys[i] + dy + (wobble ? Math.sin((xs[i] + fgScrollX) * 0.012 + dy) * wobble : 0);
+                i === 0 ? ctx.moveTo(xs[i], y) : ctx.lineTo(xs[i], y);
             }
+            ctx.lineWidth = width;
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        };
 
-            // Subsurface details (Fossils/Rocks deep in dirt)
-            if (seed < 0.2 && groundY < ch - 100) {
-                bgCtx.strokeStyle = '#D2B48C';
-                bgCtx.lineWidth = 4;
-                bgCtx.beginPath();
-                bgCtx.moveTo(x, groundY + 60);
-                bgCtx.lineTo(x + 30, groundY + 70);
-                bgCtx.stroke();
-                bgCtx.fillStyle = '#D2B48C';
-                bgCtx.beginPath();
-                bgCtx.arc(x, groundY + 58, 4, 0, Math.PI * 2);
-                bgCtx.fill();
-                bgCtx.beginPath();
-                bgCtx.arc(x, groundY + 62, 4, 0, Math.PI * 2);
-                bgCtx.fill();
-                bgCtx.beginPath();
-                bgCtx.arc(x + 30, groundY + 68, 4, 0, Math.PI * 2);
-                bgCtx.fill();
-                bgCtx.beginPath();
-                bgCtx.arc(x + 30, groundY + 72, 4, 0, Math.PI * 2);
-                bgCtx.fill();
+        // 1. Dirt body
+        ctx.beginPath();
+        ctx.moveTo(xs[0], ch + 10);
+        for (let i = 0; i < n; i++) ctx.lineTo(xs[i], ys[i]);
+        ctx.lineTo(xs[n - 1], ch + 10);
+        ctx.closePath();
+        ctx.fillStyle = dirtGradient;
+        ctx.fill();
+
+        // 2. Soil strata following the hills
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        strokeAlong(58, 6, 26, 'rgba(255,214,160,0.18)');
+        strokeAlong(104, 5, 10, 'rgba(96,46,16,0.28)');
+        strokeAlong(160, 8, 34, 'rgba(255,214,160,0.10)');
+        strokeAlong(230, 6, 12, 'rgba(80,36,12,0.25)');
+
+        // 3. Buried treasures: pebbles, fossils & gems (world-anchored so they never blink)
+        const spacing = 70;
+        const first = Math.floor((fgScrollX - 60) / spacing) * spacing;
+        for (let worldX = first; worldX <= fgScrollX + cw + 60; worldX += spacing) {
+            const x = worldX - fgScrollX;
+            const r = hash(worldX * 0.013);
+            const gy = getTerrainY(worldX);
+            if (r < 0.1 && gy + 110 < ch) {
+                drawFossil(ctx, x, gy + 78, hash(worldX * 0.7));
+            } else if (r < 0.16 && gy + 70 < ch) {
+                drawGem(ctx, x, gy + 52 + hash(worldX) * 30, Math.floor(hash(worldX * 3.1) * 4));
+            } else if (r < 0.7) {
+                const cnt = 1 + Math.floor(hash(worldX * 1.7) * 3);
+                for (let k = 0; k < cnt; k++) {
+                    const px = x + (hash(worldX + k * 9.1) - 0.5) * 50;
+                    const py = gy + 30 + hash(worldX + k * 4.3) * 140;
+                    if (py > ch) continue;
+                    const pr = 3 + hash(worldX + k) * 6;
+                    ctx.fillStyle = 'rgba(92,46,18,0.45)';
+                    ctx.beginPath();
+                    ctx.ellipse(px, py, pr * 1.4, pr, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = 'rgba(255,224,180,0.35)';
+                    ctx.beginPath();
+                    ctx.ellipse(px - pr * 0.3, py - pr * 0.35, pr * 0.6, pr * 0.35, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
         }
+
+        // 4. Grass cap
+        strokeAlong(12, 0, 18, 'rgba(70,32,10,0.35)');   // shadow on dirt under the grass
+        strokeAlong(3, 0, 22, '#2E8B3E');                // dark grass
+        // scalloped grass edge
+        ctx.fillStyle = '#2E8B3E';
+        ctx.beginPath();
+        const sc = 18;
+        const firstSc = Math.floor(fgScrollX / sc) * sc;
+        for (let wx = firstSc; wx <= fgScrollX + cw + sc; wx += sc) {
+            const x = wx - fgScrollX;
+            const y = getTerrainY(wx) + 12;
+            ctx.moveTo(x + 7, y);
+            ctx.arc(x, y, 7, 0, Math.PI);
+        }
+        ctx.fill();
+        strokeAlong(-1, 0, 13, '#5CC64A');               // bright grass
+        strokeAlong(-5, 0, 3.5, '#B4F27C');              // sunny rim light
+
+        // 5. Tufts & flowers on the grass
+        const tsp = 46;
+        const firstT = Math.floor(fgScrollX / tsp) * tsp;
+        ctx.lineWidth = 3;
+        for (let wx = firstT; wx <= fgScrollX + cw + tsp; wx += tsp) {
+            const r = hash(wx * 0.031);
+            const x = wx - fgScrollX + (r - 0.5) * 20;
+            const y = getTerrainY(wx) - 4;
+            if (r > 0.5) {
+                ctx.strokeStyle = r > 0.75 ? '#3E9E3A' : '#4DB043';
+                ctx.beginPath();
+                ctx.moveTo(x - 4, y); ctx.quadraticCurveTo(x - 7, y - 8, x - 10, y - 14);
+                ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 1, y - 10, x - 1, y - 19);
+                ctx.moveTo(x + 4, y); ctx.quadraticCurveTo(x + 7, y - 8, x + 11, y - 13);
+                ctx.stroke();
+            } else if (r < 0.28) {
+                drawFlower(ctx, x, y, Math.floor(hash(wx * 0.77) * 4));
+            }
+        }
+
+        // 6. Soft shadow under the Bronco (shrinks as it flies)
+        const sx = cw * 0.2 + 100;
+        const gC = getTerrainY(sx + fgScrollX);
+        const air = Math.max(0, gC - vis.py);
+        const k = Math.max(0.3, 1 - air / 260);
+        ctx.fillStyle = `rgba(30,20,10,${0.3 * k})`;
+        ctx.beginPath();
+        ctx.ellipse(sx, gC + 1, 92 * k, 9 * k, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawFossil(ctx, x, y, r) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((r - 0.5) * 0.8);
+        ctx.fillStyle = '#F1DDB8';
+        ctx.strokeStyle = 'rgba(80,40,15,0.55)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-14, -3); ctx.lineTo(14, -3); ctx.lineTo(14, 3); ctx.lineTo(-14, 3); ctx.closePath();
+        for (const [cx, cy] of [[-15, -4], [-15, 4], [15, -4], [15, 4]]) {
+            ctx.moveTo(cx + 5, cy);
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        }
+        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawGem(ctx, x, y, c) {
+        const [light, dark] = GEM_COLORS[c];
+        ctx.fillStyle = dark;
+        ctx.strokeStyle = 'rgba(60,30,10,0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x - 9, y - 3); ctx.lineTo(x - 5, y - 9); ctx.lineTo(x + 5, y - 9); ctx.lineTo(x + 9, y - 3); ctx.lineTo(x, y + 9); ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = light;
+        ctx.beginPath();
+        ctx.moveTo(x - 9, y - 3); ctx.lineTo(x - 5, y - 9); ctx.lineTo(x, y - 3); ctx.lineTo(x, y + 9); ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.beginPath();
+        ctx.arc(x - 4, y - 5, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawFlower(ctx, x, y, c) {
+        ctx.strokeStyle = '#3E9E3A';
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - 12);
+        ctx.stroke();
+        ctx.fillStyle = FLOWER_COLORS[c];
+        ctx.beginPath();
+        for (let p = 0; p < 5; p++) {
+            const a = p * 1.2566;
+            ctx.moveTo(x + Math.cos(a) * 4 + 3, y - 14 + Math.sin(a) * 4);
+            ctx.arc(x + Math.cos(a) * 4, y - 14 + Math.sin(a) * 4, 3, 0, Math.PI * 2);
+        }
+        ctx.fill();
+        ctx.fillStyle = c === 1 ? '#FF8A1F' : '#FFD23F';
+        ctx.beginPath();
+        ctx.arc(x, y - 14, 2.4, 0, Math.PI * 2);
+        ctx.fill();
     }
 
     // --- STREAMING_CHUNK:Input Handlers... ---
@@ -744,6 +1702,8 @@
             // Highlight the selected swatch in this row
             swatch.parentElement.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('swatch-selected'));
             swatch.classList.add('swatch-selected');
+
+            fxPaintSplash(color, part);
         };
         swatch.addEventListener('click', selectColor);
         swatch.addEventListener('touchstart', selectColor, {passive: false});
@@ -772,7 +1732,10 @@
 
         score = 0;
         speedMultiplier = 1;
+        speedDisplay.innerText = '1'; // keep the HUD in sync with the reset speed
         updateScoreDisplay();
+
+        fxStart();
 
         lastTime = performance.now();
         gameLoop(performance.now());
@@ -795,6 +1758,8 @@
         bgScrollX = 0;
         fgScrollX = 0;
         drawBackgroundLayers();
+
+        fxReset();
     }
 
     function gameOver() {
@@ -808,6 +1773,8 @@
         bronco.backWheel.classList.remove('wheel-spin');
 
         cancelAnimationFrame(animationFrameId);
+
+        fxScoreCountUp(score);
     }
 
     function spawnSkyObjects() {
@@ -900,6 +1867,7 @@
                     type: isRock ? 'rock' : 'puddle'
                 });
             } else {
+                el.className = 'collectible';
                 el.innerHTML = SVG_STAR;
                 el.style.width = '50px';
                 el.style.height = '50px';
@@ -918,24 +1886,22 @@
         // Only spawn dirt if we are mostly touching the ground
         if (bronco.isJumping && bronco.y < getTerrainY(cw * 0.2 + fgScrollX) - 20) return;
 
+        const speed = gameSpeed * speedMultiplier * 60;
         for (let i = 0; i < 5; i++) {
-            const p = document.createElement('div');
-            p.className = 'dirt-particle';
-            p.style.zIndex = '12'; // Above car, below UI
-
-            const broncoScreenX = cw * 0.2;
-            p.style.left = `${broncoScreenX + 40 + (Math.random() * 20)}px`;
-            p.style.top = `${bronco.y - 10}px`;
-
-            const size = 5 + Math.random() * 10;
-            p.style.width = `${size}px`;
-            p.style.height = `${size}px`;
-
-            document.body.appendChild(p);
-
-            setTimeout(() => {
-                p.remove();
-            }, 500);
+            const wheelX = Math.random() < 0.7 ? 52 : 152;
+            const [x, y] = carPoint(wheelX - 14 + Math.random() * 8, 116);
+            const big = Math.random() < 0.6;
+            spawnParticle({
+                kind: big ? 'dust' : 'pebble',
+                x, y,
+                vx: -speed * (0.45 + Math.random() * 0.5),
+                vy: -(40 + Math.random() * (big ? 90 : 220)),
+                g: big ? 60 : 900,
+                size: big ? 5 + Math.random() * 8 : 2 + Math.random() * 3,
+                grow: big ? 18 : 0,
+                life: big ? 0.55 + Math.random() * 0.35 : 0.5,
+                color: big ? (Math.random() < 0.5 ? '#D9B07A' : '#C79A66') : '#7A4A26'
+            });
         }
     }
 
@@ -946,9 +1912,9 @@
         // 1. Get the terrain height at the Bronco's exact location
         const groundY = getTerrainY(broncoWorldX);
 
-        // 2. Calculate the slope to tilt the car
-        const nextY = getTerrainY(broncoWorldX + 40); // Look slightly ahead
-        const prevY = getTerrainY(broncoWorldX - 40); // Look slightly behind
+        // 2. Calculate the slope to tilt the car (sampled under the car's middle so the body hugs the hill)
+        const nextY = getTerrainY(broncoWorldX + 100 + 40); // Look slightly ahead
+        const prevY = getTerrainY(broncoWorldX + 100 - 40); // Look slightly behind
         const targetAngleRad = Math.atan2(nextY - prevY, 80);
         let targetAngleDeg = targetAngleRad * (180 / Math.PI);
 
@@ -983,7 +1949,7 @@
         bronco.angle += (targetAngleDeg - bronco.angle) * 0.15;
 
         // 5. Apply Position and Rotation to DOM Element
-        bronco.element.style.transform = `translate(${broncoScreenX}px, ${bronco.y - bronco.height}px) rotate(${bronco.angle}deg)`;
+        renderBronco(broncoScreenX);
     }
 
     function checkCollisions() {
@@ -1000,6 +1966,7 @@
             const dist = Math.hypot(broncoCenterX - obsCenterX, broncoCenterY - obsCenterY);
 
             if (dist < 50) { // Generous collision radius for kids
+                fxCrash(obs);
                 gameOver();
                 return; // Stop checking
             }
@@ -1021,6 +1988,7 @@
                 star.el.style.transition = 'transform 0.2s, opacity 0.2s';
                 star.el.style.transform = `translate(${star.screenX}px, ${star.screenY}px) scale(2)`;
                 star.el.style.opacity = '0';
+                fxStarCollect(starCenterX, starCenterY);
 
                 const elementToRemove = star.el;
                 setTimeout(() => {
@@ -1097,7 +2065,9 @@
                 obstacles[i].screenY += 15;
             }
 
-            obstacles[i].el.style.transform = `translate(${obstacles[i].screenX}px, ${obstacles[i].screenY}px)`;
+            // Visual only: lean the sprite with the hill it sits on
+            const tilt = Math.atan2(getTerrainY(obstacles[i].worldX + obstacles[i].width) - getTerrainY(obstacles[i].worldX), obstacles[i].width) * 57.3 * 0.8;
+            obstacles[i].el.style.transform = `translate(${obstacles[i].screenX}px, ${obstacles[i].screenY}px) rotate(${tilt}deg)`;
 
             if (obstacles[i].screenX < -100) {
                 obstacles[i].el.remove();
@@ -1110,7 +2080,12 @@
             collectibles[i].screenX = collectibles[i].worldX - fgScrollX;
             collectibles[i].screenY = getTerrainY(collectibles[i].worldX) - collectibles[i].height - collectibles[i].hoverOffset;
 
-            collectibles[i].el.style.transform = `translate(${collectibles[i].screenX}px, ${collectibles[i].screenY}px) rotate(${timestamp * 0.1}deg)`;
+            // Visual only: a happy wobble + bob so the star's face stays upright
+            const ph = collectibles[i].hoverOffset;
+            const wob = Math.sin(timestamp * 0.006 + ph) * 14;
+            const bob = Math.sin(timestamp * 0.004 + ph) * 4;
+            const pulse = 1 + Math.sin(timestamp * 0.008 + ph) * 0.06;
+            collectibles[i].el.style.transform = `translate(${collectibles[i].screenX}px, ${collectibles[i].screenY + bob}px) rotate(${wob}deg) scale(${pulse})`;
 
             if (collectibles[i].screenX < -100) {
                 collectibles[i].el.remove();
@@ -1125,8 +2100,377 @@
         }
     }
 
+    /* =====================================================================
+       PRESENTATION: Bronco rendering & juice (no gameplay effect)
+       ===================================================================== */
+    const broncoInner = document.getElementById('bronco-inner');
+    let wheelDur = '';
+
+    // Place the car so its middle sits on the hill under it (the physics point is the car's back edge).
+    function renderBronco(broncoScreenX, quiet) {
+        const wx = broncoScreenX + fgScrollX;
+        vis.offset = getTerrainY(wx + 100) - getTerrainY(wx);
+        const y = bronco.y + vis.offset;
+        vis.px = broncoScreenX + 100;
+        vis.py = y;
+        vis.angle = bronco.angle * Math.PI / 180;
+        bronco.element.style.transform = `translate3d(${broncoScreenX}px, ${y - bronco.height}px, 0) rotate(${bronco.angle}deg)`;
+
+        if (!quiet) {
+            if (bronco.isJumping && !vis.prevJumping) squash('jump');
+            if (!bronco.isJumping && vis.prevJumping) squash('land');
+            const d = (0.46 / speedMultiplier).toFixed(3) + 's';
+            if (d !== wheelDur) {
+                wheelDur = d;
+                bronco.frontWheel.style.animationDuration = d;
+                bronco.backWheel.style.animationDuration = d;
+            }
+        }
+        vis.prevJumping = bronco.isJumping;
+    }
+
+    function squash(kind) {
+        if (!broncoInner.animate) return;
+        if (kind === 'jump') {
+            broncoInner.animate([
+                {transform: 'scale(1.08, 0.88)'},
+                {transform: 'scale(0.92, 1.12)', offset: 0.35},
+                {transform: 'scale(1, 1)'}
+            ], {duration: 380, easing: 'ease-out'});
+        } else {
+            broncoInner.animate([
+                {transform: 'scale(1.14, 0.84)'},
+                {transform: 'scale(0.96, 1.05)', offset: 0.5},
+                {transform: 'scale(1, 1)'}
+            ], {duration: 320, easing: 'ease-out'});
+        }
+    }
+
+    // Convert a point in the car's 200x120 box into screen space (accounts for rotation about the bottom-center)
+    function carPoint(lx, ly) {
+        const dx = lx - 100, dy = ly - 120;
+        const c = Math.cos(vis.angle), s = Math.sin(vis.angle);
+        return [vis.px + dx * c - dy * s, vis.py + dx * s + dy * c];
+    }
+
+    /* ---------- Particles ---------- */
+    const particles = [];
+    const MAX_PARTICLES = 320;
+    function spawnParticle(p) {
+        if (particles.length >= MAX_PARTICLES) particles.shift();
+        p.age = 0;
+        p.rot = p.rot || 0;
+        p.vr = p.vr || 0;
+        particles.push(p);
+    }
+
+    function drawSparkle(ctx, r) {
+        ctx.beginPath();
+        ctx.moveTo(0, -r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+        ctx.quadraticCurveTo(0, 0, 0, r);
+        ctx.quadraticCurveTo(0, 0, -r, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -r);
+        ctx.fill();
+    }
+
+    function drawStarShape(ctx, r) {
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+            const rr = i % 2 ? r * 0.45 : r;
+            const a = -Math.PI / 2 + i * Math.PI / 5;
+            i ? ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
+        }
+        ctx.closePath();
+    }
+
+    function drawBurst(ctx, r, text, fill) {
+        ctx.beginPath();
+        const spikes = 12;
+        for (let i = 0; i < spikes * 2; i++) {
+            const rr = i % 2 ? r * 0.62 : r * (0.95 + (i % 4 === 0 ? 0.12 : 0));
+            const a = i * Math.PI / spikes;
+            i ? ctx.lineTo(Math.cos(a) * rr * 1.3, Math.sin(a) * rr) : ctx.moveTo(Math.cos(a) * rr * 1.3, Math.sin(a) * rr);
+        }
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 5;
+        ctx.lineJoin = 'round';
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = `${Math.round(r * 0.62)}px 'Lilita One', 'Arial Black', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 6;
+        ctx.strokeText(text, 0, 2);
+        ctx.fillStyle = '#FFF';
+        ctx.fillText(text, 0, 2);
+    }
+
+    let fxDirty = false;
+    let fxLast = performance.now();
+    let exhaustTimer = 0;
+    let shownSpeed = 1;
+
+    function fxLoop(now) {
+        const dt = Math.min(0.05, (now - fxLast) / 1000);
+        fxLast = now;
+
+        if (currentState === GAME_STATE.PLAYING) {
+            // Exhaust puffs from the tailpipe
+            exhaustTimer -= dt;
+            if (exhaustTimer <= 0) {
+                exhaustTimer = 0.09 + Math.random() * 0.06;
+                const [x, y] = carPoint(4, 97);
+                spawnParticle({
+                    kind: 'puff', x, y,
+                    vx: -90 - Math.random() * 60, vy: -20 - Math.random() * 25, g: -30,
+                    size: 3 + Math.random() * 3, grow: 22, life: 0.6, color: '#F2F2F2'
+                });
+            }
+            // "Faster!" banner whenever the speed steps up
+            if (speedMultiplier > shownSpeed + 0.05) {
+                shownSpeed = speedMultiplier;
+                showToast('Faster!');
+            }
+        }
+        if (speedMultiplier < shownSpeed) shownSpeed = speedMultiplier;
+
+        const ctx = fxCtx;
+        if (particles.length || fxDirty) {
+            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            ctx.clearRect(0, 0, cw, ch);
+            fxDirty = particles.length > 0;
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.age += dt;
+            if (p.age >= p.life) { particles.splice(i, 1); continue; }
+            p.vy += (p.g || 0) * dt;
+            if (p.drag) { p.vx *= (1 - p.drag * dt); p.vy *= (1 - p.drag * dt); }
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.rot += p.vr * dt;
+            const t = p.age / p.life;
+            const size = p.size + (p.grow || 0) * p.age;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            switch (p.kind) {
+                case 'dust':
+                case 'puff':
+                    ctx.globalAlpha = (p.kind === 'puff' ? 0.55 : 0.75) * (1 - t);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'pebble':
+                case 'drop':
+                    ctx.globalAlpha = 1 - t * t;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'sparkle':
+                    ctx.globalAlpha = 1 - t;
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    drawSparkle(ctx, size * (1 - t * 0.5));
+                    break;
+                case 'star':
+                    ctx.globalAlpha = 1 - t * t;
+                    ctx.rotate(p.rot);
+                    drawStarShape(ctx, size);
+                    ctx.fillStyle = '#FFD43B';
+                    ctx.strokeStyle = INK;
+                    ctx.lineWidth = 2;
+                    ctx.lineJoin = 'round';
+                    ctx.fill();
+                    ctx.stroke();
+                    break;
+                case 'ring':
+                    ctx.globalAlpha = 1 - t;
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = 6 * (1 - t) + 1;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size + 70 * Math.sqrt(t), 0, Math.PI * 2);
+                    ctx.stroke();
+                    break;
+                case 'text': {
+                    ctx.globalAlpha = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
+                    const sc = t < 0.15 ? 0.5 + t / 0.15 * 0.7 : 1.2 - Math.min(0.2, (t - 0.15));
+                    ctx.scale(sc, sc);
+                    ctx.font = `${p.size}px 'Lilita One', 'Arial Black', sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.lineJoin = 'round';
+                    ctx.lineWidth = 6;
+                    ctx.strokeStyle = INK;
+                    ctx.strokeText(p.text, 0, 0);
+                    ctx.fillStyle = p.color;
+                    ctx.fillText(p.text, 0, 0);
+                    break;
+                }
+                case 'burst': {
+                    const pop = t < 0.18 ? 0.3 + (t / 0.18) * 0.9 : (t < 0.3 ? 1.2 - (t - 0.18) / 0.12 * 0.2 : 1);
+                    ctx.globalAlpha = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
+                    ctx.rotate(-0.12);
+                    ctx.scale(pop, pop);
+                    drawBurst(ctx, p.size, p.text, p.color);
+                    break;
+                }
+            }
+            ctx.restore();
+        }
+
+        requestAnimationFrame(fxLoop);
+    }
+
+    function fxStarCollect(x, y) {
+        spawnParticle({kind: 'ring', x, y, vx: 0, vy: 0, size: 12, life: 0.45, color: '#FFE066'});
+        for (let i = 0; i < 12; i++) {
+            const a = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+            const sp = 180 + Math.random() * 200;
+            spawnParticle({
+                kind: i % 3 === 0 ? 'star' : 'sparkle',
+                x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 300, drag: 2.5,
+                size: i % 3 === 0 ? 7 : 6 + Math.random() * 5, life: 0.6 + Math.random() * 0.3,
+                rot: Math.random() * 6, vr: (Math.random() - 0.5) * 10,
+                color: ['#FFF7B0', '#FFD43B', '#FFFFFF'][i % 3]
+            });
+        }
+        spawnParticle({kind: 'text', text: '+1', x, y: y - 20, vx: 0, vy: -90, drag: 1.5, size: 34, life: 0.8, color: '#FFD43B'});
+        const pill = document.getElementById('star-pill');
+        if (pill.animate) pill.animate([
+            {transform: 'scale(1)'}, {transform: 'scale(1.15) rotate(-3deg)'}, {transform: 'scale(1)'}
+        ], {duration: 260, easing: 'ease-out'});
+    }
+
+    function fxCrash(obs) {
+        const isRock = obs.type === 'rock';
+        const x = obs.screenX + obs.width / 2;
+        const y = obs.screenY + obs.height / 2;
+        bronco.element.classList.add('crashed');
+        gameContainer.classList.remove('shake');
+        void gameContainer.offsetWidth;
+        gameContainer.classList.add('shake');
+        if (broncoInner.animate) broncoInner.animate([
+            {transform: 'rotate(0) scale(1)'},
+            {transform: 'rotate(-9deg) scale(1.06, 0.92)', offset: 0.25},
+            {transform: 'rotate(4deg)', offset: 0.6},
+            {transform: 'rotate(0) scale(1)'}
+        ], {duration: 500, easing: 'ease-out'});
+
+        spawnParticle({kind: 'burst', x: x + 10, y: y - 60, vx: 0, vy: -10, size: 46, life: 1.1,
+            text: isRock ? 'BONK!' : 'SPLAT!', color: isRock ? '#FF5A4E' : '#B5713A'});
+        for (let i = 0; i < 22; i++) {
+            const a = -Math.PI * (0.1 + Math.random() * 0.8);
+            const sp = 150 + Math.random() * 320;
+            spawnParticle({
+                kind: isRock ? (i % 2 ? 'pebble' : 'dust') : 'drop',
+                x: x + (Math.random() - 0.5) * 30, y,
+                vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 900,
+                size: isRock ? (i % 2 ? 3 + Math.random() * 4 : 8 + Math.random() * 8) : 3 + Math.random() * 6,
+                grow: isRock && !(i % 2) ? 20 : 0,
+                life: 0.7 + Math.random() * 0.4,
+                color: isRock ? (i % 2 ? '#6E7889' : '#D9C9B0') : (i % 3 ? '#6A3C1E' : '#8A5530')
+            });
+        }
+        for (let i = 0; i < 6; i++) {
+            const a = Math.random() * Math.PI * 2;
+            spawnParticle({kind: 'star', x: x, y: y - 40, vx: Math.cos(a) * 160, vy: Math.sin(a) * 160 - 80, g: 300, drag: 1.5,
+                size: 8, life: 0.9, rot: a, vr: 6});
+        }
+    }
+
+    let countTimer = null;
+    function fxScoreCountUp(target) {
+        clearInterval(countTimer);
+        if (target <= 0) return;
+        let shown = 0;
+        finalScoreDisplay.innerText = '0';
+        const stepMs = Math.max(30, Math.min(110, 900 / target));
+        setTimeout(() => {
+            countTimer = setInterval(() => {
+                shown++;
+                finalScoreDisplay.innerText = shown;
+                if (finalScoreDisplay.animate) finalScoreDisplay.animate([{transform: 'scale(1.35)'}, {transform: 'scale(1)'}], {duration: 140});
+                if (shown >= target) { clearInterval(countTimer); finalScoreDisplay.innerText = target; }
+            }, stepMs);
+        }, 650);
+    }
+
+    function fxStart() {
+        bronco.element.classList.remove('crashed');
+        shownSpeed = speedMultiplier;
+        for (let i = 0; i < 8; i++) {
+            const [x, y] = carPoint(6, 97);
+            spawnParticle({kind: 'puff', x, y, vx: -60 - Math.random() * 140, vy: -30 - Math.random() * 60, g: -20,
+                size: 5 + Math.random() * 5, grow: 30, life: 0.8, color: '#FFFFFF'});
+        }
+        const ui = document.getElementById('ui-layer');
+        if (ui.animate) ui.animate([{transform: 'translateY(-30px)', opacity: 0}, {transform: 'none', opacity: 1}], {duration: 400, easing: 'cubic-bezier(.2,1.3,.4,1)'});
+    }
+
+    function fxReset() {
+        clearInterval(countTimer);
+        bronco.element.classList.remove('crashed');
+        gameContainer.classList.remove('shake');
+        particles.length = 0;
+        fxDirty = true;
+        renderBronco(cw * 0.2, true);
+        const preview = document.getElementById('preview-bronco');
+        if (preview.animate) preview.animate([{transform: 'translateY(-14%) scale(0.9)'}, {transform: 'none'}], {duration: 450, easing: 'cubic-bezier(.2,1.5,.4,1)'});
+    }
+
+    const toastEl = document.getElementById('toast');
+    function showToast(text) {
+        toastEl.textContent = text;
+        toastEl.classList.remove('show');
+        void toastEl.offsetWidth;
+        toastEl.classList.add('show');
+    }
+
+    // Paint splash + hop on the preview car when a color is picked
+    function fxPaintSplash(color, part) {
+        const stage = document.getElementById('preview-stage');
+        const preview = document.getElementById('preview-bronco');
+        if (preview.animate) preview.animate([
+            {transform: 'translateY(0) scale(1)'},
+            {transform: 'translateY(-10%) scale(1.04, 0.96)', offset: 0.35},
+            {transform: 'translateY(0) scale(1.06, 0.94)', offset: 0.7},
+            {transform: 'translateY(0) scale(1)'}
+        ], {duration: 420, easing: 'ease-out'});
+        const cx = stage.clientWidth * 0.5;
+        const cy = stage.clientHeight * (part === 'roof' ? 0.3 : 0.55);
+        for (let i = 0; i < 10; i++) {
+            const d = document.createElement('div');
+            d.className = 'splat';
+            d.style.background = color;
+            d.style.left = cx + 'px';
+            d.style.top = cy + 'px';
+            const a = Math.random() * Math.PI * 2;
+            const dist = 60 + Math.random() * stage.clientWidth * 0.35;
+            d.style.setProperty('--dx', Math.cos(a) * dist + 'px');
+            d.style.setProperty('--dy', Math.sin(a) * dist * 0.6 + 'px');
+            const s = 0.6 + Math.random() * 0.9;
+            d.style.width = d.style.height = (18 * s) + 'px';
+            stage.appendChild(d);
+            setTimeout(() => d.remove(), 720);
+        }
+    }
+
+    // Decorate static UI icons with the star sprite
+    document.getElementById('hud-star-icon').innerHTML = SVG_STAR.replace('<circle cx="25" cy="25" r="34" fill="url(#st-glow)"/>', '');
+    document.getElementById('final-star').innerHTML = SVG_STAR;
+
     // Initial draw
     drawBackgroundStatic();
+    requestAnimationFrame(fxLoop);
 
 </script>
 </body>

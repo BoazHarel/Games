@@ -2,18 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+    <meta name="theme-color" content="#7fd3ff">
     <title>Traffic Jam Sorter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background-color: #333; touch-action: none; user-select: none; -webkit-user-select: none; }
-        canvas { display: block; width: 100%; height: 100%; }
-        /* Simple loading message */
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-family: sans-serif; pointer-events: none; }
+        html, body { margin: 0; height: 100%; overflow: hidden; background: #7fd3ff; touch-action: none;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+        canvas { display: block; position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff;
+            font: 700 28px Fredoka, "Arial Rounded MT Bold", system-ui, sans-serif; letter-spacing: .5px;
+            text-shadow: 0 3px 0 #2b2d42; pointer-events: none; }
     </style>
-    <!-- Load Kaboom.js -->
-    <script src="https://unpkg.com/kaboom@3000.0.1/dist/kaboom.js"></script>
 </head>
 <body>
+<canvas id="game"></canvas>
 <div id="loading">Loading Traffic...</div>
 
 <script>
@@ -29,321 +34,1498 @@
     const playErr = () => zzfx(...[1.2,,160,,.05,.18,4,1.6,,,,,,.1,,.1]);
     const playPop = () => zzfx(...[.6,,317,.03,.11,.24,3,1.6,-7,,,,,.1,,.1,,.67,.06]);
 
-    // --- GAME LOGIC ---
+    // =====================================================================
+    //  TINY ENGINE (replaces Kaboom: tweens, timers, input, camera shake)
+    // =====================================================================
+    const TAU = Math.PI * 2;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp = (a, b, k) => a + (b - a) * k;
+    const vec2 = (x, y) => ({ x, y: y === undefined ? x : y });
+    const vdist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-    // Wait for Kaboom to load
+    const easings = {
+        linear: (x) => x,
+        easeOutQuad: (x) => 1 - (1 - x) * (1 - x),
+        easeOutBack: (x) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+        easeOutElastic: (x) => {
+            const c4 = TAU / 3;
+            return x === 0 ? 0 : x === 1 ? 1 : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+        },
+        easeOutBounce: (x) => {
+            const n1 = 7.5625, d1 = 2.75;
+            if (x < 1 / d1) return n1 * x * x;
+            if (x < 2 / d1) return n1 * (x -= 1.5 / d1) * x + 0.75;
+            if (x < 2.5 / d1) return n1 * (x -= 2.25 / d1) * x + 0.9375;
+            return n1 * (x -= 2.625 / d1) * x + 0.984375;
+        },
+    };
+
+    // A tween can be "keyed" on a target object, so a new tween of the same
+    // property replaces the old one instead of fighting it.
+    const tweens = [];
+    function tween(from, to, dur, setter, ease = easings.linear, target = null, key = null) {
+        if (target && key) for (const tw of tweens) if (tw.target === target && tw.key === key) tw.dead = true;
+        const isNum = typeof from === "number";
+        const tw = {
+            from: isNum ? from : vec2(from.x, from.y), to: isNum ? to : vec2(to.x, to.y),
+            isNum, dur, setter, ease, t: 0, target, key, dead: false, endFn: null,
+            onEnd(fn) { this.endFn = fn; return this; },
+            cancel() { this.dead = true; },
+        };
+        tweens.push(tw);
+        return tw;
+    }
+    function updateTweens(dt) {
+        const n = tweens.length;
+        for (let i = 0; i < n; i++) {
+            const tw = tweens[i];
+            if (tw.dead) continue;
+            tw.t += dt;
+            const k = Math.min(tw.t / tw.dur, 1);
+            const e = tw.ease(k);
+            tw.setter(tw.isNum ? lerp(tw.from, tw.to, e) : vec2(lerp(tw.from.x, tw.to.x, e), lerp(tw.from.y, tw.to.y, e)));
+            if (k >= 1) { tw.dead = true; if (tw.endFn) tw.endFn(); }
+        }
+        for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].dead) tweens.splice(i, 1);
+    }
+
+    const timers = [];
+    function wait(t, fn) { timers.push({ t, fn, every: 0 }); }
+    function loop(t, fn) { timers.push({ t, fn, every: t }); }
+    function updateTimers(dt) {
+        const n = timers.length;
+        for (let i = 0; i < n; i++) {
+            const tm = timers[i];
+            tm.t -= dt;
+            if (tm.t <= 0) {
+                tm.fn();
+                if (tm.every) tm.t += tm.every; else tm.done = true;
+            }
+        }
+        for (let i = timers.length - 1; i >= 0; i--) if (timers[i].done) timers.splice(i, 1);
+    }
+
+    // Camera shake (same decay behaviour as Kaboom's shake())
+    let camShake = 0;
+    const shake = (n) => { camShake += n; };
+
+    // =====================================================================
+    //  ART DIRECTION
+    // =====================================================================
+    const INK = "#2b2d42";
+    const FONT = 'Fredoka, "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif';
+
+    // Wait for the page (and fonts stylesheet) to load
     window.addEventListener("load", () => {
         document.getElementById("loading").style.display = "none";
 
-        // Robust font stack
-        const EMOJI_FONT = "Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif";
+        const canvas = document.getElementById("game");
+        const ctx = canvas.getContext("2d");
+        let W = 0, H = 0, DPR = 1;
+        const L = {}; // layout
 
-        kaboom({
-            background: [50, 50, 60],
-            touchToMouse: true,
-            font: EMOJI_FONT // Use system font for text
-        });
-
-        // --- SPRITE GENERATION SYSTEM ---
-        function loadEmojiAsSprite(name, char) {
-            const cvs = document.createElement("canvas");
-            cvs.width = 128;
-            cvs.height = 128;
-            const ctx = cvs.getContext("2d");
-            ctx.font = "100px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(char, 64, 70);
-            loadSprite(name, cvs.toDataURL());
-        }
-
-        // Assets defined by Emoji groups
+        // Assets defined by color groups (each variant is a hand-drawn vehicle)
         const GROUPS = [
-            { name: "red", color: rgb(255, 60, 60), emojis: ["🚗", "🏎️", "🚒"], hex: "#ff3c3c" },
-            { name: "blue", color: rgb(60, 120, 255), emojis: ["🚙", "🚐"], hex: "#3c78ff" },
-            { name: "yellow", color: rgb(255, 240, 0), emojis: ["🚕", "🚌"], hex: "#fff000" },
+            { name: "red",    hex: "#ff4b4b", cars: ["sedan", "race", "fire"],
+              sh: { light: "#ff9a8f", base: "#ff4b4b", dark: "#dc2f3c", deep: "#a51d2c", pale: "#ffd6d1" } },
+            { name: "blue",   hex: "#3d8bff", cars: ["suv", "van"],
+              sh: { light: "#93c4ff", base: "#3d8bff", dark: "#2a64d8", deep: "#1c429c", pale: "#d5e7ff" } },
+            { name: "yellow", hex: "#ffcc1f", cars: ["taxi", "bus"],
+              sh: { light: "#fff09a", base: "#ffcc1f", dark: "#f2a400", deep: "#c07800", pale: "#fff4c4" } },
         ];
 
         const PRAISE_WORDS = ["YAY!", "COOL!", "WOW!", "ZOOM!", "GREAT!", "SUPER!"];
 
-        GROUPS.forEach(group => {
-            group.emojis.forEach((emoji, index) => {
-                loadEmojiAsSprite(`${group.name}_${index}`, emoji);
+        // ---------------------------------------------------------------
+        //  Small drawing helpers
+        // ---------------------------------------------------------------
+        function rrPath(p, x, y, w, h, r) {
+            r = Math.min(r, w / 2, h / 2);
+            p.moveTo(x + r, y);
+            p.arcTo(x + w, y, x + w, y + h, r);
+            p.arcTo(x + w, y + h, x, y + h, r);
+            p.arcTo(x, y + h, x, y, r);
+            p.arcTo(x, y, x + w, y, r);
+            p.closePath();
+            return p;
+        }
+        const RR = (x, y, w, h, r) => rrPath(new Path2D(), x, y, w, h, r);
+        function circlePath(x, y, r) { const p = new Path2D(); p.arc(x, y, r, 0, TAU); return p; }
+        function fillStroke(c, p, fill, lw, stroke = INK) {
+            c.fillStyle = fill; c.fill(p);
+            if (lw) { c.lineWidth = lw; c.strokeStyle = stroke; c.stroke(p); }
+        }
+        function vgrad(c, y0, y1, stops) {
+            const g = c.createLinearGradient(0, y0, 0, y1);
+            stops.forEach(([k, col]) => g.addColorStop(k, col));
+            return g;
+        }
+        function starPath(c, r) {
+            c.beginPath();
+            for (let i = 0; i < 10; i++) {
+                const a = -Math.PI / 2 + i * Math.PI / 5;
+                const rr = i % 2 ? r * 0.45 : r;
+                c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+            }
+            c.closePath();
+        }
+        function mulberry32(a) {
+            return function () {
+                a |= 0; a = a + 0x6D2B79F5 | 0;
+                let t = Math.imul(a ^ a >>> 15, 1 | a);
+                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            };
+        }
+
+        // ---------------------------------------------------------------
+        //  VEHICLES — side view, facing right. Local units: ~240 long,
+        //  ground (bottom of tyres) at y = +60.
+        // ---------------------------------------------------------------
+        const OL = 5; // outline width in car units
+
+        function drawWheel(c, x, y, r, ang) {
+            c.fillStyle = INK;
+            c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill();
+            c.strokeStyle = "#4b4f6b"; c.lineWidth = r * 0.13; c.lineCap = "round";
+            c.beginPath(); c.arc(x, y, r * 0.78, Math.PI * 1.05, Math.PI * 1.55); c.stroke();
+            c.fillStyle = "#eef1f7";
+            c.beginPath(); c.arc(x, y, r * 0.55, 0, TAU); c.fill();
+            c.lineWidth = 3; c.strokeStyle = INK; c.stroke();
+            c.save(); c.translate(x, y); c.rotate(ang);
+            c.fillStyle = "#a9b0c3";
+            for (let i = 0; i < 5; i++) {
+                c.rotate(TAU / 5);
+                c.beginPath(); c.ellipse(0, -r * 0.3, r * 0.08, r * 0.17, 0, 0, TAU); c.fill();
+            }
+            c.restore();
+            c.fillStyle = "#6f7690";
+            c.beginPath(); c.arc(x, y, r * 0.17, 0, TAU); c.fill();
+            c.fillStyle = "rgba(255,255,255,.8)";
+            c.beginPath(); c.arc(x - r * 0.05, y - r * 0.06, r * 0.06, 0, TAU); c.fill();
+        }
+
+        function drawBody(c, p, sh, y0, y1, wells) {
+            c.fillStyle = vgrad(c, y0, y1, [[0, sh.light], [0.28, sh.base], [0.8, sh.dark], [1, sh.deep]]);
+            c.fill(p);
+            c.save(); c.clip(p);
+            for (const [x, y, r] of wells) {
+                c.fillStyle = sh.deep;
+                c.beginPath(); c.arc(x, y, r + 8, 0, TAU); c.fill();
+                c.fillStyle = "#1c1d2e";
+                c.beginPath(); c.arc(x, y + 2, r + 3, 0, TAU); c.fill();
+                c.lineWidth = OL; c.strokeStyle = INK;
+                c.beginPath(); c.arc(x, y, r + 8, 0, TAU); c.stroke();
+            }
+            c.restore();
+            c.lineWidth = OL; c.strokeStyle = INK; c.lineJoin = "round"; c.stroke(p);
+        }
+
+        function shine(c, p, pts, w = 5, a = 0.55) {
+            c.save(); c.clip(p);
+            c.strokeStyle = `rgba(255,255,255,${a})`; c.lineWidth = w; c.lineCap = "round";
+            c.beginPath(); c.moveTo(pts[0], pts[1]);
+            for (let i = 2; i < pts.length; i += 4) c.quadraticCurveTo(pts[i], pts[i + 1], pts[i + 2], pts[i + 3]);
+            c.stroke(); c.restore();
+        }
+
+        function drawGlass(c, p, x0, y0, x1, y1) {
+            c.fillStyle = vgrad(c, y0, y1, [[0, "#eefaff"], [0.5, "#b6e3fb"], [1, "#78bfea"]]);
+            c.fill(p);
+            c.save(); c.clip(p);
+            const w = x1 - x0;
+            c.fillStyle = "rgba(255,255,255,.7)";
+            c.beginPath();
+            c.moveTo(x0 + w * 0.18, y1 + 4); c.lineTo(x0 + w * 0.36, y1 + 4);
+            c.lineTo(x0 + w * 0.62, y0 - 4); c.lineTo(x0 + w * 0.44, y0 - 4); c.closePath(); c.fill();
+            c.fillStyle = "rgba(255,255,255,.45)";
+            c.beginPath();
+            c.moveTo(x0 + w * 0.42, y1 + 4); c.lineTo(x0 + w * 0.48, y1 + 4);
+            c.lineTo(x0 + w * 0.74, y0 - 4); c.lineTo(x0 + w * 0.68, y0 - 4); c.closePath(); c.fill();
+            c.restore();
+            c.lineWidth = 4; c.strokeStyle = INK; c.lineJoin = "round"; c.stroke(p);
+        }
+
+        function headlight(c, x, y, rx, ry) {
+            c.fillStyle = "#fff4b8";
+            c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, TAU); c.fill();
+            c.lineWidth = 3.5; c.strokeStyle = INK; c.stroke();
+            c.fillStyle = "#fff";
+            c.beginPath(); c.ellipse(x - rx * 0.25, y - ry * 0.3, rx * 0.35, ry * 0.3, 0, 0, TAU); c.fill();
+        }
+        function taillight(c, x, y, w, h) { fillStroke(c, RR(x, y, w, h, 3), "#ff7a3d", 3.5); }
+        function bumper(c, x, y, w, h) {
+            const p = RR(x, y, w, h, h / 2);
+            c.fillStyle = vgrad(c, y, y + h, [[0, "#f4f6fb"], [1, "#a3aabd"]]);
+            c.fill(p); c.lineWidth = 4; c.strokeStyle = INK; c.stroke(p);
+        }
+        function handle(c, x, y) { fillStroke(c, RR(x, y, 14, 5, 2.5), "rgba(43,45,66,.55)", 0); }
+        function seam(c, x0, y0, x1, y1, a = 0.35) {
+            c.strokeStyle = `rgba(43,45,66,${a})`; c.lineWidth = 3; c.lineCap = "round";
+            c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+        }
+
+        // -- Sedan / Taxi share a body ------------------------------------
+        function sedanBody() {
+            const p = new Path2D();
+            p.moveTo(-100, 48); p.lineTo(102, 48);
+            p.quadraticCurveTo(118, 48, 118, 32); p.lineTo(118, 8);
+            p.quadraticCurveTo(117, -10, 96, -14); p.lineTo(60, -18);
+            p.quadraticCurveTo(42, -58, 16, -62); p.lineTo(-40, -62);
+            p.quadraticCurveTo(-64, -60, -78, -18); p.lineTo(-102, -14);
+            p.quadraticCurveTo(-118, -12, -118, 6); p.lineTo(-118, 32);
+            p.quadraticCurveTo(-118, 48, -100, 48); p.closePath();
+            return p;
+        }
+        function sedanCommon(c, sh, wa, isTaxi, t) {
+            const W1 = [[-68, 34, 26], [70, 34, 26]];
+            const body = sedanBody();
+            if (isTaxi) {
+                // roof sign
+                const sp = RR(-40, -84, 52, 20, 6);
+                fillStroke(c, sp, vgrad(c, -84, -64, [[0, "#ffffff"], [1, "#ffe9a6"]]), 4);
+                c.fillStyle = INK; c.font = `700 13px ${FONT}`; c.textAlign = "center"; c.textBaseline = "middle";
+                c.fillText("TAXI", -14, -73.5);
+                fillStroke(c, RR(-30, -66, 32, 6, 2), INK, 0);
+            }
+            drawBody(c, body, sh, -62, 48, W1);
+            if (isTaxi) {
+                c.save(); c.clip(body);
+                const s = 9;
+                for (let i = 0; i < 26; i++) for (let j = 0; j < 2; j++) {
+                    c.fillStyle = (i + j) % 2 ? INK : "#fff";
+                    c.fillRect(-118 + i * s, 4 + j * s, s, s);
+                }
+                c.restore();
+                c.lineWidth = 2.5; c.strokeStyle = INK;
+                c.beginPath(); c.moveTo(-117, 4); c.lineTo(117, 4); c.moveTo(-117, 22); c.lineTo(117, 22); c.stroke();
+            }
+            const fw = new Path2D(); fw.moveTo(6, -22); fw.lineTo(50, -22); fw.quadraticCurveTo(36, -50, 14, -54); fw.lineTo(6, -54); fw.closePath();
+            drawGlass(c, fw, 6, -54, 50, -22);
+            const bw = new Path2D(); bw.moveTo(-4, -22); bw.lineTo(-4, -54); bw.lineTo(-38, -54); bw.quadraticCurveTo(-56, -51, -66, -22); bw.closePath();
+            drawGlass(c, bw, -66, -54, -4, -22);
+            seam(c, 1, -16, 1, 40);
+            seam(c, -70, -16, -70, 22, 0.25);
+            handle(c, 10, -8); handle(c, -60, -8);
+            shine(c, body, [-104, -6, -60, -12, 0, -11, 60, -10, 100, -6], 5, 0.5);
+            shine(c, body, [-30, -57, -10, -58, 12, -57], 4, 0.6);
+            headlight(c, 110, -2, 7, 9);
+            taillight(c, -121, -6, 9, 16);
+            bumper(c, 100, 26, 26, 14);
+            bumper(c, -126, 26, 26, 14);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+        function drawSedan(c, sh, wa, t) { sedanCommon(c, sh, wa, false, t); }
+        function drawTaxi(c, sh, wa, t) { sedanCommon(c, sh, wa, true, t); }
+
+        // -- Race car -------------------------------------------------------
+        function drawRace(c, sh, wa, t) {
+            const W1 = [[-72, 31, 29], [80, 35, 25]];
+            // spoiler
+            fillStroke(c, RR(-110, -34, 10, 34, 3), "#4b4f6b", 4);
+            fillStroke(c, RR(-130, -46, 48, 14, 5), sh.dark, 4.5);
+            // canopy + driver
+            const can = new Path2D();
+            can.moveTo(-34, 0); can.quadraticCurveTo(-26, -48, 4, -50); can.quadraticCurveTo(30, -48, 40, 0); can.closePath();
+            c.save(); c.clip(can);
+            c.fillStyle = vgrad(c, -50, 0, [[0, "#d9f3ff"], [1, "#7fc2ea"]]); c.fill(can);
+            fillStroke(c, circlePath(0, -22, 17), "#ffffff", 4);
+            fillStroke(c, RR(2, -30, 18, 11, 5), "#3b3f5e", 0);
+            c.fillStyle = "rgba(255,255,255,.8)"; c.fillRect(6, -28, 7, 3);
+            c.fillStyle = sh.base; c.fillRect(-17, -24, 34, 5);
+            c.restore();
+            c.save(); c.clip(can);
+            c.fillStyle = "rgba(255,255,255,.45)";
+            c.beginPath(); c.moveTo(-14, 0); c.lineTo(-6, 0); c.lineTo(14, -52); c.lineTo(6, -52); c.closePath(); c.fill();
+            c.restore();
+            c.lineWidth = 4; c.strokeStyle = INK; c.stroke(can);
+            // body
+            const p = new Path2D();
+            p.moveTo(-108, 46); p.lineTo(110, 46);
+            p.quadraticCurveTo(126, 46, 126, 34); p.lineTo(126, 28);
+            p.quadraticCurveTo(122, 16, 100, 13); p.lineTo(46, 2);
+            p.quadraticCurveTo(30, -6, 14, -6); p.lineTo(-50, -8);
+            p.lineTo(-106, -8); p.quadraticCurveTo(-120, -7, -120, 8);
+            p.lineTo(-120, 32); p.quadraticCurveTo(-120, 46, -108, 46); p.closePath();
+            drawBody(c, p, sh, -8, 46, W1);
+            c.save(); c.clip(p);
+            c.fillStyle = "#ffffff"; c.fillRect(-130, 12, 270, 7);
+            c.fillStyle = INK; c.fillRect(-130, 19, 270, 2.5); c.fillRect(-130, 9.5, 270, 2.5);
+            c.restore();
+            fillStroke(c, circlePath(-20, 14, 15), "#ffffff", 4);
+            c.fillStyle = INK; c.font = `700 20px ${FONT}`; c.textAlign = "center"; c.textBaseline = "middle";
+            c.fillText("1", -20, 15);
+            fillStroke(c, RR(60, 18, 22, 7, 3.5), "#2b2d42", 0);
+            shine(c, p, [-110, -2, -60, -3, 0, -1, 60, 5, 112, 18], 4, 0.55);
+            fillStroke(c, RR(110, 18, 12, 7, 3), "#fff4b8", 3);
+            // exhaust pipe
+            fillStroke(c, RR(-132, 30, 16, 8, 4), "#9aa1b5", 3.5);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+
+        // -- Fire truck -----------------------------------------------------
+        function drawFire(c, sh, wa, t) {
+            const W1 = [[-84, 35, 25], [-30, 35, 25], [84, 35, 25]];
+            // ladder
+            const lad = "#eef1f7";
+            fillStroke(c, RR(-104, -42, 8, 10, 2), "#8c93a8", 3);
+            fillStroke(c, RR(14, -42, 8, 10, 2), "#8c93a8", 3);
+            for (let x = -110; x <= 26; x += 14) fillStroke(c, RR(x, -58, 5, 16, 2), lad, 2.5);
+            fillStroke(c, RR(-118, -62, 150, 7, 3.5), lad, 3.5);
+            fillStroke(c, RR(-118, -46, 150, 7, 3.5), lad, 3.5);
+            // rear body
+            const box = RR(-122, -34, 166, 80, 9);
+            drawBody(c, box, sh, -34, 46, W1.slice(0, 2));
+            // compartments
+            fillStroke(c, RR(-112, -24, 52, 36, 5), sh.dark, 3.5);
+            fillStroke(c, RR(-52, -24, 52, 36, 5), sh.dark, 3.5);
+            c.fillStyle = "rgba(255,255,255,.25)";
+            for (let i = 0; i < 4; i++) { c.fillRect(-108, -19 + i * 8, 44, 3); c.fillRect(-48, -19 + i * 8, 44, 3); }
+            fillStroke(c, RR(4, -24, 30, 36, 5), "#c9ced9", 3.5);
+            fillStroke(c, circlePath(19, -6, 11), "#f0f2f7", 3);
+            fillStroke(c, circlePath(19, -6, 4), sh.base, 0);
+            c.save(); c.clip(box); c.fillStyle = "#fff"; c.fillRect(-130, 18, 180, 6); c.restore();
+            // cab
+            const cab = new Path2D();
+            cab.moveTo(38, 46); cab.lineTo(38, -62); cab.quadraticCurveTo(38, -72, 48, -72);
+            cab.lineTo(86, -72); cab.quadraticCurveTo(98, -72, 104, -58);
+            cab.lineTo(114, -26); cab.quadraticCurveTo(124, -23, 124, -8);
+            cab.lineTo(124, 34); cab.quadraticCurveTo(124, 46, 112, 46); cab.closePath();
+            drawBody(c, cab, sh, -72, 46, [W1[2]]);
+            c.save(); c.clip(cab); c.fillStyle = "#fff"; c.fillRect(30, 18, 100, 6); c.restore();
+            const win = new Path2D();
+            win.moveTo(50, -62); win.lineTo(88, -62); win.quadraticCurveTo(95, -60, 99, -50);
+            win.lineTo(107, -28); win.lineTo(50, -28); win.closePath();
+            drawGlass(c, win, 50, -62, 107, -28);
+            seam(c, 74, -24, 74, 40, 0.3);
+            handle(c, 80, -16);
+            shine(c, cab, [44, -66, 60, -68, 84, -68], 4, 0.6);
+            shine(c, box, [-116, -28, -60, -30, 36, -28], 4, 0.55);
+            // light bar (flashing)
+            const on = Math.floor(t * 6) % 2 === 0;
+            fillStroke(c, RR(48, -84, 40, 13, 5), "#5a5f78", 3.5);
+            fillStroke(c, RR(51, -82, 16, 9, 4), on ? "#ff3b3b" : "#7a1a22", 0);
+            fillStroke(c, RR(69, -82, 16, 9, 4), on ? "#5a7cff" : "#ffffff", 0);
+            if (on) { c.fillStyle = "rgba(255,80,80,.25)"; c.beginPath(); c.arc(59, -78, 18, 0, TAU); c.fill(); }
+            headlight(c, 118, 2, 6, 9);
+            taillight(c, -125, -16, 8, 18);
+            bumper(c, 106, 28, 26, 14);
+            bumper(c, -130, 30, 20, 13);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+
+        // -- SUV ---------------------------------------------------------------
+        function drawSUV(c, sh, wa, t) {
+            const W1 = [[-70, 32, 28], [72, 32, 28]];
+            // spare tyre on the back door
+            fillStroke(c, circlePath(-120, -4, 20), INK, 0);
+            fillStroke(c, circlePath(-120, -4, 10), "#9aa1b5", 3);
+            // roof rack
+            fillStroke(c, RR(-92, -78, 8, 10, 2), "#6f7690", 3);
+            fillStroke(c, RR(22, -78, 8, 10, 2), "#6f7690", 3);
+            fillStroke(c, RR(-100, -84, 138, 8, 4), "#8c93a8", 3.5);
+            const p = new Path2D();
+            p.moveTo(-104, 48); p.lineTo(104, 48);
+            p.quadraticCurveTo(120, 48, 120, 34); p.lineTo(120, 4);
+            p.quadraticCurveTo(119, -12, 100, -15); p.lineTo(68, -20);
+            p.lineTo(52, -62); p.quadraticCurveTo(48, -70, 38, -70);
+            p.lineTo(-98, -70); p.quadraticCurveTo(-110, -70, -112, -58);
+            p.lineTo(-116, -20); p.lineTo(-116, 34);
+            p.quadraticCurveTo(-116, 48, -104, 48); p.closePath();
+            drawBody(c, p, sh, -70, 48, W1);
+            const fw = new Path2D(); fw.moveTo(20, -24); fw.lineTo(60, -24); fw.lineTo(46, -60); fw.lineTo(20, -60); fw.closePath();
+            drawGlass(c, fw, 20, -60, 60, -24);
+            const mw = RR(-36, -60, 48, 36, 5); drawGlass(c, mw, -36, -60, 12, -24);
+            const rw = new Path2D(); rw.moveTo(-44, -60); rw.lineTo(-96, -60); rw.quadraticCurveTo(-102, -60, -103, -54); rw.lineTo(-106, -24); rw.lineTo(-44, -24); rw.closePath();
+            drawGlass(c, rw, -106, -60, -44, -24);
+            seam(c, 16, -18, 16, 38); seam(c, -40, -18, -40, 38);
+            handle(c, 24, -10); handle(c, -32, -10);
+            c.save(); c.clip(p); c.fillStyle = "rgba(43,45,66,.28)"; c.fillRect(-120, 22, 250, 30); c.restore();
+            shine(c, p, [-110, -12, -50, -16, 10, -15, 70, -14, 112, -8], 5, 0.5);
+            shine(c, p, [-96, -65, -40, -66, 34, -65], 4, 0.6);
+            headlight(c, 112, -4, 7, 9);
+            taillight(c, -120, -36, 8, 16);
+            bumper(c, 104, 26, 26, 15);
+            bumper(c, -128, 26, 24, 15);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+
+        // -- Van ---------------------------------------------------------------
+        function drawVan(c, sh, wa, t) {
+            const W1 = [[-74, 34, 26], [74, 34, 26]];
+            const p = new Path2D();
+            p.moveTo(-104, 48); p.lineTo(104, 48);
+            p.quadraticCurveTo(120, 48, 120, 32); p.lineTo(120, -2);
+            p.quadraticCurveTo(120, -16, 104, -20); p.lineTo(80, -28);
+            p.quadraticCurveTo(62, -72, 38, -78); p.lineTo(-100, -78);
+            p.quadraticCurveTo(-118, -78, -118, -60); p.lineTo(-118, 32);
+            p.quadraticCurveTo(-118, 48, -104, 48); p.closePath();
+            drawBody(c, p, sh, -78, 48, W1);
+            // swoosh stripe
+            c.save(); c.clip(p);
+            c.fillStyle = sh.pale;
+            c.beginPath(); c.moveTo(-120, -8); c.bezierCurveTo(-40, -8, 0, -2, 130, -14); c.lineTo(130, -4);
+            c.bezierCurveTo(0, 8, -40, 4, -120, 4); c.closePath(); c.fill();
+            c.restore();
+            const fw = new Path2D(); fw.moveTo(30, -34); fw.lineTo(72, -34); fw.quadraticCurveTo(58, -64, 40, -68); fw.lineTo(30, -68); fw.closePath();
+            drawGlass(c, fw, 30, -68, 72, -34);
+            drawGlass(c, RR(-30, -68, 52, 34, 6), -30, -68, 22, -34);
+            drawGlass(c, RR(-106, -68, 68, 34, 8), -106, -68, -38, -34);
+            // sliding door
+            c.lineWidth = 3; c.strokeStyle = "rgba(43,45,66,.4)"; c.stroke(RR(-34, -72, 60, 108, 6));
+            seam(c, -34, -27, 26, -27, 0.4);
+            handle(c, -26, 6);
+            shine(c, p, [-100, -72, -40, -73, 36, -72], 4, 0.6);
+            headlight(c, 112, -6, 7, 9);
+            taillight(c, -121, -30, 8, 18);
+            bumper(c, 102, 26, 26, 14);
+            bumper(c, -126, 26, 24, 14);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+
+        // -- School bus ----------------------------------------------------------
+        function drawBus(c, sh, wa, t) {
+            const W1 = [[-78, 33, 27], [82, 33, 27]];
+            const p = new Path2D();
+            p.moveTo(-110, 48); p.lineTo(110, 48);
+            p.quadraticCurveTo(124, 48, 124, 34); p.lineTo(124, -4);
+            p.quadraticCurveTo(124, -16, 112, -17); p.lineTo(96, -19);
+            p.lineTo(92, -82); p.quadraticCurveTo(90, -92, 80, -92);
+            p.lineTo(-108, -92); p.quadraticCurveTo(-122, -92, -122, -78);
+            p.lineTo(-122, 34); p.quadraticCurveTo(-122, 48, -110, 48); p.closePath();
+            // roof lights
+            fillStroke(c, RR(-116, -99, 14, 9, 3), "#ff9a3d", 3);
+            fillStroke(c, RR(66, -99, 14, 9, 3), "#ff9a3d", 3);
+            drawBody(c, p, sh, -92, 48, W1);
+            for (let i = 0; i < 5; i++) {
+                const x = -112 + i * 31;
+                drawGlass(c, RR(x, -80, 25, 30, 5), x, -80, x + 25, -50);
+            }
+            // door
+            fillStroke(c, RR(46, -82, 34, 118, 5), sh.dark, 3.5);
+            drawGlass(c, RR(50, -78, 12, 50, 3), 50, -78, 62, -28);
+            drawGlass(c, RR(64, -78, 12, 50, 3), 64, -78, 76, -28);
+            // windshield sliver
+            const ws = new Path2D(); ws.moveTo(84, -82); ws.lineTo(88, -82); ws.lineTo(92, -26); ws.lineTo(84, -26); ws.closePath();
+            drawGlass(c, ws, 84, -82, 92, -26);
+            // rub rails
+            c.save(); c.clip(p);
+            c.fillStyle = INK;
+            c.fillRect(-130, -42, 176, 3.5); c.fillRect(-130, -10, 176, 3.5); c.fillRect(-130, 14, 260, 3.5);
+            c.restore();
+            // stop sign
+            c.save(); c.translate(-104, -24);
+            c.beginPath();
+            for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; c.lineTo(Math.cos(a) * 11, Math.sin(a) * 11); }
+            c.closePath(); c.fillStyle = "#ff3b3b"; c.fill(); c.lineWidth = 3; c.strokeStyle = INK; c.stroke();
+            c.fillStyle = "#fff"; c.fillRect(-6, -1.5, 12, 3);
+            c.restore();
+            shine(c, p, [-114, -86, -40, -87, 76, -86], 4, 0.6);
+            headlight(c, 117, -4, 6, 8);
+            taillight(c, -125, -2, 8, 16);
+            bumper(c, 104, 26, 28, 15);
+            bumper(c, -130, 26, 22, 15);
+            for (const [x, y, r] of W1) drawWheel(c, x, y, r, wa / r);
+        }
+
+        const CAR_TYPES = {
+            sedan: { draw: drawSedan, box: [-128, -64, 126, 60], tail: [-118, 40] },
+            taxi:  { draw: drawTaxi,  box: [-128, -86, 126, 60], tail: [-118, 40] },
+            race:  { draw: drawRace,  box: [-134, -52, 128, 60], tail: [-132, 34] },
+            fire:  { draw: drawFire,  box: [-132, -86, 132, 60], tail: [-126, 40] },
+            suv:   { draw: drawSUV,   box: [-142, -86, 130, 60], tail: [-120, 40] },
+            van:   { draw: drawVan,   box: [-128, -80, 128, 60], tail: [-120, 40] },
+            bus:   { draw: drawBus,   box: [-132, -100, 132, 60], tail: [-124, 40] },
+        };
+
+        // ---------------------------------------------------------------
+        //  CLOUD SPRITES (pre-rendered once)
+        // ---------------------------------------------------------------
+        const cloudSprites = [0, 1, 2].map((k) => {
+            const cv = document.createElement("canvas");
+            cv.width = 440; cv.height = 220;
+            const c = cv.getContext("2d");
+            const r = mulberry32(77 + k * 13);
+            const blobs = [];
+            const n = 5 + k;
+            for (let i = 0; i < n; i++) {
+                const t = i / (n - 1);
+                blobs.push([70 + t * 300, 140 - Math.sin(t * Math.PI) * (40 + r() * 30), 38 + Math.sin(t * Math.PI) * 34 + r() * 12]);
+            }
+            const draw = (dy, col) => {
+                c.fillStyle = col;
+                c.beginPath();
+                for (const [x, y, rr] of blobs) { c.moveTo(x + rr, y + dy); c.arc(x, y + dy, rr, 0, TAU); }
+                c.fill();
+                c.beginPath(); c.moveTo(70, 160 + dy);
+                c.fillRect(70, 120 + dy, 300, 46);
+            };
+            draw(10, "rgba(120,170,215,.35)");
+            draw(0, "#ffffff");
+            c.save();
+            c.globalCompositeOperation = "source-atop";
+            c.fillStyle = "rgba(190,222,248,.9)";
+            c.fillRect(0, 150, 440, 80);
+            c.restore();
+            return cv;
+        });
+
+        // ---------------------------------------------------------------
+        //  LAYOUT + STATIC BACKGROUND CACHES
+        // ---------------------------------------------------------------
+        const skyCvs = document.createElement("canvas");
+        const groundCvs = document.createElement("canvas");
+
+        function computeLayout() {
+            const m = Math.min(W, H);
+            L.m = m;
+            L.cx = W / 2; L.cy = H / 2;
+            L.carW = Math.min(Math.max(m * 0.38, Math.min(W * 0.52, H * 0.24)), W * 0.62);
+            L.u = L.carW / 250;
+            const u = L.u;
+            L.lw = Math.max(1.5, m * 0.0045);
+            L.title = clamp(m * 0.062, 22, 46);
+            L.titleY = Math.max(10, H * 0.018) + L.title * 0.85;
+            L.titleBottom = L.titleY + L.title * 0.85;
+            L.contactY = L.cy + 60 * u;
+            L.roadH = 150 * u;
+            L.roadTop = L.contactY - L.roadH * 0.72;
+            L.roadBot = L.roadTop + L.roadH;
+            L.laneY = L.roadTop + L.roadH * 0.36;
+            L.farSWTop = L.roadTop - 22 * u;
+            L.nearSWBot = L.roadBot + 26 * u;
+
+            // --- DYNAMIC GARAGE SIZING --- (same rule as before: 3 slots across the bottom)
+            const numGarages = GROUPS.length;
+            const spacing = W / numGarages;
+            const gap = clamp(W * 0.03, 12, 40);
+            const gw = spacing - gap;
+            let gh = H * 0.25;                 // garages are ~25% of the screen height
+            gh = Math.min(gh, gw * 1.4);       // ...but never towering over their width
+            const margin = Math.max(14, H * 0.022);
+            L.garageW = gw; L.garageH = gh;
+            L.garageY = H - gh / 2 - margin;
+        }
+
+        function buildSky() {
+            skyCvs.width = Math.round(W * DPR); skyCvs.height = Math.round(H * DPR);
+            const c = skyCvs.getContext("2d");
+            c.setTransform(DPR, 0, 0, DPR, 0, 0);
+            const g = c.createLinearGradient(0, 0, 0, L.roadTop);
+            g.addColorStop(0, "#5ec4ff"); g.addColorStop(0.65, "#a9e4ff"); g.addColorStop(1, "#e3f7ff");
+            c.fillStyle = g; c.fillRect(0, 0, W, H);
+            // sun
+            const sx = W - L.m * 0.13, sy = L.m * 0.13, sr = L.m * 0.055;
+            const glow = c.createRadialGradient(sx, sy, sr * 0.5, sx, sy, sr * 3.4);
+            glow.addColorStop(0, "rgba(255,244,190,.85)"); glow.addColorStop(1, "rgba(255,244,190,0)");
+            c.fillStyle = glow; c.beginPath(); c.arc(sx, sy, sr * 3.4, 0, TAU); c.fill();
+            c.save(); c.translate(sx, sy);
+            c.fillStyle = "rgba(255,214,90,.55)";
+            for (let i = 0; i < 12; i++) {
+                c.rotate(TAU / 12);
+                c.beginPath(); c.moveTo(-sr * 0.18, -sr * 1.25); c.lineTo(0, -sr * 1.75); c.lineTo(sr * 0.18, -sr * 1.25); c.closePath(); c.fill();
+            }
+            c.restore();
+            c.fillStyle = vgrad(c, sy - sr, sy + sr, [[0, "#fff1a0"], [1, "#ffc93c"]]);
+            c.beginPath(); c.arc(sx, sy, sr, 0, TAU); c.fill();
+            c.lineWidth = L.lw; c.strokeStyle = "#f2a400"; c.stroke();
+        }
+
+        function drawTree(c, x, base, s, rng) {
+            const lw = L.lw;
+            fillStroke(c, RR(x - s * 0.09, base - s * 0.55, s * 0.18, s * 0.55, s * 0.05), "#9a6440", lw);
+            const greens = ["#4fbf5f", "#5fcf6a", "#45b35a"];
+            const g = greens[Math.floor(rng() * 3)];
+            const blobs = [[0, -s * 0.78, s * 0.36], [-s * 0.26, -s * 0.6, s * 0.26], [s * 0.26, -s * 0.6, s * 0.27]];
+            c.beginPath();
+            for (const [dx, dy, r] of blobs) { c.moveTo(x + dx + r, base + dy); c.arc(x + dx, base + dy, r, 0, TAU); }
+            c.fillStyle = g; c.fill();
+            c.lineWidth = lw; c.strokeStyle = INK; c.stroke();
+            c.fillStyle = g; // re-fill to hide inner outlines
+            for (const [dx, dy, r] of blobs) { c.beginPath(); c.arc(x + dx, base + dy, r - lw * 0.5, 0, TAU); c.fill(); }
+            c.fillStyle = "rgba(255,255,255,.28)";
+            c.beginPath(); c.arc(x - s * 0.1, base - s * 0.9, s * 0.13, 0, TAU); c.fill();
+            c.fillStyle = "rgba(20,80,40,.18)";
+            c.beginPath(); c.arc(x + s * 0.12, base - s * 0.5, s * 0.2, 0, Math.PI); c.fill();
+        }
+
+        function drawBuilding(c, x, base, bw, bh, kind, col, rng) {
+            const lw = L.lw, m = L.m;
+            const top = base - bh;
+            const winCol = "#fff8dc";
+            if (kind === "house") {
+                const roofH = bw * 0.42;
+                // chimney
+                fillStroke(c, RR(x + bw * 0.62, top - roofH * 0.85, bw * 0.12, roofH * 0.7, 2), "#c46a4c", lw);
+                const roof = new Path2D();
+                roof.moveTo(x - bw * 0.08, top + 2); roof.lineTo(x + bw / 2, top - roofH); roof.lineTo(x + bw * 1.08, top + 2); roof.closePath();
+                fillStroke(c, roof, col.roof, lw);
+                fillStroke(c, RR(x, top, bw, bh, 2), vgrad(c, top, base, [[0, col.wall], [1, col.shade]]), lw);
+                const ww = bw * 0.24;
+                for (const fx of [0.14, 0.62]) {
+                    fillStroke(c, RR(x + bw * fx, top + bh * 0.22, ww, ww, 3), winCol, lw * 0.8);
+                    c.strokeStyle = "rgba(43,45,66,.5)"; c.lineWidth = lw * 0.6;
+                    c.beginPath(); c.moveTo(x + bw * fx + ww / 2, top + bh * 0.22); c.lineTo(x + bw * fx + ww / 2, top + bh * 0.22 + ww);
+                    c.moveTo(x + bw * fx, top + bh * 0.22 + ww / 2); c.lineTo(x + bw * fx + ww, top + bh * 0.22 + ww / 2); c.stroke();
+                }
+                fillStroke(c, RR(x + bw * 0.4, base - bh * 0.42, bw * 0.2, bh * 0.42, bw * 0.06), "#8a5a3b", lw * 0.8);
+                fillStroke(c, circlePath(x + bw * 0.5, top - roofH * 0.42, bw * 0.07), winCol, lw * 0.8);
+            } else if (kind === "shop") {
+                fillStroke(c, RR(x, top, bw, bh, 3), vgrad(c, top, base, [[0, col.wall], [1, col.shade]]), lw);
+                fillStroke(c, RR(x - 2, top - 4, bw + 4, m * 0.018, 3), col.roof, lw);
+                // upper windows
+                const cols = Math.max(2, Math.round(bw / (m * 0.05)));
+                const cw = bw / cols;
+                for (let i = 0; i < cols; i++) {
+                    if (bh > m * 0.2) fillStroke(c, RR(x + i * cw + cw * 0.22, top + bh * 0.1, cw * 0.56, bh * 0.16, 3), winCol, lw * 0.7);
+                }
+                // awning
+                const ay = base - bh * 0.48, ah = bh * 0.12;
+                const stripes = Math.max(4, Math.round(bw / (m * 0.025)));
+                const sw = (bw + 8) / stripes;
+                for (let i = 0; i < stripes; i++) {
+                    c.fillStyle = i % 2 ? "#ffffff" : col.awning;
+                    c.beginPath();
+                    c.moveTo(x - 4 + i * sw, ay); c.lineTo(x - 4 + (i + 1) * sw, ay);
+                    c.lineTo(x - 4 + (i + 1) * sw, ay + ah);
+                    c.arc(x - 4 + (i + 0.5) * sw, ay + ah, sw / 2, 0, Math.PI);
+                    c.closePath(); c.fill();
+                }
+                c.lineWidth = lw; c.strokeStyle = INK;
+                c.beginPath(); c.moveTo(x - 4, ay); c.lineTo(x + bw + 4, ay); c.stroke();
+                // shop window + door
+                fillStroke(c, RR(x + bw * 0.08, ay + ah + sw * 0.6, bw * 0.5, base - (ay + ah + sw * 0.6) - 3, 3), "#cdeeff", lw * 0.8);
+                fillStroke(c, RR(x + bw * 0.66, ay + ah + sw * 0.6, bw * 0.24, base - (ay + ah + sw * 0.6), 3), "#8a5a3b", lw * 0.8);
+            } else {
+                // tower
+                fillStroke(c, RR(x, top, bw, bh, 3), vgrad(c, top, base, [[0, col.wall], [1, col.shade]]), lw);
+                fillStroke(c, RR(x - 3, top - 2, bw + 6, m * 0.016, 3), col.roof, lw);
+                if (rng() < 0.5) fillStroke(c, RR(x + bw * 0.2, top - m * 0.03, bw * 0.22, m * 0.03, 2), col.roof, lw);
+                const cols = Math.max(2, Math.round(bw / (m * 0.042)));
+                const rows = Math.max(1, Math.floor((bh - m * 0.08) / (m * 0.052)));
+                const cw = bw / cols, rh = (bh - m * 0.08) / rows;
+                for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+                    const lit = rng() < 0.5;
+                    fillStroke(c, RR(x + i * cw + cw * 0.22, top + m * 0.03 + j * rh + rh * 0.18, cw * 0.56, rh * 0.6, 2),
+                        lit ? winCol : "#bfe6fb", lw * 0.6);
+                }
+                fillStroke(c, RR(x + bw / 2 - bw * 0.14, base - m * 0.05, bw * 0.28, m * 0.05, 3), "#8a5a3b", lw * 0.8);
+            }
+        }
+
+        function buildGround() {
+            groundCvs.width = Math.round(W * DPR); groundCvs.height = Math.round(H * DPR);
+            const c = groundCvs.getContext("2d");
+            c.setTransform(DPR, 0, 0, DPR, 0, 0);
+            c.lineJoin = "round"; c.lineCap = "round";
+            const rng = mulberry32(20240607);
+            const u = L.u, m = L.m, lw = L.lw;
+            const base = L.farSWTop;
+            const avail = Math.max(20, base - L.titleBottom - 6);
+
+            // rolling hills
+            const hill = (amp, yoff, col, freq, ph) => {
+                c.beginPath(); c.moveTo(0, base);
+                for (let x = 0; x <= W + 10; x += 10) c.lineTo(x, base - yoff - amp * (0.5 + 0.5 * Math.sin(x / (m * freq) + ph)));
+                c.lineTo(W, base); c.closePath(); c.fillStyle = col; c.fill();
+            };
+            hill(avail * 0.22, avail * 0.30, "#b5e6b0", 0.32, 1.3);
+            hill(avail * 0.18, avail * 0.14, "#98da92", 0.22, 4.1);
+
+            // hazy back skyline
+            let x = -rng() * m * 0.1;
+            while (x < W) {
+                const bw = m * (0.09 + rng() * 0.1);
+                const bh = Math.min(avail * (0.45 + rng() * 0.5), m * 0.55);
+                c.fillStyle = "#c4def0";
+                c.fillRect(x, base - bh, bw, bh);
+                c.fillStyle = "#d9ecf8";
+                for (let wy = base - bh + m * 0.025; wy < base - m * 0.04; wy += m * 0.04)
+                    for (let wx = x + bw * 0.18; wx < x + bw - bw * 0.2; wx += bw * 0.28) c.fillRect(wx, wy, bw * 0.12, m * 0.018);
+                x += bw + m * rng() * 0.02;
+            }
+
+            // colorful front row
+            const palettes = [
+                { wall: "#ffd6a5", shade: "#f6bf86", roof: "#e58a5c", awning: "#ff7b7b" },
+                { wall: "#cdb4db", shade: "#b89bcb", roof: "#8e6fae", awning: "#7bc4ff" },
+                { wall: "#b9f2c9", shade: "#98dcac", roof: "#3fa96b", awning: "#ffb347" },
+                { wall: "#ffe3ef", shade: "#f7c5da", roof: "#e0709b", awning: "#5ec4a8" },
+                { wall: "#d4ecff", shade: "#b1d5f2", roof: "#5b8fc9", awning: "#ff9f6e" },
+                { wall: "#fff1b8", shade: "#f3dc8a", roof: "#e6a94a", awning: "#9b7bff" },
+            ];
+            x = -rng() * m * 0.05;
+            const treeSpots = [];
+            let pi = Math.floor(rng() * palettes.length);
+            while (x < W + 10) {
+                const kindR = rng();
+                const kind = kindR < 0.4 ? "tower" : kindR < 0.7 ? "house" : "shop";
+                const bw = m * (kind === "tower" ? 0.13 + rng() * 0.07 : 0.15 + rng() * 0.06);
+                let bh = kind === "tower" ? avail * (0.5 + rng() * 0.38) : kind === "shop" ? avail * (0.32 + rng() * 0.18) : avail * (0.26 + rng() * 0.12);
+                bh = Math.min(bh, m * (kind === "tower" ? 0.42 : 0.24));
+                pi = (pi + 1 + Math.floor(rng() * 2)) % palettes.length;
+                drawBuilding(c, x, base, bw, bh, kind, palettes[pi], rng);
+                const gapW = rng() < 0.55 ? m * (0.05 + rng() * 0.05) : m * 0.01;
+                if (gapW > m * 0.04) treeSpots.push(x + bw + gapW / 2);
+                x += bw + gapW;
+            }
+            // lamp posts
+            const lamps = Math.max(2, Math.round(W / (m * 0.6)));
+            for (let i = 0; i < lamps; i++) {
+                const lx = (i + 0.5) * W / lamps + m * 0.06;
+                const lh = Math.min(avail * 0.6, m * 0.2);
+                fillStroke(c, RR(lx - lw * 1.4, base - lh, lw * 2.8, lh, lw), "#5b6178", lw * 0.6);
+                fillStroke(c, RR(lx - m * 0.02, base - lh - m * 0.012, m * 0.04, m * 0.018, m * 0.008), "#5b6178", lw * 0.6);
+                fillStroke(c, circlePath(lx, base - lh + m * 0.012, m * 0.011), "#fff3a8", lw * 0.6);
+            }
+            for (const tx of treeSpots) drawTree(c, tx, base + 2, Math.min(m * (0.13 + rng() * 0.05), avail * 0.7), rng);
+
+            // far sidewalk + curb
+            const curbH = 6 * u;
+            c.fillStyle = "#efe6d6"; c.fillRect(0, base, W, L.roadTop - base);
+            c.strokeStyle = "#d8ccb6"; c.lineWidth = Math.max(1, lw * 0.6);
+            c.beginPath();
+            for (let sx = 0; sx < W; sx += 34 * u) { c.moveTo(sx, base); c.lineTo(sx - 6 * u, L.roadTop - curbH); }
+            c.stroke();
+            c.fillStyle = "#cfc5b4"; c.fillRect(0, L.roadTop - curbH, W, curbH);
+            c.strokeStyle = INK; c.lineWidth = lw;
+            c.beginPath(); c.moveTo(0, base); c.lineTo(W, base); c.stroke();
+
+            // road
+            c.fillStyle = vgrad(c, L.roadTop, L.roadBot, [[0, "#5c6277"], [0.5, "#555b6f"], [1, "#4a4f62"]]);
+            c.fillRect(0, L.roadTop, W, L.roadH);
+            const specks = Math.floor(W * L.roadH / 90);
+            for (let i = 0; i < specks; i++) {
+                c.fillStyle = rng() < 0.5 ? "rgba(255,255,255,.07)" : "rgba(0,0,0,.10)";
+                const s = 1 + rng() * 2.2 * Math.max(1, u);
+                c.fillRect(rng() * W, L.roadTop + rng() * L.roadH, s, s);
+            }
+            // a few tar-patch cracks
+            c.strokeStyle = "rgba(0,0,0,.18)"; c.lineWidth = Math.max(1, lw * 0.5);
+            for (let i = 0; i < Math.round(W / (m * 0.5)); i++) {
+                let px = rng() * W, py = L.roadTop + L.roadH * (0.15 + rng() * 0.7);
+                c.beginPath(); c.moveTo(px, py);
+                for (let k = 0; k < 4; k++) { px += (rng() * 2 - 1) * 12 * u + 8 * u; py += (rng() * 2 - 1) * 5 * u; c.lineTo(px, py); }
+                c.stroke();
+            }
+            // edge lines
+            c.fillStyle = "rgba(255,255,255,.85)";
+            c.fillRect(0, L.roadTop + 7 * u, W, 4 * u);
+            c.fillRect(0, L.roadBot - 11 * u, W, 4 * u);
+            c.strokeStyle = INK; c.lineWidth = lw;
+            c.beginPath(); c.moveTo(0, L.roadTop); c.lineTo(W, L.roadTop); c.stroke();
+
+            // near curb + sidewalk
+            c.fillStyle = "#ddd5c6"; c.fillRect(0, L.roadBot, W, curbH);
+            c.fillStyle = "#b9b0a0"; c.fillRect(0, L.roadBot + curbH, W, curbH * 0.6);
+            c.fillStyle = "#efe6d6"; c.fillRect(0, L.roadBot + curbH * 1.6, W, L.nearSWBot - L.roadBot - curbH * 1.6);
+            c.strokeStyle = "#d8ccb6"; c.lineWidth = Math.max(1, lw * 0.6);
+            c.beginPath();
+            for (let sx = 0; sx < W; sx += 40 * u) { c.moveTo(sx, L.roadBot + curbH * 1.6); c.lineTo(sx + 6 * u, L.nearSWBot); }
+            c.stroke();
+            c.strokeStyle = INK; c.lineWidth = lw;
+            c.beginPath(); c.moveTo(0, L.roadBot); c.lineTo(W, L.roadBot); c.stroke();
+
+            // grass lot
+            const gTop = L.nearSWBot;
+            c.fillStyle = vgrad(c, gTop, H, [[0, "#93dc7c"], [1, "#69bf58"]]);
+            c.fillRect(0, gTop, W, H - gTop);
+            const band = m * 0.09;
+            c.fillStyle = "rgba(255,255,255,.07)";
+            for (let bx = 0; bx < W + H; bx += band * 2) {
+                c.beginPath(); c.moveTo(bx, gTop); c.lineTo(bx + band, gTop); c.lineTo(bx + band - (H - gTop) * 0.5, H); c.lineTo(bx - (H - gTop) * 0.5, H); c.closePath(); c.fill();
+            }
+            c.strokeStyle = INK; c.lineWidth = lw;
+            c.beginPath(); c.moveTo(0, gTop); c.lineTo(W, gTop); c.stroke();
+            // grass tufts + flowers
+            const tufts = Math.round(W * (H - gTop) / (m * m * 0.012));
+            for (let i = 0; i < tufts; i++) {
+                const tx = rng() * W, ty = gTop + 10 + rng() * (H - gTop - 10);
+                const s = m * (0.008 + rng() * 0.006);
+                c.strokeStyle = "rgba(40,120,50,.45)"; c.lineWidth = Math.max(1, lw * 0.6);
+                c.beginPath(); c.moveTo(tx - s, ty - s * 1.6); c.lineTo(tx, ty); c.lineTo(tx + s, ty - s * 1.7); c.moveTo(tx, ty); c.lineTo(tx, ty - s * 2); c.stroke();
+                if (rng() < 0.35) {
+                    c.fillStyle = choose(["#ffffff", "#ff8fb1", "#ffe066", "#c9a7ff"]);
+                    for (let k = 0; k < 5; k++) { const a = k * TAU / 5; c.beginPath(); c.arc(tx + Math.cos(a) * s * 0.7, ty - s * 2.4 + Math.sin(a) * s * 0.7, s * 0.55, 0, TAU); c.fill(); }
+                    c.fillStyle = "#ffb000"; c.beginPath(); c.arc(tx, ty - s * 2.4, s * 0.45, 0, TAU); c.fill();
+                }
+            }
+            // bushes along the sidewalk edge
+            const bushes = Math.round(W / (m * 0.16));
+            for (let i = 0; i < bushes; i++) {
+                const bx = (i + 0.2 + rng() * 0.6) * W / bushes;
+                const br = m * (0.018 + rng() * 0.012);
+                if (gTop + br * 2 > L.garageY - L.garageH / 2) continue;
+                c.beginPath();
+                c.arc(bx - br * 0.9, gTop + br * 0.6, br * 0.8, 0, TAU);
+                c.arc(bx + br * 0.9, gTop + br * 0.6, br * 0.8, 0, TAU);
+                c.arc(bx, gTop + br * 0.2, br, 0, TAU);
+                c.fillStyle = "#47a957"; c.fill();
+            }
+        }
+
+        // ---------------------------------------------------------------
+        //  GAME STATE (logic preserved from the original)
+        // ---------------------------------------------------------------
+        let mouse = vec2(0, 0);
+        const mousePos = () => vec2(mouse.x, mouse.y);
+        const center = () => vec2(L.cx, L.cy);
+
+        const clouds = [];
+        const particles = [];
+        const texts = [];
+        let roadDist = 0;
+        let time = 0;
+
+        let currentGroup = null;
+        let canInteract = true;
+        let currentCar = null;
+        let isDragging = false;
+        let dragOffset = vec2(0);
+
+        const garages = [];
+        GROUPS.forEach((group) => {
+            garages.push({
+                groupName: group.name, group, pos: vec2(0, 0), w: 0, h: 0,
+                hover: 0, door: 0, doorHold: false, sq: 0, sqv: 0, flash: 0,
+                hasPoint(p) { return Math.abs(p.x - this.pos.x) <= this.w / 2 && Math.abs(p.y - this.pos.y) <= this.h / 2; },
             });
         });
 
-        loadEmojiAsSprite("parking_icon", "🅿️");
-        loadEmojiAsSprite("cloud", "☁️");
-
-        scene("main", () => {
-            // --- BACKGROUND DECORATION ---
-
-            // 1. Moving Road Stripes (BACKGROUND LAYER)
-            loop(0.3, () => {
-                const stripe = add([
-                    rect(10, 80),
-                    pos(center().x, -100),
-                    color(255, 255, 255),
-                    opacity(0.3),
-                    anchor("center"),
-                    move(DOWN, 400),
-                    z(-5), // Layer: Background
-                    "road_stripe"
-                ]);
-
-                // Fix: Check position instead of time so they don't vanish on tall screens
-                stripe.onUpdate(() => {
-                    if (stripe.pos.y > height() + 200) {
-                        destroy(stripe);
-                    }
-                });
+        function layoutGarages() {
+            const spacing = W / GROUPS.length;
+            garages.forEach((g, index) => {
+                g.pos = vec2((spacing * index) + (spacing / 2), L.garageY);
+                g.w = L.garageW; g.h = L.garageH;
             });
+        }
 
-            // 2. Floating Clouds (BACKGROUND LAYER)
-            loop(4, () => {
-                const cloud = add([
-                    sprite("cloud"),
-                    pos(-200, rand(0, height()/3)),
-                    scale(rand(1, 2)),
-                    opacity(0.3),
-                    move(RIGHT, rand(20, 50)),
-                    z(-5), // Layer: Background
-                ]);
+        function resize() {
+            const nd = Math.min(window.devicePixelRatio || 1, 2);
+            const w = window.innerWidth, h = window.innerHeight;
+            // A 0×0 resize (hidden frame, some mobile rotations) makes the
+            // skyline loops add 0 each step and never return.
+            if (!(w > 0 && h > 0)) return;
+            if (w === W && h === H && nd === DPR) return;
+            DPR = nd;
+            W = w; H = h;
+            canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+            const oldC = L.cx !== undefined ? center() : null;
+            computeLayout();
+            buildSky(); buildGround();
+            layoutGarages();
+            if (!currentCar || currentCar.dead || isDragging) return;
+            const posOk = Number.isFinite(currentCar.pos.x) && Number.isFinite(currentCar.pos.y);
+            // keep a resting car on the (new) centre spot
+            if (!posOk || (oldC && !currentCar.falling && vdist(currentCar.pos, oldC) < 2)) {
+                for (const tw of tweens) if (tw.target === currentCar && tw.key === "pos") tw.dead = true;
+                currentCar.pos = center();
+                if (!posOk) currentCar.falling = false;
+            }
+        }
 
-                // Fix: Check position instead of time
-                cloud.onUpdate(() => {
-                    if (cloud.pos.x > width() + 200) {
-                        destroy(cloud);
-                    }
-                });
+        // --- Particles -------------------------------------------------
+        function puff(x, y, size, vx, vy, life = 0.6, col = "rgba(255,255,255,0.9)") {
+            particles.push({ kind: "puff", x, y, vx, vy, s0: size * 0.5, s1: size, life, max: life, col, grav: -10, drag: 2.5 });
+        }
+        function confetti(x, y, col) {
+            const a = rand(-Math.PI * 0.95, -Math.PI * 0.05), sp = rand(180, 520) * clamp(L.m / 700, 0.6, 1.4);
+            particles.push({ kind: "confetti", x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: rand(1, 1.6), max: 1.6,
+                col, w: rand(10, 16) * clamp(L.m / 700, 0.7, 1.3), h: rand(6, 9) * clamp(L.m / 700, 0.7, 1.3), rot: rand(0, TAU), vr: rand(-10, 10), flip: rand(0, TAU), grav: 520, drag: 1.2 });
+        }
+        function star(x, y, col, sp = 1) {
+            const a = rand(0, TAU), v = rand(120, 360) * sp * clamp(L.m / 700, 0.6, 1.4);
+            particles.push({ kind: "star", x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, life: rand(0.7, 1.1), max: 1.1,
+                col, r: rand(8, 15) * clamp(L.m / 700, 0.7, 1.4), rot: rand(0, TAU), vr: rand(-6, 6), grav: 300, drag: 2 });
+        }
+        function ring(x, y, r, col) { particles.push({ kind: "ring", x, y, r0: r * 0.3, r1: r, life: 0.5, max: 0.5, col, vx: 0, vy: 0, grav: 0, drag: 0 }); }
+
+        function updateParticles(dt) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.life -= dt;
+                if (p.life <= 0) { particles.splice(i, 1); continue; }
+                const dk = Math.exp(-p.drag * dt);
+                p.vx *= dk; p.vy = p.vy * dk + p.grav * dt;
+                p.x += p.vx * dt; p.y += p.vy * dt;
+                if (p.rot !== undefined) p.rot += p.vr * dt;
+                if (p.flip !== undefined) p.flip += dt * 9;
+            }
+        }
+        function drawParticles(c) {
+            for (const p of particles) {
+                const k = 1 - p.life / p.max; // 0 -> 1
+                if (p.kind === "puff") {
+                    c.globalAlpha = Math.min(1, p.life / p.max * 1.6) * 0.9;
+                    c.fillStyle = p.col;
+                    c.beginPath(); c.arc(p.x, p.y, lerp(p.s0, p.s1, easings.easeOutQuad(k)), 0, TAU); c.fill();
+                } else if (p.kind === "confetti") {
+                    c.globalAlpha = Math.min(1, p.life * 3);
+                    c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.scale(Math.cos(p.flip), 1);
+                    c.fillStyle = p.col; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    c.restore();
+                } else if (p.kind === "star") {
+                    c.globalAlpha = Math.min(1, p.life * 3);
+                    c.save(); c.translate(p.x, p.y); c.rotate(p.rot);
+                    starPath(c, p.r); c.fillStyle = p.col; c.fill();
+                    c.lineWidth = 2; c.strokeStyle = "rgba(43,45,66,.6)"; c.stroke();
+                    c.restore();
+                } else if (p.kind === "ring") {
+                    c.globalAlpha = 1 - k;
+                    c.lineWidth = 8 * (1 - k) + 1; c.strokeStyle = p.col;
+                    c.beginPath(); c.arc(p.x, p.y, lerp(p.r0, p.r1, easings.easeOutQuad(k)), 0, TAU); c.stroke();
+                }
+            }
+            c.globalAlpha = 1;
+        }
+
+        // --- Clouds -----------------------------------------------------
+        function spawnCloud(x) {
+            clouds.push({
+                spr: choose(cloudSprites),
+                x: x !== undefined ? x : -L.m * 0.5,
+                yk: rand(0.08, 0.62),
+                scale: rand(1, 2),
+                speed: rand(20, 50),
             });
+        }
+        // Floating Clouds (BACKGROUND LAYER)
+        loop(4, () => spawnCloud());
 
-            add([
-                text("Traffic Sorter", { size: 36 }),
-                pos(center().x, 40),
-                anchor("center"),
-                color(255, 255, 255),
-                z(100) // Layer: Top UI
-            ]);
+        // --- AUDIO UNLOCKER ---
+        let audioUnlocked = false;
+        function unlockAudio() {
+            if (!audioUnlocked && zzfxX && zzfxX.state === 'suspended') {
+                zzfxX.resume();
+                audioUnlocked = true;
+            }
+        }
 
-            // --- AUDIO UNLOCKER ---
-            let audioUnlocked = false;
-            onMousePress(() => {
-                if (!audioUnlocked && zzfxX && zzfxX.state === 'suspended') {
-                    zzfxX.resume();
-                    audioUnlocked = true;
+        // ---------------------------------------------------------------
+        //  CORE GAME LOGIC (unchanged rules)
+        // ---------------------------------------------------------------
+        function spawnCar() {
+            canInteract = true;
+            isDragging = false;
+
+            const groupIdx = Math.floor(rand(0, GROUPS.length));
+            currentGroup = GROUPS[groupIdx];
+
+            const variantIdx = Math.floor(rand(0, currentGroup.cars.length));
+            const type = currentGroup.cars[variantIdx];
+
+            currentCar = {
+                type, group: currentGroup, pos: vec2(center().x, Math.min(-200, -170 * L.u)),
+                scale: 1, lift: 0, rot: 0, wob: 0, sq: 0, sqv: 0, t: 0, vy: 0,
+                falling: true, dead: false, puffT: 0,
+            };
+            const car = currentCar;
+
+            wait(0.1, () => playHonk());
+
+            tween(car.pos.y, center().y, 1, (p) => car.pos.y = p, easings.easeOutBounce, car, "pos").onEnd(() => {
+                car.falling = false;
+                // Dust particles on landing
+                for (let i = 0; i < 6; i++) {
+                    const side = i % 2 ? 1 : -1;
+                    puff(car.pos.x + side * rand(60, 120) * L.u, L.contactY - 4 * L.u, rand(14, 24) * L.u,
+                        side * rand(40, 120), rand(-60, -20), rand(0.5, 0.8), "rgba(240,236,228,0.95)");
                 }
             });
+        }
 
-            let currentGroup = null;
-            let canInteract = true;
-            let currentCar = null;
-            let isDragging = false;
-            let dragOffset = vec2(0);
+        function checkMatch(selectedGroupName, btnObj) {
+            if (!canInteract || !currentCar) return;
 
-            const garages = [];
-            
-            // --- DYNAMIC GARAGE SIZING ---
-            const numGarages = GROUPS.length;
-            const spacing = width() / numGarages;
-            const garageWidth = spacing - 40; // Use a gap of 40px
-            const garageHeight = height() * 0.25; // Garages are 25% of the screen height
-            const garageY = height() - (garageHeight / 2) - 20; // Position at bottom with 20px margin
+            const car = currentCar;
+            if (selectedGroupName === currentGroup.name) {
+                // WIN
+                canInteract = false;
+                playVroom();
+                playWin();
+                shake(5);
 
-            GROUPS.forEach((group, index) => {
-                const xPos = (spacing * index) + (spacing / 2);
+                const sh = currentGroup.sh;
+                const door = vec2(btnObj.pos.x, btnObj.pos.y + btnObj.h * 0.2);
+                btnObj.doorHold = true;
+                btnObj.flash = 1;
+                btnObj.sqv -= 6;
 
-                const btn = add([
-                    rect(garageWidth, garageHeight, { radius: 20 }),
-                    pos(xPos, garageY),
-                    anchor("center"),
-                    color(group.color),
-                    outline(4, WHITE),
-                    area(),
-                    scale(1),
-                    z(10), // Layer: Ground
-                    "garage",
-                    { groupName: group.name }
-                ]);
+                // 1. Confetti + stars
+                const cols = [sh.base, sh.light, sh.dark, "#ffffff", sh.base];
+                for (let i = 0; i < 34; i++) confetti(btnObj.pos.x + rand(-btnObj.w * 0.3, btnObj.w * 0.3), btnObj.pos.y - btnObj.h * 0.2, choose(cols));
+                for (let i = 0; i < 10; i++) star(btnObj.pos.x, btnObj.pos.y - btnObj.h * 0.1, i % 2 ? "#ffe066" : sh.light);
+                ring(btnObj.pos.x, btnObj.pos.y, Math.max(btnObj.w, btnObj.h) * 0.75, "#ffffff");
 
-                add([
-                    sprite("parking_icon"),
-                    pos(xPos, garageY),
-                    anchor("center"),
-                    scale(garageHeight / 256), // Scale icon relative to garage height
-                    z(11), // Layer: Above Garage
-                    color(0,0,0)
-                ]);
+                // 2. Praise Word Pop-up
+                const word = choose(PRAISE_WORDS);
+                texts.push({ word, x: center().x, y: center().y - 40 * L.u, t: 0, life: 1, sh });
+                for (let i = 0; i < 8; i++) star(center().x, center().y - 40 * L.u, "#ffe066", 0.7);
 
-                garages.push(btn);
+                car.falling = false;
+                tween(car.pos, door, 0.4, (p) => car.pos = p, easings.easeOutQuad, car, "pos").onEnd(() => {
+                    car.dead = true; // destroy(currentCar)
+                    for (let i = 0; i < 5; i++) puff(door.x + rand(-30, 30) * L.u, door.y + rand(-10, 20) * L.u, rand(16, 26) * L.u, rand(-80, 80), rand(-80, -20));
+                    wait(0.35, () => { btnObj.doorHold = false; });
+                    wait(0.8, spawnCar); // Wait a bit longer to read the text
+                });
 
-                btn.onClick(() => {
-                    if (!isDragging) {
-                        checkMatch(group.name, btn);
+                tween(car.scale, 0, 0.4, (p) => car.scale = p, easings.linear, car, "scale");
+
+            } else {
+                // LOSE
+                playErr();
+                shake(2);
+                car.wob = 1;
+                btnObj.flash = -1;
+
+                const startX = btnObj.pos.x;
+                const amp = 10 * clamp(L.m / 700, 0.7, 1.5);
+                tween(btnObj.pos.x, startX + amp, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
+                    tween(btnObj.pos.x, startX - amp, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
+                        btnObj.pos.x = startX;
+                    });
+                });
+
+                if (vdist(car.pos, center()) > 50) {
+                    car.falling = false;
+                    tween(car.pos, center(), 0.5, (p) => car.pos = p, easings.easeOutElastic, car, "pos");
+                }
+                tween(car.scale, 1, 0.2, (p) => car.scale = p, easings.linear, car, "scale");
+            }
+        }
+
+        function carHit(car, p) {
+            const b = CAR_TYPES[car.type].box;
+            const s = L.u * Math.max(car.scale, 0.01);
+            const pad = 14;
+            const groundY = car.pos.y + 60 * s;
+            return p.x >= car.pos.x + b[0] * s - pad && p.x <= car.pos.x + b[2] * s + pad &&
+                   p.y >= groundY + (b[1] - 60) * s - pad && p.y <= groundY + pad;
+        }
+
+        // Press: garage taps first (like the original onClick registration order), then car pickup.
+        // Kaboom's object onClick is onMousePress("left") only; drag starts on any button.
+        function onPress(button) {
+            unlockAudio();
+            if (button === 0) {
+                garages.forEach((garage) => {
+                    if (garage.hasPoint(mousePos()) && !isDragging) {
+                        checkMatch(garage.groupName, garage);
                     }
                 });
-            });
+            }
+            if (currentCar && !currentCar.dead && carHit(currentCar, mousePos()) && canInteract) {
+                isDragging = true;
+                currentCar.falling = false;
+                for (const tw of tweens) if (tw.target === currentCar && tw.key === "pos") tw.dead = true;
+                dragOffset = vec2(mouse.x - currentCar.pos.x, mouse.y - currentCar.pos.y);
+                playPop(); // Little sound on pickup
+                currentCar.sqv += 5;
+                tween(currentCar.scale, 1.1, 0.1, (p) => currentCar.scale = p, easings.linear, currentCar, "scale");
+            }
+        }
 
-            function spawnCar() {
-                canInteract = true;
+        function onRelease() {
+            if (isDragging && currentCar) {
                 isDragging = false;
 
-                const groupIdx = Math.floor(rand(0, GROUPS.length));
-                currentGroup = GROUPS[groupIdx];
-
-                const emojiIdx = Math.floor(rand(0, currentGroup.emojis.length));
-                const spriteName = `${currentGroup.name}_${emojiIdx}`;
-
-                // 40% Dynamic Scale
-                const screenRef = Math.min(width(), height());
-                const targetSize = screenRef * 0.4;
-                const dynamicScale = targetSize / 128;
-
-                currentCar = add([
-                    sprite(spriteName),
-                    pos(center().x, -200),
-                    anchor("center"),
-                    scale(dynamicScale),
-                    color(currentGroup.color),
-                    area(),
-                    z(50), // Layer: Objects/Cars
-                    "car",
-                    { originalScale: dynamicScale }
-                ]);
-
-                wait(0.1, () => playHonk());
-
-                tween(currentCar.pos.y, center().y, 1, (p) => currentCar.pos.y = p, easings.easeOutBounce).onEnd(() => {
-                    // Dust particles on landing
-                    for(let i=0; i<5; i++) {
-                        add([
-                            rect(10, 10),
-                            pos(currentCar.pos.x + rand(-40, 40), currentCar.pos.y + 40),
-                            color(200, 200, 200),
-                            move(rand(0, -180), rand(50, 100)),
-                            lifespan(0.5),
-                            opacity(0.5),
-                            z(49) // Layer: Just below car
-                        ])
+                let droppedOnGarage = false;
+                garages.forEach(garage => {
+                    // STRICTER CHECK: Center of car must be inside the garage button
+                    if (garage.hasPoint(currentCar.pos)) {
+                        droppedOnGarage = true;
+                        checkMatch(garage.groupName, garage);
                     }
                 });
 
-                // Idle Animation (Breathing)
-                let t = 0;
-                currentCar.onUpdate(() => {
-                    if (!isDragging) {
-                        t += dt() * 4;
-                        // Gentle sine wave on scale
-                        const breathe = Math.sin(t) * 0.05;
-                        currentCar.scale = vec2(currentCar.originalScale + breathe);
-                    }
-                });
-            }
-
-            function checkMatch(selectedGroupName, btnObj) {
-                if (!canInteract || !currentCar) return;
-
-                if (selectedGroupName === currentGroup.name) {
-                    // WIN
-                    canInteract = false;
-                    playVroom();
-                    playWin();
-                    shake(5);
-
-                    // 1. Confetti
-                    for (let i = 0; i < 20; i++) {
-                        add([
-                            rect(10, 10),
-                            pos(btnObj.pos),
-                            color(currentGroup.color),
-                            move(rand(0, 360), rand(100, 300)),
-                            lifespan(1),
-                            opacity(1),
-                            scale(rand(0.5, 1)),
-                            z(80) // Layer: FX
-                        ]);
-                    }
-
-                    // 2. Praise Word Pop-up
-                    const word = choose(PRAISE_WORDS);
-                    add([
-                        text(word, { size: 48, font: EMOJI_FONT }),
-                        pos(center()),
-                        anchor("center"),
-                        color(255, 255, 255),
-                        outline(4, currentGroup.color),
-                        move(UP, 100),
-                        lifespan(1),
-                        opacity(1),
-                        z(100) // Layer: Top UI
-                    ]);
-
-                    tween(currentCar.pos, btnObj.pos, 0.4, (p) => currentCar.pos = p, easings.easeOutQuad).onEnd(() => {
-                        destroy(currentCar);
-                        wait(0.8, spawnCar); // Wait a bit longer to read the text
-                    });
-
-                    tween(currentCar.scale, vec2(0), 0.4, (p) => currentCar.scale = p);
-
-                } else {
-                    // LOSE
-                    playErr();
-                    shake(2);
-
-                    const startX = btnObj.pos.x;
-                    tween(btnObj.pos.x, startX + 10, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
-                        tween(btnObj.pos.x, startX - 10, 0.1, (p) => btnObj.pos.x = p, easings.linear).onEnd(() => {
-                            btnObj.pos.x = startX;
-                        });
-                    });
-
-                    if (currentCar.pos.dist(center()) > 50) {
-                        tween(currentCar.pos, center(), 0.5, (p) => currentCar.pos = p, easings.easeOutElastic);
-                    }
-                    tween(currentCar.scale, vec2(currentCar.originalScale), 0.2, (p) => currentCar.scale = p);
+                if (!droppedOnGarage) {
+                    playPop(); // Little sound on drop
+                    const car = currentCar;
+                    tween(car.pos, center(), 0.5, (p) => car.pos = p, easings.easeOutElastic, car, "pos");
+                    tween(car.scale, 1, 0.2, (p) => car.scale = p, easings.linear, car, "scale");
                 }
             }
+        }
 
-            onMousePress(() => {
-                if (currentCar && currentCar.isHovering() && canInteract) {
-                    isDragging = true;
-                    dragOffset = mousePos().sub(currentCar.pos);
-                    playPop(); // Little sound on pickup
-                    tween(currentCar.scale, vec2(currentCar.originalScale * 1.1), 0.1, (p) => currentCar.scale = p);
-                }
-            });
-
-            onMouseRelease(() => {
-                if (isDragging && currentCar) {
-                    isDragging = false;
-
-                    let droppedOnGarage = false;
-                    garages.forEach(garage => {
-                        // STRICTER CHECK: Center of car must be inside the garage button
-                        if (garage.hasPoint(currentCar.pos)) {
-                            droppedOnGarage = true;
-                            checkMatch(garage.groupName, garage);
-                        }
-                    });
-
-                    if (!droppedOnGarage) {
-                        playPop(); // Little sound on drop
-                        tween(currentCar.pos, center(), 0.5, (p) => currentCar.pos = p, easings.easeOutElastic);
-                        tween(currentCar.scale, vec2(currentCar.originalScale), 0.2, (p) => currentCar.scale = p);
-                    }
-                }
-            });
-
-            onUpdate(() => {
-                if (isDragging && currentCar) {
-                    currentCar.pos = mousePos().sub(dragOffset);
-                }
-            });
-
-            spawnCar();
+        // --- Pointer input (single pointer, like touchToMouse) -------------
+        let activePointer = null;
+        const toLocal = (e) => { mouse = vec2(e.clientX, e.clientY); };
+        canvas.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            if (activePointer !== null) return;
+            activePointer = e.pointerId;
+            try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+            toLocal(e);
+            onPress(e.button);
         });
+        window.addEventListener("pointermove", (e) => { if (e.pointerId === activePointer) toLocal(e); });
+        const end = (e) => {
+            if (e.pointerId !== activePointer) return;
+            toLocal(e);
+            activePointer = null;
+            onRelease();
+        };
+        window.addEventListener("pointerup", end);
+        window.addEventListener("pointercancel", end);
+        canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
-        go("main");
+        // ---------------------------------------------------------------
+        //  UPDATE
+        // ---------------------------------------------------------------
+        let lastDragX = 0, dragVX = 0;
+        function update(dt) {
+            time += dt;
+            roadDist += 220 * dt;
+            updateTimers(dt);
+            updateTweens(dt);
+
+            if (isDragging && currentCar) {
+                currentCar.pos = mousePos();
+                currentCar.pos.x -= dragOffset.x; currentCar.pos.y -= dragOffset.y;
+            }
+
+            // clouds
+            for (let i = clouds.length - 1; i >= 0; i--) {
+                const cl = clouds[i];
+                cl.x += cl.speed * dt;
+                if (cl.x > W + 200) clouds.splice(i, 1);
+            }
+
+            // car juice
+            const car = currentCar;
+            if (car && !car.dead) {
+                car.t += dt * 4;
+                const prevVy = car.vy;
+                car.vy = car.lastY !== undefined ? (car.pos.y - car.lastY) / Math.max(dt, 1e-4) : 0;
+                car.lastY = car.pos.y;
+                if (car.falling && prevVy > 300 && car.vy <= 0) {
+                    car.sqv += clamp(prevVy / 160, 2, 9); // bounce squash
+                    puff(car.pos.x - 80 * L.u, L.contactY - 6 * L.u, 20 * L.u, -90, -30, 0.45, "rgba(240,236,228,0.95)");
+                    puff(car.pos.x + 80 * L.u, L.contactY - 6 * L.u, 20 * L.u, 90, -30, 0.45, "rgba(240,236,228,0.95)");
+                }
+                // squash spring
+                const acc = -320 * car.sq - 16 * car.sqv;
+                car.sqv += acc * dt; car.sq += car.sqv * dt;
+                // lift / lean
+                car.lift = lerp(car.lift, isDragging ? 1 : 0, 1 - Math.exp(-14 * dt));
+                dragVX = lerp(dragVX, (car.pos.x - lastDragX) / Math.max(dt, 1e-4), 1 - Math.exp(-10 * dt));
+                lastDragX = car.pos.x;
+                const leanTarget = isDragging ? clamp(dragVX * 0.00045, -0.3, 0.3) : 0;
+                car.wob = Math.max(0, car.wob - dt * 2.2);
+                car.rot = lerp(car.rot, leanTarget, 1 - Math.exp(-12 * dt)) ;
+                // exhaust puffs while idling on the road
+                if (!isDragging && !car.falling && canInteract) {
+                    car.puffT -= dt;
+                    if (car.puffT <= 0) {
+                        car.puffT = rand(0.28, 0.45);
+                        const tail = CAR_TYPES[car.type].tail;
+                        const s = L.u * car.scale;
+                        puff(car.pos.x + tail[0] * s, car.pos.y + tail[1] * s, rand(8, 13) * L.u, rand(-120, -70), rand(-30, -10), 0.6, "rgba(225,230,240,0.85)");
+                    }
+                }
+            }
+
+            // garages: hover / door / bounce
+            for (const g of garages) {
+                const hov = isDragging && currentCar && g.hasPoint(currentCar.pos) ? 1 : 0;
+                g.hover = lerp(g.hover, hov, 1 - Math.exp(-14 * dt));
+                const target = g.doorHold ? 1 : hov ? 0.6 : 0;
+                g.door = lerp(g.door, target, 1 - Math.exp(-(g.doorHold ? 18 : 9) * dt));
+                const acc = -300 * g.sq - 14 * g.sqv;
+                g.sqv += acc * dt; g.sq += g.sqv * dt;
+                g.flash *= Math.exp(-3.5 * dt);
+            }
+
+            // praise texts: move(UP, 100) + lifespan(1)
+            for (let i = texts.length - 1; i >= 0; i--) {
+                const tx = texts[i];
+                tx.t += dt; tx.y -= 100 * dt;
+                if (tx.t >= tx.life) texts.splice(i, 1);
+            }
+
+            updateParticles(dt);
+            camShake = lerp(camShake, 0, Math.min(1, 5 * dt));
+        }
+
+        // ---------------------------------------------------------------
+        //  RENDER
+        // ---------------------------------------------------------------
+        function drawGarage(c, g) {
+            const sh = g.group.sh;
+            const lw = Math.max(2, L.lw * 1.15);
+            const w = g.w, h = g.h;
+            const x0 = g.pos.x - w / 2, y0 = g.pos.y - h / 2;
+            const sq = g.sq * 0.05;
+            const hs = 1 + g.hover * 0.045;
+
+            // soft ground shadow
+            c.fillStyle = "rgba(30,60,30,.22)";
+            c.beginPath(); c.ellipse(g.pos.x, y0 + h - 1, w * 0.56, h * 0.07, 0, 0, TAU); c.fill();
+
+            c.save();
+            c.translate(g.pos.x, y0 + h);
+            c.scale(hs * (1 + sq * 0.6), hs * (1 - sq));
+            c.translate(-g.pos.x, -(y0 + h));
+
+            // hover glow
+            if (g.hover > 0.02) {
+                c.globalAlpha = g.hover;
+                c.lineWidth = lw * 3; c.strokeStyle = "#ffffff";
+                c.stroke(RR(x0 - lw * 3, y0 - lw * 3, w + lw * 6, h + lw * 6, Math.min(w, h) * 0.14));
+                c.globalAlpha = 1;
+            }
+
+            const roofH = h * 0.27;
+            const baseH = h * 0.06;
+            const wallTop = y0 + roofH * 0.82;
+            const wallBot = y0 + h - baseH;
+            const ov = w * 0.045;
+
+            // walls
+            const wall = RR(x0 + w * 0.02, wallTop, w * 0.96, wallBot - wallTop + 2, Math.min(w, h) * 0.04);
+            c.fillStyle = vgrad(c, wallTop, wallBot, [[0, sh.base], [1, sh.dark]]);
+            c.fill(wall);
+            // brick hints
+            c.save(); c.clip(wall);
+            c.strokeStyle = "rgba(255,255,255,.14)"; c.lineWidth = Math.max(1, lw * 0.5);
+            const bh = Math.max(8, h * 0.07), bw = bh * 2.4;
+            for (let j = 0, yy = wallTop + bh; yy < wallBot; yy += bh, j++) {
+                c.beginPath(); c.moveTo(x0, yy); c.lineTo(x0 + w, yy);
+                for (let xx = x0 + (j % 2 ? bw / 2 : 0); xx < x0 + w; xx += bw) { c.moveTo(xx, yy - bh); c.lineTo(xx, yy); }
+                c.stroke();
+            }
+            c.restore();
+            c.lineWidth = lw; c.strokeStyle = INK; c.stroke(wall);
+
+            // door opening
+            const dw = w * 0.64, dh = (wallBot - wallTop) * 0.74;
+            const dx = g.pos.x - dw / 2, dy = wallBot - dh;
+            const doorP = new Path2D();
+            const dr = Math.min(dw, dh) * 0.16;
+            doorP.moveTo(dx, wallBot); doorP.lineTo(dx, dy + dr); doorP.quadraticCurveTo(dx, dy, dx + dr, dy);
+            doorP.lineTo(dx + dw - dr, dy); doorP.quadraticCurveTo(dx + dw, dy, dx + dw, dy + dr); doorP.lineTo(dx + dw, wallBot); doorP.closePath();
+            c.fillStyle = vgrad(c, dy, wallBot, [[0, "#1b1c2c"], [1, "#3b3e5c"]]);
+            c.fill(doorP);
+            c.save(); c.clip(doorP);
+            // warm interior light when open
+            if (g.door > 0.05) {
+                const lg = c.createRadialGradient(g.pos.x, dy, 2, g.pos.x, dy, dh * 1.1);
+                lg.addColorStop(0, `rgba(255,236,160,${0.55 * g.door})`); lg.addColorStop(1, "rgba(255,236,160,0)");
+                c.fillStyle = lg; c.fillRect(dx, dy, dw, dh);
+                // stripes on floor
+                c.fillStyle = `rgba(255,255,255,${0.25 * g.door})`;
+                c.fillRect(g.pos.x - dw * 0.03, wallBot - dh * 0.35, dw * 0.06, dh * 0.3);
+            }
+            // roller shutter
+            const shH = dh * (1 - g.door * 0.9);
+            c.fillStyle = vgrad(c, dy, dy + shH, [[0, "#ffffff"], [1, sh.pale]]);
+            c.fillRect(dx, dy, dw, shH);
+            c.strokeStyle = "rgba(43,45,66,.22)"; c.lineWidth = Math.max(1, lw * 0.55);
+            const slat = Math.max(6, dh / 9);
+            c.beginPath();
+            for (let yy = dy + shH - slat; yy > dy; yy -= slat) { c.moveTo(dx, yy); c.lineTo(dx + dw, yy); }
+            c.stroke();
+            c.fillStyle = sh.dark;
+            c.fillRect(dx, dy + shH - Math.max(4, slat * 0.45), dw, Math.max(4, slat * 0.45));
+            fillStroke(c, RR(g.pos.x - dw * 0.1, dy + shH - Math.max(4, slat * 0.45) - Math.max(3, slat * 0.3), dw * 0.2, Math.max(3, slat * 0.3), 2), "#8c93a8", 0);
+            c.restore();
+            c.lineWidth = lw; c.strokeStyle = INK; c.stroke(doorP);
+
+            // lamps beside door
+            const lr = Math.max(3, Math.min(w, h) * 0.035);
+            for (const sx of [-1, 1]) {
+                const lx = g.pos.x + sx * (dw / 2 + (w * 0.96 - dw) / 4), ly = dy + lr * 1.6;
+                if (w * 0.96 - dw > lr * 4) {
+                    c.fillStyle = "rgba(255,240,170,.35)"; c.beginPath(); c.arc(lx, ly, lr * 2.2, 0, TAU); c.fill();
+                    fillStroke(c, circlePath(lx, ly, lr), "#fff3a8", lw * 0.7);
+                }
+            }
+
+            // roof
+            const roof = new Path2D();
+            const ry = y0 + roofH;
+            roof.moveTo(x0 - ov, ry);
+            roof.lineTo(x0 + w * 0.12, y0 + h * 0.03);
+            roof.quadraticCurveTo(g.pos.x, y0 - h * 0.03, x0 + w * 0.88, y0 + h * 0.03);
+            roof.lineTo(x0 + w + ov, ry); roof.closePath();
+            c.fillStyle = vgrad(c, y0, ry, [[0, sh.light], [0.5, sh.dark], [1, sh.deep]]);
+            c.fill(roof);
+            c.save(); c.clip(roof);
+            c.strokeStyle = "rgba(43,45,66,.18)"; c.lineWidth = Math.max(1, lw * 0.6);
+            const tile = Math.max(6, roofH / 3.2);
+            c.beginPath();
+            for (let yy = y0 + tile * 0.9; yy < ry; yy += tile) { c.moveTo(x0 - ov, yy); c.lineTo(x0 + w + ov, yy); }
+            c.stroke();
+            c.restore();
+            c.lineWidth = lw; c.strokeStyle = INK; c.lineJoin = "round"; c.stroke(roof);
+            fillStroke(c, RR(x0 - ov, ry - lw * 0.5, w + ov * 2, Math.max(5, h * 0.035), 3), sh.deep, lw);
+
+            // base slab
+            fillStroke(c, RR(x0 - ov * 0.5, wallBot, w + ov, baseH, 3), "#e3ddd2", lw);
+
+            // "P" badge
+            const br = Math.min(roofH * 0.42, w * 0.13);
+            const bx = g.pos.x, by = y0 + roofH * 0.48;
+            if (g.flash > 0.02) {
+                c.fillStyle = `rgba(255,255,255,${0.6 * g.flash})`;
+                c.beginPath(); c.arc(bx, by, br * (1.4 + (1 - g.flash) * 1.4), 0, TAU); c.fill();
+            }
+            fillStroke(c, circlePath(bx, by, br), "#ffffff", lw);
+            c.lineWidth = Math.max(2, br * 0.16); c.strokeStyle = sh.base;
+            c.beginPath(); c.arc(bx, by, br * 0.78, 0, TAU); c.stroke();
+            c.fillStyle = sh.deep;
+            c.font = `700 ${Math.round(br * 1.25)}px ${FONT}`;
+            c.textAlign = "center"; c.textBaseline = "middle";
+            c.fillText("P", bx, by + br * 0.06);
+
+            // wrong-garage tint
+            if (g.flash < -0.02) {
+                c.globalAlpha = -g.flash * 0.35; c.fillStyle = "#2b2d42";
+                c.fill(wall); c.globalAlpha = 1;
+            }
+            c.restore();
+        }
+
+        function drawCar(c, car) {
+            const u = L.u;
+            const s = car.scale * (isDragging ? 1 : 1 + Math.sin(car.t) * 0.02); // idle "breathing"
+            if (s <= 0.001) return;
+            const sq = clamp(car.sq * 0.035, -0.25, 0.3);
+            const sx = 1 + sq * 0.7, sy = 1 - sq;
+            const groundY = car.pos.y + 60 * u * s;
+            const wob = car.wob > 0 ? Math.sin(car.wob * 30) * 0.12 * car.wob : 0;
+
+            // shadow
+            let shY, shW, shA;
+            if (car.falling) {
+                shY = L.contactY;
+                const k = clamp(1 - (L.contactY - groundY) / (H * 0.6), 0.15, 1);
+                shW = 118 * u * k; shA = 0.32 * k;
+            } else {
+                shY = groundY + 3 * u + car.lift * 26 * u * s;
+                shW = 118 * u * s * (1 - car.lift * 0.18); shA = 0.32 * (1 - car.lift * 0.45);
+            }
+            c.fillStyle = `rgba(20,24,40,${shA})`;
+            c.beginPath(); c.ellipse(car.pos.x + car.lift * 10 * u, shY, shW, shW * 0.12, 0, 0, TAU); c.fill();
+
+            c.save();
+            c.translate(car.pos.x, groundY);
+            c.rotate(car.rot + wob);
+            c.scale(u * s * sx, u * s * sy);
+            c.translate(0, -60);
+            c.lineJoin = "round"; c.lineCap = "round";
+            // tiny engine rumble while idling on the road
+            const rumble = (!isDragging && !car.falling) ? Math.sin(time * 38) * 0.7 : 0;
+            c.translate(0, rumble);
+            CAR_TYPES[car.type].draw(c, car.group.sh, roadDist, time);
+            c.restore();
+        }
+
+        function drawTitle(c) {
+            const T = L.title;
+            c.font = `700 ${T}px ${FONT}`;
+            const label = "Traffic Sorter";
+            const tw = c.measureText(label).width;
+            const w = tw + T * 1.5, h = T * 1.55;
+            const x = W / 2 - w / 2, y = L.titleY - h / 2;
+            c.fillStyle = "rgba(20,40,60,.25)";
+            c.fill(RR(x, y + T * 0.14, w, h, T * 0.42));
+            fillStroke(c, RR(x, y, w, h, T * 0.42), vgrad(c, y, y + h, [[0, "#3cbf72"], [1, "#24985a"]]), Math.max(2, T * 0.08));
+            c.lineWidth = Math.max(2, T * 0.07); c.strokeStyle = "#ffffff";
+            c.stroke(RR(x + T * 0.14, y + T * 0.14, w - T * 0.28, h - T * 0.28, T * 0.3));
+            c.fillStyle = "rgba(255,255,255,.2)";
+            c.fill(RR(x + T * 0.22, y + T * 0.2, w - T * 0.44, h * 0.32, T * 0.2));
+            c.textAlign = "center"; c.textBaseline = "middle";
+            c.fillStyle = "#17603a"; c.fillText(label, W / 2, L.titleY + T * 0.08);
+            c.fillStyle = "#ffffff"; c.fillText(label, W / 2, L.titleY);
+        }
+
+        function drawTexts(c) {
+            for (const tx of texts) {
+                const P = clamp(L.m * 0.13, 42, 112);
+                const pop = easings.easeOutBack(Math.min(1, tx.t / 0.28));
+                const a = tx.t > 0.7 ? Math.max(0, 1 - (tx.t - 0.7) / 0.3) : 1;
+                c.save();
+                c.globalAlpha = a;
+                c.translate(tx.x, tx.y);
+                c.rotate(Math.sin(tx.t * 9) * 0.05);
+                c.scale(pop, pop);
+                c.font = `700 ${P}px ${FONT}`;
+                c.textAlign = "center"; c.textBaseline = "middle";
+                c.lineJoin = "round";
+                c.lineWidth = P * 0.24; c.strokeStyle = INK;
+                c.strokeText(tx.word, 0, P * 0.07);
+                c.fillStyle = tx.sh.deep; c.fillText(tx.word, 0, P * 0.07);
+                c.lineWidth = P * 0.14; c.strokeStyle = tx.sh.base;
+                c.strokeText(tx.word, 0, 0);
+                c.fillStyle = vgrad(c, -P * 0.4, P * 0.4, [[0, "#ffffff"], [1, "#fff4c9"]]);
+                c.fillText(tx.word, 0, 0);
+                c.restore();
+            }
+        }
+
+        function render() {
+            const c = ctx;
+            c.setTransform(DPR, 0, 0, DPR, 0, 0);
+            c.drawImage(skyCvs, 0, 0, W, H);
+
+            // clouds (behind the town)
+            for (const cl of clouds) {
+                const cw = L.m * 0.2 * cl.scale, ch = cw / 2;
+                c.globalAlpha = 0.92;
+                c.drawImage(cl.spr, cl.x - cw / 2, cl.yk * Math.max(40, L.farSWTop * 0.75) - ch / 2, cw, ch);
+            }
+            c.globalAlpha = 1;
+
+            const sx = (Math.random() * 2 - 1) * camShake, sy = (Math.random() * 2 - 1) * camShake;
+            c.fillStyle = "#69bf58"; c.fillRect(0, H - 12, W, 12);
+            c.save();
+            c.translate(sx, sy);
+            c.drawImage(groundCvs, 0, 0, W, H);
+
+            // moving lane dashes (the road "drives" under the car)
+            const u = L.u;
+            const dashL = 46 * u, gap = 38 * u, per = dashL + gap;
+            const off = -((roadDist * u) % per);
+            c.fillStyle = "#ffd23f";
+            for (let x = off - per; x < W + per; x += per) {
+                c.beginPath(); rrPath(c, x, L.laneY - 3 * u, dashL, 6 * u, 3 * u); c.fill();
+            }
+
+            for (const g of garages) drawGarage(c, g);
+
+            // particles behind the car (exhaust / dust)
+            drawParticles(c);
+            if (currentCar && !currentCar.dead) drawCar(c, currentCar);
+
+            drawTexts(c);
+            c.restore();
+            drawTitle(c);
+        }
+
+        // ---------------------------------------------------------------
+        //  BOOT
+        // ---------------------------------------------------------------
+        resize();
+        window.addEventListener("resize", resize);
+        if (window.visualViewport) window.visualViewport.addEventListener("resize", resize);
+        for (let i = 0; i < 4; i++) { spawnCloud(rand(0, W)); }
+        if (document.fonts && document.fonts.load) document.fonts.load(`700 40px Fredoka`).catch(() => {});
+
+        spawnCar();
+
+        let last = performance.now();
+        function frame(now) {
+            const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+            last = now;
+            update(dt);
+            render();
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
     });
 </script>
 </body>

@@ -2,147 +2,818 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#2a1785">
     <title>Connect Four</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            touch-action: manipulation; /* Prevents double-tap zooming on mobile */
+        /* ================================================================
+           Palette & tokens
+           ================================================================ */
+        :root {
+            --bg-1: #5b3cf0;
+            --bg-2: #3a1fa8;
+            --bg-3: #1a0d58;
+            --ink: #170b4a;
+            --red: #ff4d63;
+            --red-deep: #c4102f;
+            --yellow: #ffd23f;
+            --yellow-deep: #d98a00;
+            --gold: #ffe27a;
+            --green: #2fd17a;
+            --green-deep: #13924f;
+            --blue: #3d7bff;
+            --blue-deep: #1b44c4;
+            --glass: rgba(255, 255, 255, 0.10);
+            --glass-edge: rgba(255, 255, 255, 0.22);
+            --u: 0.5px; /* fallback unit for discs outside the board */
+            --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
         }
 
-        /* Custom bouncy drop animation for the chips */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body { height: 100%; }
+
+        body {
+            margin: 0;
+            height: 100dvh;
+            overflow: hidden;
+            font-family: 'Nunito', system-ui, sans-serif;
+            color: #fff;
+            touch-action: manipulation; /* Prevents double-tap zooming on mobile */
+            -webkit-user-select: none;
+            user-select: none;
+            background:
+                radial-gradient(1100px 700px at 12% -12%, rgba(255, 110, 200, 0.40), transparent 60%),
+                radial-gradient(900px 700px at 112% 18%, rgba(70, 215, 255, 0.32), transparent 60%),
+                radial-gradient(1000px 760px at 50% 125%, rgba(255, 180, 60, 0.28), transparent 62%),
+                linear-gradient(165deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+            background-color: var(--bg-2);
+        }
+
+        /* ---------- Decorative background ---------- */
+        .bg-dots {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.10) 1.4px, transparent 1.6px);
+            background-size: 26px 26px;
+            -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%);
+            mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%);
+        }
+        .bg-float { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .bg-float span {
+            position: absolute; border-radius: 50%;
+            width: var(--s); height: var(--s); left: var(--x); top: var(--y);
+            opacity: var(--o, 0.22);
+            animation: floaty var(--t, 16s) ease-in-out infinite alternate;
+            animation-delay: var(--d, 0s);
+        }
+        .bg-float .fr { background: radial-gradient(circle at 35% 30%, #ff9aa6, #ff3654 45%, rgba(160, 0, 40, 0) 72%); }
+        .bg-float .fy { background: radial-gradient(circle at 35% 30%, #fff2a8, #ffc414 45%, rgba(190, 110, 0, 0) 72%); }
+        .bg-float .fw { background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.9), rgba(255,255,255,.2) 45%, rgba(255,255,255,0) 72%); }
+        @keyframes floaty {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(var(--dx, 30px), var(--dy, -40px)) scale(1.08); }
+        }
+
+        /* ================================================================
+           App layout (portrait first)
+           ================================================================ */
+        .app {
+            position: relative; z-index: 1;
+            height: 100dvh;
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+            padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+            grid-template-areas:
+                "brand restart"
+                "modes modes"
+                "scores scores"
+                "status status"
+                "board board"
+                "controls controls";
+            gap: clamp(7px, 1.6vmin, 16px);
+            align-items: center;
+        }
+        .panel-bg { display: none; }
+
+        /* ---------- Brand ---------- */
+        .brand {
+            grid-area: brand;
+            margin: 0;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(26px, 6.4vmin, 56px);
+            line-height: 1;
+            letter-spacing: 0.01em;
+            display: flex; align-items: center; gap: 0.18em;
+            text-shadow: 0 3px 0 rgba(20, 8, 80, 0.55), 0 8px 18px rgba(10, 0, 50, 0.45);
+            white-space: nowrap;
+        }
+        .brand .word {
+            background: linear-gradient(180deg, #ffffff 0%, #e9e4ff 55%, #c8bdff 100%);
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 3px 0 rgba(20, 8, 80, 0.55));
+            text-shadow: none;
+        }
+        .brand .four {
+            --size: 1.3em;
+            display: inline-grid; place-items: center;
+            font-size: 1em;
+            color: #7a3d00;
+            text-shadow: 0 2px 0 rgba(255, 255, 255, 0.55);
+            transform: rotate(-8deg);
+            animation: fourWiggle 3.2s ease-in-out infinite;
+        }
+        .brand .four b { position: relative; z-index: 2; font-weight: 700; font-size: 0.8em; }
+        @keyframes fourWiggle {
+            0%, 100% { transform: rotate(-8deg) translateY(0); }
+            50% { transform: rotate(6deg) translateY(-3px); }
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            --c1: var(--blue); --c2: var(--blue-deep); --lip: 6px;
+            position: relative;
+            border: 0; cursor: pointer;
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.22);
+            background: linear-gradient(180deg, color-mix(in srgb, var(--c1) 80%, #fff) 0%, var(--c1) 45%, color-mix(in srgb, var(--c1) 82%, var(--c2)) 100%);
+            box-shadow:
+                inset 0 2px 0 rgba(255, 255, 255, 0.45),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+                0 var(--lip) 0 var(--c2),
+                0 calc(var(--lip) + 6px) 16px rgba(10, 0, 50, 0.38);
+            transform: translateY(0);
+            transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease, background 0.25s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.4em;
+            touch-action: manipulation;
+            outline: none;
+        }
+        .btn::after { /* glossy cap */
+            content: ''; position: absolute; left: 8%; right: 8%; top: 5%; height: 38%;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+            pointer-events: none;
+        }
+        @media (hover: hover) { .btn:hover { filter: brightness(1.08) saturate(1.05); } }
+        .btn:active {
+            transform: translateY(var(--lip));
+            box-shadow:
+                inset 0 2px 0 rgba(255, 255, 255, 0.35),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.12),
+                0 0 0 var(--c2),
+                0 3px 8px rgba(10, 0, 50, 0.35);
+        }
+        .btn:focus-visible { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8), 0 var(--lip) 0 var(--c2); }
+
+        .btn-green { --c1: var(--green); --c2: var(--green-deep); }
+        .btn-red { --c1: #ff5a6e; --c2: #b3122e; }
+
+        .restart {
+            grid-area: restart;
+            justify-self: end;
+            --lip: 5px;
+            font-size: clamp(15px, 3vmin, 24px);
+            padding: 0.5em 1em;
+            border-radius: 999px;
+        }
+        .restart .ico { display: inline-block; transition: transform 0.5s ease; }
+        .restart:active .ico { transform: rotate(-200deg); }
+
+        /* ---------- Mode toggle ---------- */
+        .modes {
+            grid-area: modes;
+            position: relative;
+            display: grid; grid-template-columns: 1fr 1fr;
+            padding: 5px;
+            border-radius: 999px;
+            background: rgba(12, 4, 60, 0.38);
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+        .modes .thumb {
+            position: absolute; top: 5px; bottom: 5px; left: 5px;
+            width: calc(50% - 5px);
+            border-radius: 999px;
+            background: linear-gradient(180deg, #ffffff 0%, #ece8ff 100%);
+            box-shadow: 0 4px 0 #b9adf5, 0 8px 16px rgba(10, 0, 60, 0.35), inset 0 -2px 0 rgba(90, 60, 200, 0.12);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modes[data-mode="2P"] .thumb { transform: translateX(100%); }
+        .mode-btn {
+            position: relative; z-index: 1;
+            border: 0; background: transparent; cursor: pointer;
+            font-family: var(--font-display); font-weight: 600;
+            font-size: clamp(16px, 3.4vmin, 28px);
+            color: rgba(255, 255, 255, 0.78);
+            padding: 0.32em 0.4em 0.42em;
+            display: flex; align-items: center; justify-content: center; gap: 0.35em;
+            transition: color 0.25s ease, transform 0.15s ease;
+            touch-action: manipulation;
+        }
+        .mode-btn .vs { font-size: 0.62em; opacity: 0.85; letter-spacing: 0.04em; }
+        .mode-btn.active { color: var(--ink); }
+        .mode-btn:not(.active) .em { filter: drop-shadow(0 0 1px rgba(255,255,255,.9)) drop-shadow(0 0 1px rgba(255,255,255,.9)); opacity: 0.85; }
+        .mode-btn:active { transform: scale(0.96); }
+        .mode-btn .em { font-size: 1.1em; filter: drop-shadow(0 2px 2px rgba(0,0,0,.2)); }
+
+        /* ---------- Score cards ---------- */
+        .scores {
+            grid-area: scores;
+            display: flex; align-items: center; gap: clamp(6px, 1.4vmin, 14px);
+        }
+        .vs-badge {
+            flex: none;
+            font-family: var(--font-display); font-weight: 700;
+            font-size: clamp(13px, 2.6vmin, 20px);
+            width: 2.3em; height: 2.3em; border-radius: 50%;
+            display: grid; place-items: center;
+            background: linear-gradient(180deg, #ffffff, #dcd5ff);
+            color: var(--ink);
+            box-shadow: 0 3px 0 #a597f0, 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .pcard {
+            --pc: var(--red);
+            flex: 1 1 0; min-width: 0;
+            display: flex; align-items: center; gap: clamp(6px, 1.4vmin, 12px);
+            padding: clamp(6px, 1.3vmin, 11px) clamp(9px, 1.8vmin, 16px);
+            border-radius: clamp(14px, 2.6vmin, 22px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+            border: 2px solid var(--glass-edge);
+            box-shadow: 0 8px 22px rgba(10, 0, 50, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, box-shadow 0.3s, background 0.3s;
+        }
+        .pcard.p2 { --pc: var(--yellow); }
+        .pcard.turn {
+            transform: translateY(-2px) scale(1.03);
+            border-color: var(--pc);
+            background: linear-gradient(180deg, color-mix(in srgb, var(--pc) 30%, transparent), rgba(255, 255, 255, 0.06));
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--pc) 35%, transparent), 0 0 26px color-mix(in srgb, var(--pc) 55%, transparent), 0 10px 22px rgba(10, 0, 50, 0.3);
+        }
+        .pcard .mini { --size: clamp(30px, 6.4vmin, 52px); flex: none; }
+        .pinfo { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 auto; }
+        .pname {
+            font-family: var(--font-display); font-weight: 600;
+            font-size: clamp(13px, 2.6vmin, 21px);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: color-mix(in srgb, var(--pc) 60%, #fff);
+            line-height: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pips { display: flex; flex-wrap: wrap; gap: clamp(2px, 0.5vmin, 4px); }
+        .pips i {
+            width: clamp(5px, 1.1vmin, 9px); height: clamp(5px, 1.1vmin, 9px); border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s, transform 0.3s;
+        }
+        .pips i.on { background: var(--pc); box-shadow: 0 0 6px var(--pc); transform: scale(1.15); }
+        .score {
+            font-family: var(--font-display); font-weight: 700;
+            font-size: clamp(26px, 6.2vmin, 52px);
+            line-height: 1;
+            min-width: 1.1em; text-align: right;
+            text-shadow: 0 3px 0 rgba(10, 0, 60, 0.4);
+        }
+        .score.bump { animation: bump 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes bump {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.6) rotate(-6deg); color: var(--gold); }
+            100% { transform: scale(1); }
+        }
+
+        /* ---------- Status banner ---------- */
+        .status {
+            --pc: var(--red);
+            grid-area: status;
+            justify-self: center;
+            display: flex; align-items: center; justify-content: center; gap: 0.5em;
+            padding: 0.35em 1.1em 0.35em 0.5em;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(22, 10, 80, 0.85), rgba(14, 6, 56, 0.9));
+            border: 2px solid color-mix(in srgb, var(--pc) 70%, transparent);
+            box-shadow: 0 0 22px color-mix(in srgb, var(--pc) 40%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 8px 18px rgba(0, 0, 0, 0.3);
+            font-size: clamp(18px, 4.2vmin, 36px);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            max-width: 100%;
+        }
+        .status.p2 { --pc: var(--yellow); }
+        .status.won { --pc: var(--gold); animation: statusPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes statusPop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+        .status .mini { --size: 1.45em; animation: avatarBob 1.2s ease-in-out infinite; }
+        @keyframes avatarBob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(8deg); } }
+        .status-text {
+            font-family: var(--font-display); font-weight: 700;
+            color: color-mix(in srgb, var(--pc) 85%, #fff);
+            text-shadow: 0 0 14px color-mix(in srgb, var(--pc) 55%, transparent), 0 2px 0 rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
+        }
+        .status.thinking .status-text::after {
+            content: '';
+            display: inline-block; width: 1.2em; text-align: left;
+            animation: dots 1s steps(4) infinite;
+        }
+        @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+
+        /* ---------- Controls ---------- */
+        .controls {
+            grid-area: controls;
+            display: flex; gap: clamp(10px, 2vmin, 18px);
+            width: 100%; max-width: 560px; justify-self: center;
+            padding-bottom: 6px;
+        }
+        .controls .btn {
+            height: clamp(50px, 9vmin, 76px);
+            border-radius: clamp(16px, 3vmin, 26px);
+            font-size: clamp(20px, 4vmin, 34px);
+        }
+        .controls .arrow { flex: 0 0 clamp(64px, 14vmin, 112px); }
+        .controls .arrow svg { width: 0.9em; height: 0.9em; filter: drop-shadow(0 2px 0 rgba(0,0,0,.2)); }
+        .btn-drop { flex: 1 1 auto; letter-spacing: 0.08em; --c1: #ff4d63; --c2: #a50d28; }
+        body[data-turn="2"] .btn-drop { --c1: #ffc21a; --c2: #b06d00; color: #5a2a00; text-shadow: 0 2px 0 rgba(255,255,255,.4); }
+        body[data-robot="1"] .controls .btn { filter: grayscale(0.55) brightness(0.85); }
+        .btn-drop .chev { display: inline-block; animation: chev 1s ease-in-out infinite; }
+        @keyframes chev { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+
+        /* ================================================================
+           The board
+           ================================================================ */
+        .board-wrap {
+            grid-area: board;
+            align-self: stretch; justify-self: stretch;
+            min-height: 0; min-width: 0;
+            container-type: size;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stage {
+            /* 760 x 790 board units: 110 hover row + 660 board + 20 thickness */
+            --W: min(100cqw, calc(100cqh * 760 / 790));
+            --u: calc(var(--W) / 760);
+            position: relative;
+            width: var(--W);
+            height: calc(var(--u) * 790);
+            flex: none;
+        }
+        .stage.thud { animation: thud 0.22s ease-out; }
+        @keyframes thud {
+            0% { transform: translateY(0); }
+            30% { transform: translateY(calc(var(--u) * 5)); }
+            100% { transform: translateY(0); }
+        }
+        .stage > * { position: absolute; }
+
+        .board-shadow {
+            left: 4%; right: 4%; top: calc(var(--u) * 700); height: calc(var(--u) * 100);
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(5, 0, 30, 0.55), rgba(5, 0, 30, 0) 70%);
+            filter: blur(calc(var(--u) * 6));
+            z-index: 0;
+        }
+        .board-glow {
+            left: -4%; right: -4%; top: calc(var(--u) * 80); bottom: -2%;
+            border-radius: calc(var(--u) * 90);
+            background: radial-gradient(ellipse at 50% 45%, rgba(90, 150, 255, 0.45), rgba(90, 150, 255, 0) 65%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .cavity {
+            left: calc(var(--u) * 18); top: calc(var(--u) * 128);
+            width: calc(var(--u) * 724); height: calc(var(--u) * 624);
+            border-radius: calc(var(--u) * 30);
+            background:
+                radial-gradient(ellipse at 50% 30%, #18245e 0%, #0b1238 60%, #050821 100%);
+            z-index: 1;
+        }
+        #discs, #spill {
+            left: 0; top: 0; width: 100%; height: 100%;
+            z-index: 2; pointer-events: none;
+        }
+        #spill {
+            left: calc(var(--u) * 30); top: calc(var(--u) * 140);
+            width: calc(var(--u) * 700); height: calc(var(--u) * 600);
+            overflow: hidden;
+        }
+        .slot {
+            position: absolute;
+            left: calc(var(--u) * (30 + var(--c) * 100));
+            top: calc(var(--u) * (140 + var(--r) * 100));
+            width: calc(var(--u) * 100); height: calc(var(--u) * 100);
+        }
+        .spill-slot {
+            position: absolute;
+            left: calc(var(--u) * var(--c) * 100);
+            top: calc(var(--u) * var(--r) * 100);
+            width: calc(var(--u) * 100); height: calc(var(--u) * 100);
+            animation: spill 0.55s cubic-bezier(0.55, 0, 0.9, 0.5) both;
+        }
+        @keyframes spill {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(calc(var(--u) * 720)); }
+        }
+        #face {
+            left: 0; top: 0; width: 100%; height: 100%;
+            z-index: 3; pointer-events: none;
+            overflow: visible;
+        }
+        #col-glow {
+            left: calc(var(--u) * (34 + var(--c, 3) * 100));
+            top: calc(var(--u) * 122);
+            width: calc(var(--u) * 92); height: calc(var(--u) * 636);
+            border-radius: calc(var(--u) * 46);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05) 70%, rgba(255, 255, 255, 0));
+            box-shadow: inset 0 0 0 calc(var(--u) * 3) rgba(255, 255, 255, 0.18);
+            z-index: 4; pointer-events: none;
+            transition: left 0.18s cubic-bezier(0.3, 1.3, 0.5, 1), opacity 0.2s;
+        }
+        #win-svg {
+            left: 0; top: 0; width: 100%; height: 100%;
+            z-index: 5; pointer-events: none; overflow: visible;
+        }
+        #overlay {
+            left: 0; top: 0; width: 100%; height: 100%;
+            z-index: 7;
+            display: grid;
+            grid-template-columns: 130fr repeat(5, 100fr) 130fr;
+        }
+        #overlay > div { cursor: pointer; }
+        .off { opacity: 0 !important; }
+
+        /* ---------- Discs ---------- */
+        .disc {
+            --a: #ff96a0; --b: #f2264a; --c2: #b80c2d; --d: #690016;
+            position: absolute;
+            left: 7%; top: 7%; width: 86%; height: 86%;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 50%, transparent 0 57%, rgba(0, 0, 0, 0.22) 59%, rgba(255, 255, 255, 0.28) 63%, transparent 66%),
+                radial-gradient(circle at 34% 28%, var(--a) 0%, var(--b) 36%, var(--c2) 72%, var(--d) 100%);
+            box-shadow:
+                inset 0 calc(var(--u) * -6) calc(var(--u) * 10) rgba(0, 0, 0, 0.35),
+                inset 0 calc(var(--u) * 4) calc(var(--u) * 6) rgba(255, 255, 255, 0.35);
+        }
+        .disc.p2 { --a: #fff6b8; --b: #ffd21f; --c2: #f0a000; --d: #8f5200; }
+        .disc::before { /* raised centre medallion */
+            content: ''; position: absolute; inset: 27%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 32%, var(--a) 0%, var(--b) 55%, var(--c2) 100%);
+            box-shadow:
+                0 calc(var(--u) * 2) calc(var(--u) * 3) rgba(0, 0, 0, 0.28),
+                inset 0 calc(var(--u) * -2) calc(var(--u) * 4) rgba(0, 0, 0, 0.18),
+                inset 0 calc(var(--u) * 2) calc(var(--u) * 2) rgba(255, 255, 255, 0.4);
+        }
+        .disc::after { /* specular glint */
+            content: ''; position: absolute;
+            left: 14%; top: 9%; width: 46%; height: 28%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%);
+            transform: rotate(-24deg);
+        }
+        .mini {
+            --size: 40px;
+            position: relative; display: inline-block;
+            left: auto; top: auto;
+            width: var(--size); height: var(--size);
+            --u: calc(var(--size) / 86);
+            box-shadow:
+                inset 0 calc(var(--u) * -6) calc(var(--u) * 10) rgba(0, 0, 0, 0.35),
+                inset 0 calc(var(--u) * 4) calc(var(--u) * 6) rgba(255, 255, 255, 0.35),
+                0 calc(var(--u) * 6) calc(var(--u) * 10) rgba(0, 0, 0, 0.35);
+        }
+        .face {
+            position: absolute; inset: 0; z-index: 2;
+            display: grid; place-items: center;
+            font-size: calc(var(--size, 40px) * 0.56);
+            line-height: 1;
+            filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.25));
+        }
+        .face:empty { display: none; }
+
+        .chip-drop { animation: dropBounce 0.5s both; }
         @keyframes dropBounce {
-            0% { transform: translateY(var(--drop-start, -500%)); animation-timing-function: ease-in; }
-            70% { transform: translateY(0); animation-timing-function: ease-out; }
-            85% { transform: translateY(-15%); animation-timing-function: ease-in; }
+            0%   { transform: translateY(var(--drop)); animation-timing-function: cubic-bezier(0.45, 0, 0.95, 0.55); }
+            56%  { transform: translateY(0) scale(1.04, 0.95); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+            72%  { transform: translateY(calc(var(--u) * -24)) scale(0.98, 1.02); animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.5); }
+            85%  { transform: translateY(0) scale(1.02, 0.98); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+            93%  { transform: translateY(calc(var(--u) * -6)); animation-timing-function: ease-in; }
             100% { transform: translateY(0); }
         }
 
-        .chip-drop {
-            animation: dropBounce 0.5s forwards;
+        #hover-disc {
+            left: calc(var(--u) * (37 + var(--c, 3) * 100));
+            top: calc(var(--u) * 12);
+            width: calc(var(--u) * 86); height: calc(var(--u) * 86);
+            z-index: 6; pointer-events: none;
+            transition: left 0.18s cubic-bezier(0.3, 1.3, 0.5, 1), opacity 0.15s;
+            animation: hoverBob 1.1s ease-in-out infinite;
+            box-shadow:
+                inset 0 calc(var(--u) * -6) calc(var(--u) * 10) rgba(0, 0, 0, 0.35),
+                inset 0 calc(var(--u) * 4) calc(var(--u) * 6) rgba(255, 255, 255, 0.35),
+                0 calc(var(--u) * 14) calc(var(--u) * 16) rgba(5, 0, 40, 0.45);
         }
+        @keyframes hoverBob {
+            0%, 100% { transform: translateY(calc(var(--u) * -4)); }
+            50% { transform: translateY(calc(var(--u) * 4)); }
+        }
+        .ghost {
+            position: absolute;
+            left: calc(var(--u) * (30 + var(--c, 3) * 100 + 8));
+            top: calc(var(--u) * (140 + var(--r, 5) * 100 + 8));
+            width: calc(var(--u) * 84); height: calc(var(--u) * 84);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 77, 99, 0.42), rgba(255, 77, 99, 0.18) 70%);
+            box-shadow: inset 0 0 0 calc(var(--u) * 6) rgba(255, 120, 135, 0.55);
+            animation: ghostPulse 1.1s ease-in-out infinite;
+            transition: opacity 0.15s;
+        }
+        .ghost.p2 {
+            background: radial-gradient(circle, rgba(255, 210, 63, 0.45), rgba(255, 210, 63, 0.18) 70%);
+            box-shadow: inset 0 0 0 calc(var(--u) * 6) rgba(255, 226, 122, 0.6);
+        }
+        @keyframes ghostPulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 
-        /* Pop animation for the win modal */
+        /* ---------- Win highlight ---------- */
+        .stage.has-win .slot .disc:not(.win) { filter: saturate(0.7) brightness(0.72); transition: filter 0.6s; }
+        .disc.win { animation: winGlow 0.9s ease-in-out infinite alternate; }
+        @keyframes winGlow {
+            from { filter: brightness(1) saturate(1); }
+            to { filter: brightness(1.35) saturate(1.25); }
+        }
+        .win-line-glow { stroke: var(--gold); stroke-width: 34; stroke-linecap: round; opacity: 0.45; filter: url(#winBlur); }
+        .win-line { stroke: #fffbe0; stroke-width: 12; stroke-linecap: round; }
+        .win-line, .win-line-glow { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawLine 0.55s 0.1s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        .win-ring { fill: none; stroke: var(--gold); stroke-width: 7; transform-box: fill-box; transform-origin: center; animation: ringPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both, ringPulse 0.9s 0.5s ease-in-out infinite alternate; }
+        .win-ring-glow { fill: none; stroke: var(--gold); stroke-width: 18; opacity: 0.5; filter: url(#winBlur); }
+        @keyframes ringPop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes ringPulse { from { stroke-width: 7; } to { stroke-width: 10; stroke: #fff6c4; } }
+
+        /* ================================================================
+           Win modal
+           ================================================================ */
+        .modal {
+            position: fixed; inset: 0; z-index: 50;
+            align-items: center; justify-content: center;
+            padding: 16px;
+            background: radial-gradient(ellipse at center, rgba(40, 15, 120, 0.55), rgba(5, 0, 25, 0.82));
+            -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease both;
+        }
+        .hidden { display: none !important; }
+        .modal.flex { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card {
+            position: relative;
+            width: min(92vw, 460px);
+            padding: clamp(22px, 5vmin, 44px) clamp(18px, 4vmin, 40px) clamp(22px, 4.5vmin, 40px);
+            border-radius: clamp(26px, 5vmin, 44px);
+            text-align: center;
+            color: var(--ink);
+            background: linear-gradient(180deg, #ffffff 0%, #f1edff 100%);
+            box-shadow: 0 10px 0 #b6a8f5, 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 -4px 0 rgba(90, 60, 200, 0.08);
+            animation: popIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
         @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.4) translateY(40px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .win-icon {
+            --bs: clamp(96px, 20vmin, 150px);
+            position: relative;
+            height: var(--bs);
+            margin: calc(var(--bs) * -0.78) auto clamp(8px, 2vmin, 16px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .win-icon .rays {
+            position: absolute; left: 50%; top: 50%;
+            width: calc(var(--bs) * 2.7); aspect-ratio: 1; translate: -50% -50%;
+            border-radius: 50%;
+            background: repeating-conic-gradient(from 0deg, rgba(255, 214, 80, 0.55) 0deg 10deg, rgba(255, 214, 80, 0) 10deg 22.5deg);
+            -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+            mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+            animation: spin 9s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes spin { to { rotate: 360deg; } }
+        .win-icon .big {
+            --size: var(--bs);
+            box-shadow:
+                inset 0 calc(var(--u) * -6) calc(var(--u) * 10) rgba(0, 0, 0, 0.35),
+                inset 0 calc(var(--u) * 4) calc(var(--u) * 6) rgba(255, 255, 255, 0.35),
+                0 calc(var(--u) * 10) 0 rgba(60, 20, 120, 0.25),
+                0 calc(var(--u) * 18) calc(var(--u) * 30) rgba(0, 0, 0, 0.35);
+            animation: bigSpin 0.9s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .win-icon .big + .big { margin-left: calc(var(--size) * -0.35); animation-delay: 0.3s; }
+        @keyframes bigSpin { from { transform: rotateY(540deg) scale(0.3); } to { transform: rotateY(0) scale(1); } }
+        .win-icon .crown {
+            position: absolute; left: 50%; top: -34%; z-index: 3;
+            font-size: clamp(34px, 7vmin, 54px);
+            translate: -50% 0;
+            animation: crownDrop 0.6s 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            filter: drop-shadow(0 4px 3px rgba(0,0,0,.3));
+        }
+        @keyframes crownDrop { from { transform: translateY(-40px) rotate(-30deg); opacity: 0; } to { transform: translateY(0) rotate(-10deg); opacity: 1; } }
+        .win-title {
+            margin: 0 0 clamp(16px, 3.5vmin, 28px);
+            font-family: var(--font-display); font-weight: 700;
+            font-size: clamp(30px, 6.6vmin, 50px);
+            line-height: 1.1;
+        }
+        .win-title.red { color: #e3163a; text-shadow: 0 3px 0 #ffd0d6; }
+        .win-title.yellow { color: #e08a00; text-shadow: 0 3px 0 #ffeeb0; }
+        .win-title.draw { color: #4b3c9a; text-shadow: 0 3px 0 #e2dcff; }
+        .win-title .sub { display: block; margin-top: 6px; font-size: 0.48em; color: #6d63a6; text-shadow: none; font-weight: 600; }
+        .card .btn {
+            width: 100%;
+            font-size: clamp(22px, 4.6vmin, 34px);
+            padding: 0.55em 1em;
+            border-radius: 999px;
+            --lip: 7px;
+            animation: btnPulse 1.6s 1s ease-in-out infinite;
+        }
+        @keyframes btnPulse { 0%, 100% { scale: 1; } 50% { scale: 1.04; } }
+
+        #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; }
+
+        /* ================================================================
+           Landscape: side panel + big board
+           ================================================================ */
+        @media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+            .app {
+                max-width: 1320px;
+                grid-template-columns: clamp(230px, 30vw, 380px) minmax(0, 1fr);
+                grid-template-rows: minmax(0, 1fr) auto auto auto auto auto minmax(0, 1fr) auto;
+                grid-template-areas:
+                    ".        board"
+                    "brand    board"
+                    "modes    board"
+                    "scores   board"
+                    "status   board"
+                    "restart  board"
+                    ".        board"
+                    ".        controls";
+                column-gap: clamp(14px, 3vw, 40px);
+                row-gap: clamp(8px, 2.2vh, 20px);
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+            .panel-bg {
+                display: block;
+                grid-column: 1; grid-row: 1 / -1;
+                align-self: stretch;
+                margin: 0 -12px;
+                border-radius: 32px;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+                border: 1px solid rgba(255, 255, 255, 0.16);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 20px 50px rgba(5, 0, 40, 0.25);
+            }
+            .brand { justify-self: center; font-size: clamp(28px, min(4.4vw, 8vh), 60px); }
+            .restart { justify-self: center; font-size: clamp(15px, min(2vw, 3.6vh), 24px); }
+            .modes .mode-btn { font-size: clamp(15px, min(2.2vw, 4vh), 26px); }
+            .scores { flex-direction: column; align-items: stretch; }
+            .scores .vs-badge { display: none; }
+            .pcard { flex: none; }
+            .pcard .mini { --size: clamp(30px, min(4vw, 8vh), 54px); }
+            .score { font-size: clamp(26px, min(4.2vw, 8vh), 54px); }
+            .pname { font-size: clamp(13px, min(1.8vw, 3.4vh), 20px); }
+            .status { font-size: clamp(17px, min(2.5vw, 4.6vh), 32px); justify-self: stretch; }
+            .controls .btn { height: clamp(46px, 9vh, 76px); font-size: clamp(18px, 4.2vh, 32px); }
+        }
+        @media (orientation: portrait) and (max-width: 420px) {
+            .scores .vs-badge { display: none; }
+            .pname { letter-spacing: 0.03em; }
+            .pcard { padding: 6px 8px; gap: 6px; }
+        }
+        @media (orientation: landscape) and (max-height: 500px) {
+            .pips { display: none; }
+            .pcard { padding: 5px 10px; }
         }
 
-        .bounce-in {
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        @media (prefers-reduced-motion: reduce) {
+            .bg-float span, .brand .four, .btn-drop .chev, #hover-disc, .win-icon .rays { animation: none; }
         }
-
     </style>
 </head>
 
-<body class="bg-gradient-to-b from-sky-300 to-indigo-500 min-h-[100dvh] flex flex-col items-center justify-center p-2 sm:p-4 md:p-8 selection:bg-none overflow-x-hidden">
+<body data-turn="1">
 
-<!-- Main Game Container: Scales beautifully across phone, tablet, and desktop -->
-<div class="w-full max-w-[95vw] sm:max-w-lg md:max-w-2xl lg:max-w-3xl bg-white/20 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] p-3 sm:p-6 md:p-8 shadow-2xl border-2 sm:border-4 border-white/40 max-h-[96dvh] flex flex-col mx-auto">
+<div class="bg-dots" aria-hidden="true"></div>
+<div class="bg-float" aria-hidden="true">
+    <span class="fr" style="--s:220px;--x:-60px;--y:12%;--t:17s;--dx:40px;--dy:-30px"></span>
+    <span class="fy" style="--s:180px;--x:82%;--y:6%;--t:14s;--dx:-50px;--dy:40px;--o:.26"></span>
+    <span class="fw" style="--s:90px;--x:70%;--y:70%;--t:12s;--dx:-30px;--dy:-60px;--o:.14"></span>
+    <span class="fy" style="--s:140px;--x:8%;--y:76%;--t:19s;--dx:60px;--dy:-20px;--o:.2"></span>
+    <span class="fr" style="--s:120px;--x:90%;--y:58%;--t:15s;--dx:-40px;--dy:-50px;--o:.2"></span>
+    <span class="fw" style="--s:60px;--x:30%;--y:4%;--t:11s;--dx:30px;--dy:30px;--o:.16"></span>
+    <span class="fr" style="--s:70px;--x:48%;--y:92%;--t:13s;--dx:-20px;--dy:-40px;--o:.18"></span>
+</div>
+
+<!-- Main Game Container -->
+<main class="app">
+    <div class="panel-bg" aria-hidden="true"></div>
 
     <!-- Header -->
-    <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-center text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.3)] mb-3 sm:mb-5 md:mb-6 tracking-wide shrink-0">
-        CONNECT 4
+    <h1 class="brand">
+        <span class="word">Connect</span>
+        <span class="four disc mini p2"><b>4</b></span>
     </h1>
 
+    <!-- Reset Button -->
+    <button class="btn btn-red restart" onclick="resetGame()"><span class="ico">⟲</span> Restart</button>
+
     <!-- Mode Toggles -->
-    <div class="flex gap-2 sm:gap-4 mb-3 sm:mb-5 md:mb-6 shrink-0">
-        <button id="btn-1p" onclick="setMode('1P')"
-                class="flex-1 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold transition-all flex items-center justify-center gap-1 sm:gap-2">
-            <span class="text-lg sm:text-2xl md:text-3xl">👤</span> <span
-                class="text-xs sm:text-base md:text-lg">vs</span> <span class="text-lg sm:text-2xl md:text-3xl">🤖</span>
+    <div class="modes" id="modes" data-mode="1P">
+        <span class="thumb" aria-hidden="true"></span>
+        <button id="btn-1p" class="mode-btn active" onclick="setMode('1P')">
+            <span class="em">👤</span><span class="vs">vs</span><span class="em">🤖</span>
         </button>
-        <button id="btn-2p" onclick="setMode('2P')"
-                class="flex-1 py-2 sm:py-3 md:py-4 rounded-xl sm:rounded-2xl font-bold transition-all flex items-center justify-center gap-1 sm:gap-2">
-            <span class="text-lg sm:text-2xl md:text-3xl">👤</span> <span
-                class="text-xs sm:text-base md:text-lg">vs</span> <span class="text-lg sm:text-2xl md:text-3xl">👤</span>
+        <button id="btn-2p" class="mode-btn" onclick="setMode('2P')">
+            <span class="em">👤</span><span class="vs">vs</span><span class="em">👤</span>
         </button>
     </div>
 
     <!-- Scoreboard -->
-    <div class="flex justify-between items-center w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] mx-auto px-2 sm:px-4 mb-3 sm:mb-5 shrink-0">
-        <div class="flex flex-col items-center bg-white shadow-sm px-6 sm:px-8 py-1 sm:py-2 rounded-xl sm:rounded-2xl border-b-4 border-red-500 min-w-[80px] sm:min-w-[100px]">
-            <span class="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider">Red</span>
-            <span id="score-p1" class="text-2xl sm:text-4xl font-black text-red-600">0</span>
+    <div class="scores">
+        <div class="pcard p1 turn" id="card-p1">
+            <span class="disc mini p1"></span>
+            <div class="pinfo">
+                <span class="pname">Red</span>
+                <span class="pips" id="pips-p1"></span>
+            </div>
+            <span id="score-p1" class="score">0</span>
         </div>
-        <div class="text-white font-black text-xl sm:text-2xl drop-shadow-md px-2">
-            VS
-        </div>
-        <div class="flex flex-col items-center bg-white shadow-sm px-6 sm:px-8 py-1 sm:py-2 rounded-xl sm:rounded-2xl border-b-4 border-yellow-500 min-w-[80px] sm:min-w-[100px]">
-            <span id="score-p2-label" class="text-xs sm:text-sm font-black text-yellow-500 uppercase tracking-wider">Robot</span>
-            <span id="score-p2" class="text-2xl sm:text-4xl font-black text-yellow-600">0</span>
+        <div class="vs-badge">VS</div>
+        <div class="pcard p2" id="card-p2">
+            <span class="disc mini p2"><span class="face" id="p2-face">🤖</span></span>
+            <div class="pinfo">
+                <span id="score-p2-label" class="pname">Robot</span>
+                <span class="pips" id="pips-p2"></span>
+            </div>
+            <span id="score-p2" class="score">0</span>
         </div>
     </div>
 
     <!-- Status Indicator -->
-    <div class="flex items-center justify-center gap-2 sm:gap-3 md:gap-4 bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl shadow-inner mb-3 sm:mb-5 md:mb-6 transition-colors shrink-0"
-         id="status-card">
-        <span id="turn-avatar" class="text-2xl sm:text-4xl md:text-5xl">🔴</span>
-        <span id="status-text" class="text-xl sm:text-3xl md:text-4xl font-black text-red-500 drop-shadow-sm">Red's Turn!</span>
+    <div class="status" id="status-card">
+        <span id="turn-avatar" class="disc mini p1"></span>
+        <span id="status-text" class="status-text">Red's Turn!</span>
     </div>
 
-    <!-- Game Area: Uses min() and relative sizing to fit the board perfectly on all screens -->
-    <div class="relative w-full select-none flex-grow flex flex-col justify-center items-center min-h-0">
-
-        <div class="w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] relative flex flex-col">
-            <!-- Indicator Layer (Shows where piece will fall) -->
-            <div id="indicators"
-                 class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 px-2 sm:px-3 md:px-4 mb-1 sm:mb-2 pointer-events-none w-full"></div>
-
-            <!-- Main Board Background (The blue plastic rack) -->
-            <div class="bg-blue-600 p-1.5 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-[0_4px_0_0_#1e3a8a,0_8px_10px_rgba(0,0,0,0.3)] sm:shadow-[0_8px_0_0_#1e3a8a,0_15px_20px_rgba(0,0,0,0.4)] border-2 sm:border-4 border-blue-400 relative">
-
-                <!-- Slots Container (The empty holes) -->
-                <div id="board" class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 relative z-0"></div>
-
-                <!-- Interaction Overlay (Captures clicks and touches for entire columns) -->
-                <div id="overlay"
-                     class="absolute inset-0 grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 p-1.5 sm:p-3 md:p-4 z-20"></div>
-            </div>
+    <!-- Game Area -->
+    <div class="board-wrap">
+        <div class="stage" id="stage">
+            <div class="board-glow"></div>
+            <div class="board-shadow"></div>
+            <div class="cavity"></div>
+            <div id="spill"></div>
+            <div id="discs"></div>
+            <svg id="face" viewBox="0 0 760 790" preserveAspectRatio="none" aria-hidden="true"></svg>
+            <div id="col-glow" class="off"></div>
+            <svg id="win-svg" viewBox="0 0 760 790" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                    <filter id="winBlur" filterUnits="userSpaceOnUse" x="-60" y="-60" width="880" height="910">
+                        <feGaussianBlur stdDeviation="8"/>
+                    </filter>
+                </defs>
+            </svg>
+            <div id="hover-disc" class="disc p1 off"></div>
+            <!-- Interaction Overlay (Captures clicks and touches for entire columns) -->
+            <div id="overlay"></div>
         </div>
     </div>
 
     <!-- On-Screen Controls -->
-    <div class="flex justify-center items-center gap-3 sm:gap-6 mt-2 sm:mt-4 w-full max-w-[min(100%,70dvh)] md:max-w-[min(100%,65dvh)] mx-auto shrink-0 z-10 px-2">
-        <button onclick="moveLeft()"
-                class="bg-blue-500 hover:bg-blue-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] active:translate-y-[4px] active:shadow-none text-xl sm:text-3xl font-black w-16 sm:w-24 transition-all flex items-center justify-center">
-            ◀
+    <div class="controls">
+        <button class="btn arrow" onclick="moveLeft()" aria-label="Move left">
+            <svg viewBox="0 0 24 24"><path d="M16 3 L5 12 L16 21 Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
         </button>
-        <button onclick="dropPeg()"
-                class="bg-green-500 hover:bg-green-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#166534] active:translate-y-[4px] active:shadow-none text-lg sm:text-2xl font-black flex-1 transition-all">
-            DROP
-        </button>
-        <button onclick="moveRight()"
-                class="bg-blue-500 hover:bg-blue-400 text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] active:translate-y-[4px] active:shadow-none text-xl sm:text-3xl font-black w-16 sm:w-24 transition-all flex items-center justify-center">
-            ▶
+        <button class="btn btn-drop" onclick="dropPeg()">DROP <span class="chev">▼</span></button>
+        <button class="btn arrow" onclick="moveRight()" aria-label="Move right">
+            <svg viewBox="0 0 24 24"><path d="M8 3 L19 12 L8 21 Z" fill="currentColor" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
         </button>
     </div>
-
-    <!-- Reset Button -->
-    <div class="mt-4 sm:mt-6 md:mt-8 text-center shrink-0">
-        <button onclick="resetGame()"
-                class="bg-red-500 hover:bg-red-400 text-white px-6 sm:px-8 md:px-12 py-2 sm:py-3 md:py-4 rounded-full font-black text-lg sm:text-xl md:text-3xl shadow-[0_4px_0_0_#991b1b] sm:shadow-[0_6px_0_0_#991b1b] md:shadow-[0_8px_0_0_#991b1b] active:shadow-[0_0px_0_0_#991b1b] active:translate-y-[4px] sm:active:translate-y-[6px] md:active:translate-y-[8px] transition-all">
-            🔄 Restart
-        </button>
-    </div>
-</div>
+</main>
 
 <!-- Win Modal Popup -->
-<div id="win-modal"
-     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4">
-    <div class="bg-white p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] text-center max-w-sm md:max-w-lg w-full bounce-in border-4 sm:border-8 border-white/50 bg-clip-padding">
-        <div id="win-icon" class="text-6xl sm:text-7xl md:text-8xl mb-2 sm:mb-4 drop-shadow-md">🎉🔴🎉</div>
-        <h2 id="win-title" class="text-3xl sm:text-4xl md:text-5xl font-black text-red-500 mb-6 sm:mb-8 drop-shadow-sm">
-            Red Wins!</h2>
-        <button onclick="resetGame()"
-                class="w-full bg-green-500 hover:bg-green-400 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full font-black text-xl sm:text-2xl md:text-3xl shadow-[0_4px_0_0_#166534] sm:shadow-[0_6px_0_0_#166534] active:shadow-[0_0px_0_0_#166534] active:translate-y-[4px] sm:active:translate-y-[6px] transition-all">
-            Play Again!
-        </button>
+<div id="win-modal" class="modal hidden">
+    <div class="card">
+        <div id="win-icon" class="win-icon"></div>
+        <h2 id="win-title" class="win-title red">Red Wins!</h2>
+        <button class="btn btn-green" onclick="resetGame()">Play Again!</button>
     </div>
 </div>
+
+<canvas id="fx"></canvas>
 
 <script>
     // --- Game Constants & State ---
@@ -163,37 +834,319 @@
     // Audio Context for simple fun sound effects
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+    // ================================================================
+    // Presentation helpers (visual only)
+    // ================================================================
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    // Board geometry in SVG units: cells are 100 units, grid origin at (30, 140)
+    const cellCX = c => 80 + c * 100;
+    const cellCY = r => 190 + r * 100;
+
+    // Confetti / sparkle particle system on a full-screen canvas
+    const FX = (() => {
+        const cv = document.getElementById('fx');
+        const ctx = cv.getContext('2d');
+        let parts = [];
+        let running = false;
+        let last = 0;
+        let dpr = 1;
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function size() {
+            dpr = Math.min(2, window.devicePixelRatio || 1);
+            cv.width = Math.round(innerWidth * dpr);
+            cv.height = Math.round(innerHeight * dpr);
+        }
+        size();
+        window.addEventListener('resize', size);
+
+        const COLORS = {
+            1: ['#ff4d63', '#ff8a96', '#ffd23f', '#ffffff', '#ff2e4d', '#ffb3bc'],
+            2: ['#ffd23f', '#fff1a0', '#ff9f1c', '#ffffff', '#ffc414', '#ff6b7d'],
+            0: ['#ff4d63', '#ffd23f', '#7ee0ff', '#ffffff', '#b59bff', '#2fd17a']
+        };
+
+        function add(p) { parts.push(p); }
+
+        function burst(x, y, n, player, power = 1) {
+            if (reduce) n = Math.round(n / 3);
+            const cols = COLORS[player] || COLORS[0];
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const sp = (180 + Math.random() * 520) * power;
+                const spark = Math.random() < 0.25;
+                add({
+                    x, y,
+                    vx: Math.cos(a) * sp,
+                    vy: Math.sin(a) * sp - 260 * power,
+                    g: spark ? 300 : 900,
+                    drag: spark ? 2.2 : 1.4,
+                    rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 14,
+                    w: 6 + Math.random() * 8, h: 4 + Math.random() * 6,
+                    color: cols[(Math.random() * cols.length) | 0],
+                    life: 0, max: spark ? 0.8 + Math.random() * 0.6 : 2.2 + Math.random() * 1.4,
+                    shape: spark ? 'star' : (Math.random() < 0.3 ? 'circle' : 'rect'),
+                    wob: Math.random() * 6.28
+                });
+            }
+            start();
+        }
+
+        function cannons(player) {
+            const W = innerWidth, H = innerHeight;
+            const n = reduce ? 20 : 70;
+            const cols = COLORS[player] || COLORS[0];
+            [[0, H, -1], [W, H, 1]].forEach(([x, y, side]) => {
+                for (let i = 0; i < n; i++) {
+                    const a = (-Math.PI / 2) + side * -(0.25 + Math.random() * 0.45);
+                    const sp = 700 + Math.random() * 700;
+                    add({
+                        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                        g: 900, drag: 1.3,
+                        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 14,
+                        w: 7 + Math.random() * 8, h: 4 + Math.random() * 6,
+                        color: cols[(Math.random() * cols.length) | 0],
+                        life: 0, max: 3 + Math.random() * 1.5,
+                        shape: Math.random() < 0.3 ? 'circle' : 'rect', wob: Math.random() * 6.28
+                    });
+                }
+            });
+            start();
+        }
+
+        function rain(seconds, player) {
+            const cols = COLORS[player] || COLORS[0];
+            const endAt = performance.now() + seconds * 1000;
+            const drip = () => {
+                if (performance.now() > endAt) return;
+                for (let i = 0; i < (reduce ? 1 : 4); i++) {
+                    add({
+                        x: Math.random() * innerWidth, y: -20,
+                        vx: (Math.random() - 0.5) * 120, vy: 120 + Math.random() * 160,
+                        g: 160, drag: 0.3,
+                        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 10,
+                        w: 8 + Math.random() * 8, h: 5 + Math.random() * 6,
+                        color: cols[(Math.random() * cols.length) | 0],
+                        life: 0, max: 6,
+                        shape: Math.random() < 0.25 ? 'circle' : 'rect', wob: Math.random() * 6.28
+                    });
+                }
+                start();
+                requestAnimationFrame(drip);
+            };
+            drip();
+        }
+
+        function star(cx, cy, r) {
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const rad = i % 2 === 0 ? r : r * 0.35;
+                const a = (i / 8) * Math.PI * 2;
+                ctx.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function tick(t) {
+            const dt = Math.min(0.05, (t - last) / 1000 || 0.016);
+            last = t;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            const H = innerHeight + 40;
+            parts = parts.filter(p => p.life < p.max && p.y < H);
+            for (const p of parts) {
+                p.life += dt;
+                p.vx -= p.vx * p.drag * dt;
+                p.vy += p.g * dt - p.vy * p.drag * dt * 0.5;
+                p.x += p.vx * dt + Math.sin(p.life * 6 + p.wob) * 0.6;
+                p.y += p.vy * dt;
+                p.rot += p.vr * dt;
+                const fade = Math.min(1, (p.max - p.life) / 0.5);
+                ctx.globalAlpha = Math.max(0, fade);
+                ctx.fillStyle = p.color;
+                if (p.shape === 'star') {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.shadowColor = p.color; ctx.shadowBlur = 10;
+                    star(0, 0, p.w * 0.9);
+                    ctx.restore();
+                } else if (p.shape === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.h * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.scale(1, Math.cos(p.life * 8 + p.wob));
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                }
+            }
+            ctx.globalAlpha = 1;
+            if (parts.length) requestAnimationFrame(tick);
+            else { running = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+        }
+
+        function start() {
+            if (running) return;
+            running = true;
+            last = performance.now();
+            requestAnimationFrame(tick);
+        }
+
+        return { burst, cannons, rain };
+    })();
+
+    // Convert a board cell to screen coordinates (for particles)
+    function cellScreenPos(r, c) {
+        const stage = document.getElementById('stage');
+        const rect = stage.getBoundingClientRect();
+        const k = rect.width / 760;
+        return { x: rect.left + cellCX(c) * k, y: rect.top + cellCY(r) * k };
+    }
+
+    function discHTML(player, extraClass = '', face = '') {
+        return `<span class="disc mini ${getChipStyle(player)} ${extraClass}">${face ? `<span class="face">${face}</span>` : ''}</span>`;
+    }
+
+    function buildFace() {
+        const face = document.getElementById('face');
+        let holes = '', clip = '', shadows = '', walls = '', lips = '';
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const x = cellCX(c), y = cellCY(r);
+                holes += `<circle cx="${x}" cy="${y}" r="40" fill="#000"/>`;
+                clip += `<circle cx="${x}" cy="${y}" r="40"/>`;
+                shadows += `<circle cx="${x}" cy="${y + 7}" r="43" fill="none" stroke="#000418" stroke-width="12"/>`;
+                walls += `<circle cx="${x}" cy="${y}" r="41.5" fill="none" stroke="url(#wallG)" stroke-width="4"/>`;
+                lips += `<circle cx="${x}" cy="${y}" r="46.5" fill="none" stroke="url(#lipG)" stroke-width="3.5"/>`;
+            }
+        }
+        face.innerHTML = `
+            <defs>
+                <linearGradient id="faceG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5a96ff"/>
+                    <stop offset="0.18" stop-color="#3d7bff"/>
+                    <stop offset="0.6" stop-color="#2a60ee"/>
+                    <stop offset="1" stop-color="#1c46c8"/>
+                </linearGradient>
+                <linearGradient id="sideG" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+                    <stop offset="0.12" stop-color="#ffffff" stop-opacity="0"/>
+                    <stop offset="0.88" stop-color="#000830" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#000830" stop-opacity="0.22"/>
+                </linearGradient>
+                <linearGradient id="edgeG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#16359c"/>
+                    <stop offset="1" stop-color="#0b1f66"/>
+                </linearGradient>
+                <linearGradient id="glossG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#fff" stop-opacity="0.38"/>
+                    <stop offset="0.45" stop-color="#fff" stop-opacity="0.10"/>
+                    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="rimG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#cfe0ff" stop-opacity="0.95"/>
+                    <stop offset="0.5" stop-color="#9bbcff" stop-opacity="0.25"/>
+                    <stop offset="1" stop-color="#0a1c60" stop-opacity="0.6"/>
+                </linearGradient>
+                <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#06134a"/>
+                    <stop offset="0.55" stop-color="#1a3fb0"/>
+                    <stop offset="1" stop-color="#a9c6ff"/>
+                </linearGradient>
+                <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/>
+                    <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+                    <stop offset="1" stop-color="#001060" stop-opacity="0.45"/>
+                </linearGradient>
+                <mask id="holeMask" maskUnits="userSpaceOnUse" x="0" y="0" width="760" height="790">
+                    <rect x="0" y="0" width="760" height="790" fill="#fff"/>
+                    ${holes}
+                </mask>
+                <clipPath id="holeClip">${clip}</clipPath>
+                <filter id="softBlur" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="5"/>
+                </filter>
+            </defs>
+            <g mask="url(#holeMask)">
+                <rect x="0" y="126" width="760" height="660" rx="46" fill="url(#edgeG)"/>
+                <rect x="0" y="110" width="760" height="660" rx="46" fill="url(#faceG)"/>
+                <rect x="0" y="110" width="760" height="660" rx="46" fill="url(#sideG)"/>
+                <path d="M46 112 H714 Q756 112 756 154 V330 Q560 300 380 320 Q180 345 4 300 V154 Q4 112 46 112 Z" fill="url(#glossG)"/>
+                <rect x="2.5" y="112.5" width="755" height="655" rx="44" fill="none" stroke="url(#rimG)" stroke-width="5"/>
+            </g>
+            <g clip-path="url(#holeClip)" opacity="0.7">
+                <g filter="url(#softBlur)">${shadows}</g>
+            </g>
+            <g>${walls}</g>
+            <g>${lips}</g>
+        `;
+    }
+
+    function thud() {
+        const stage = document.getElementById('stage');
+        if (!stage) return;
+        stage.classList.remove('thud');
+        void stage.offsetWidth;
+        stage.classList.add('thud');
+    }
+
+    // Slide existing discs out the bottom of the board (visual only)
+    function spillDiscs() {
+        const spill = document.getElementById('spill');
+        if (!spill) return;
+        document.querySelectorAll('#discs .slot > .disc').forEach(chip => {
+            const slot = chip.parentElement;
+            const r = +slot.dataset.r, c = +slot.dataset.c;
+            const holder = document.createElement('div');
+            holder.className = 'spill-slot';
+            holder.style.setProperty('--r', r);
+            holder.style.setProperty('--c', c);
+            holder.style.animationDelay = `${(ROWS - 1 - r) * 45 + Math.random() * 40}ms`;
+            chip.classList.remove('chip-drop', 'win');
+            holder.appendChild(chip);
+            spill.appendChild(holder);
+            holder.addEventListener('animationend', () => holder.remove());
+            setTimeout(() => holder.remove(), 1500);
+        });
+    }
+
+    function renderPips() {
+        [1, 2].forEach(p => {
+            const el = document.getElementById(`pips-p${p}`);
+            if (!el) return;
+            let html = '';
+            for (let i = 0; i < WINNING_SCORE; i++) html += `<i class="${i < scores[p] ? 'on' : ''}"></i>`;
+            el.innerHTML = html;
+        });
+    }
+
+    function playerName(player) {
+        if (player === 1) return 'Red';
+        return gameMode === '1P' ? 'Robot' : 'Yellow';
+    }
+
     // --- Styling for the chips ---
     function getChipStyle(player) {
-        if (player === 1) {
-            // Red Player Chip
-            return "bg-gradient-to-br from-red-400 via-red-500 to-red-700 shadow-[inset_0_3px_6px_rgba(255,255,255,0.4),0_4px_5px_rgba(0,0,0,0.5)] border-[1px] border-red-800";
-        } else {
-            // Yellow Player Chip
-            return "bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-600 shadow-[inset_0_3px_6px_rgba(255,255,255,0.6),0_4px_5px_rgba(0,0,0,0.5)] border-[1px] border-yellow-700";
-        }
+        return player === 1 ? 'p1' : 'p2';
     }
 
     function setupBoard() {
-        const boardEl = document.getElementById('board');
+        const boardEl = document.getElementById('discs');
         const overlayEl = document.getElementById('overlay');
-        const indicatorsEl = document.getElementById('indicators');
 
         boardEl.innerHTML = '';
         overlayEl.innerHTML = '';
-        indicatorsEl.innerHTML = '';
+
+        buildFace();
 
         for (let c = 0; c < COLS; c++) {
-            // 1. Create Top Indicators (Shows hovering ghost chip)
-            const ind = document.createElement('div');
-            ind.id = `ind-${c}`;
-            ind.className = 'w-full aspect-square transition-opacity duration-200 opacity-0 flex items-center justify-center';
-            ind.innerHTML = `<div class="w-[85%] h-[85%] rounded-full opacity-60"></div>`;
-            indicatorsEl.appendChild(ind);
-
-            // 2. Create invisible Interaction Overlay columns (for easy clicking/tapping)
+            // Invisible Interaction Overlay columns (for easy clicking/tapping)
             const colOverlay = document.createElement('div');
-            colOverlay.className = 'h-full w-full cursor-pointer rounded-full hover:bg-white/10 transition-colors z-20';
             colOverlay.dataset.col = c;
 
             // Add event listeners to update selected column and drop
@@ -203,37 +1156,54 @@
             overlayEl.appendChild(colOverlay);
         }
 
-        // 3. Create the dark empty holes of the board
+        // Landing-spot ghost
+        const ghost = document.createElement('div');
+        ghost.id = 'ghost';
+        ghost.className = 'ghost off';
+        boardEl.appendChild(ghost);
+
+        // Slot containers (chips live behind the board face)
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 const slot = document.createElement('div');
                 slot.id = `slot-${r}-${c}`;
-                // The dark blue hole
-                slot.className = 'w-full aspect-square rounded-full bg-[#0a192f] shadow-[inset_0_4px_8px_rgba(0,0,0,0.8)] flex items-center justify-center relative z-0';
+                slot.className = 'slot';
+                slot.dataset.r = r;
+                slot.dataset.c = c;
+                slot.style.setProperty('--r', r);
+                slot.style.setProperty('--c', c);
                 boardEl.appendChild(slot);
             }
         }
     }
 
     function updateIndicator() {
+        const hover = document.getElementById('hover-disc');
+        const glow = document.getElementById('col-glow');
+        const ghost = document.getElementById('ghost');
+        if (!hover || !glow || !ghost) return;
+
         // Hide indicators during animation, game over, or AI's turn
         if (gameOver || isAnimating || (gameMode === '1P' && currentPlayer === 2)) {
-            for (let c = 0; c < COLS; c++) {
-                const ind = document.getElementById(`ind-${c}`);
-                if (ind) ind.classList.add('opacity-0');
-            }
+            hover.classList.add('off');
+            glow.classList.add('off');
+            ghost.classList.add('off');
             return;
         }
 
-        for (let c = 0; c < COLS; c++) {
-            const ind = document.getElementById(`ind-${c}`);
-            if (!ind) continue;
-            if (c === selectedCol) {
-                ind.classList.remove('opacity-0');
-                ind.firstElementChild.className = `w-[85%] h-[85%] rounded-full opacity-70 ${getChipStyle(currentPlayer)}`;
-            } else {
-                ind.classList.add('opacity-0');
-            }
+        const style = getChipStyle(currentPlayer);
+        hover.className = `disc ${style}`;
+        hover.style.setProperty('--c', selectedCol);
+        glow.classList.remove('off');
+        glow.style.setProperty('--c', selectedCol);
+
+        const row = board.length ? getLowestEmptyRow(selectedCol) : -1;
+        if (row === -1) {
+            ghost.className = 'ghost off';
+        } else {
+            ghost.className = `ghost ${style}`;
+            ghost.style.setProperty('--c', selectedCol);
+            ghost.style.setProperty('--r', row);
         }
     }
 
@@ -278,16 +1248,15 @@
         const chip = document.createElement('div');
 
         // Render the colored chip
-        chip.className = `w-[85%] h-[85%] rounded-full absolute z-10 chip-drop ${getChipStyle(currentPlayer)}`;
+        chip.className = `disc ${getChipStyle(currentPlayer)} chip-drop`;
         chip.id = `chip-${row}-${col}`;
 
-        // Calculate how far the chip needs to drop based on the row
-        // Top rows drop a shorter distance than bottom rows
-        const dropPercent = -((row + 1.5) * 115);
-        chip.style.setProperty('--drop-start', `${dropPercent}%`);
+        // The chip starts in the hover row above the board and falls behind the board face
+        chip.style.setProperty('--drop', `calc(var(--u) * ${-(135 + row * 100)})`);
 
         slot.appendChild(chip);
         playSound('drop');
+        setTimeout(thud, 280); // little board jolt on impact (visual only)
 
         // Wait for the CSS animation to finish before checking for wins
         setTimeout(() => {
@@ -421,6 +1390,7 @@
     }
 
     function highlightWin(cells) {
+        const isNew = currentWinningCells !== cells;
         currentWinningCells = cells;
 
         // Remove old highlight if it exists
@@ -436,45 +1406,51 @@
         const first = sorted[0];
         const last = sorted[sorted.length - 1];
 
-        const c1 = document.getElementById(`slot-${first[0]}-${first[1]}`);
-        const c2 = document.getElementById(`slot-${last[0]}-${last[1]}`);
-        const board = document.getElementById('board');
+        const svg = document.getElementById('win-svg');
+        const stage = document.getElementById('stage');
+        if (!svg || !stage) return;
 
-        if (!c1 || !c2 || !board) return;
+        // Glowing golden line + rings drawn in board units (scales automatically)
+        const x1 = cellCX(first[1]), y1 = cellCY(first[0]);
+        const x2 = cellCX(last[1]), y2 = cellCY(last[0]);
 
-        const c1Rect = c1.getBoundingClientRect();
-        const c2Rect = c2.getBoundingClientRect();
-        const boardRect = board.getBoundingClientRect();
+        const g = document.createElementNS(SVG_NS, 'g');
+        g.id = 'win-highlight-line';
+        let rings = '';
+        sorted.forEach(([r, c], i) => {
+            const d = (i * 0.08).toFixed(2);
+            rings += `<circle class="win-ring-glow" cx="${cellCX(c)}" cy="${cellCY(r)}" r="44"/>`;
+            rings += `<circle class="win-ring" style="animation-delay:${d}s, ${(0.5 + +d).toFixed(2)}s" cx="${cellCX(c)}" cy="${cellCY(r)}" r="44"/>`;
+        });
+        g.innerHTML = `
+            ${rings}
+            <line class="win-line-glow" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" pathLength="1000"/>
+            <line class="win-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" pathLength="1000"/>
+        `;
+        svg.appendChild(g);
 
-        // Calculate centers relative to the board
-        const x1 = c1Rect.left + c1Rect.width / 2 - boardRect.left;
-        const y1 = c1Rect.top + c1Rect.height / 2 - boardRect.top;
-        const x2 = c2Rect.left + c2Rect.width / 2 - boardRect.left;
-        const y2 = c2Rect.top + c2Rect.height / 2 - boardRect.top;
+        stage.classList.add('has-win');
+        cells.forEach(([r, c]) => {
+            const chip = document.getElementById(`chip-${r}-${c}`);
+            if (chip) chip.classList.add('win');
+        });
 
-        const distance = Math.hypot(x2 - x1, y2 - y1);
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-
-        // Make the pill big enough to comfortably wrap the chips
-        const thickness = c1Rect.width + 16; // Add padding
-        const length = distance + thickness;
-
-        const cx = (x1 + x2) / 2;
-        const cy = (y1 + y2) / 2;
-
-        const line = document.createElement('div');
-        line.id = 'win-highlight-line';
-        // Glowing golden capsule that encapsulates the 4 winning chips!
-        line.className = 'absolute z-20 pointer-events-none rounded-full border-[6px] sm:border-[8px] border-yellow-300 shadow-[0_0_20px_rgba(253,224,71,0.8),inset_0_0_15px_rgba(253,224,71,0.5)] animate-pulse';
-        line.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'; // Bright semi-transparent fill
-
-        line.style.width = `${length}px`;
-        line.style.height = `${thickness}px`;
-        line.style.left = `${cx - length / 2}px`;
-        line.style.top = `${cy - thickness / 2}px`;
-        line.style.transform = `rotate(${angle}rad)`;
-
-        board.appendChild(line);
+        if (isNew) {
+            const winner = board[first[0]][first[1]];
+            sorted.forEach(([r, c], i) => {
+                setTimeout(() => {
+                    const p = cellScreenPos(r, c);
+                    FX.burst(p.x, p.y, 34, winner, 0.8);
+                }, 120 + i * 90);
+            });
+            const card = document.getElementById('status-card');
+            const statusText = document.getElementById('status-text');
+            if (card && statusText) {
+                card.classList.remove('thinking');
+                card.classList.add('won');
+                statusText.textContent = `${playerName(winner)} got 4!`;
+            }
+        }
     }
 
     function makeAIMove() {
@@ -540,17 +1516,26 @@
         const statusText = document.getElementById('status-text');
         const avatarEl = document.getElementById('turn-avatar');
         const statusCard = document.getElementById('status-card');
+        const robotTurn = gameMode === '1P' && currentPlayer === 2;
 
         if (currentPlayer === 1) {
             statusText.textContent = "Red's Turn!";
-            statusText.className = "text-xl sm:text-3xl md:text-4xl font-black text-red-500 drop-shadow-sm";
-            avatarEl.innerHTML = '🔴';
+            avatarEl.className = 'disc mini p1';
+            avatarEl.innerHTML = '';
         } else {
-            const name = gameMode === '1P' ? "Robot's Turn!" : "Yellow's Turn!";
+            const name = gameMode === '1P' ? "Robot's Turn" : "Yellow's Turn!";
             statusText.textContent = name;
-            statusText.className = "text-xl sm:text-3xl md:text-4xl font-black text-yellow-500 drop-shadow-sm";
-            avatarEl.innerHTML = gameMode === '1P' ? '🤖' : '🟡';
+            avatarEl.className = 'disc mini p2';
+            avatarEl.innerHTML = gameMode === '1P' ? '<span class="face">🤖</span>' : '';
         }
+
+        // Visual turn state
+        statusCard.className = `status ${getChipStyle(currentPlayer)}${robotTurn ? ' thinking' : ''}`;
+        document.body.dataset.turn = currentPlayer;
+        document.body.dataset.robot = robotTurn ? '1' : '0';
+        document.getElementById('card-p1').classList.toggle('turn', currentPlayer === 1);
+        document.getElementById('card-p2').classList.toggle('turn', currentPlayer === 2);
+        document.getElementById('p2-face').textContent = gameMode === '1P' ? '🤖' : '';
     }
 
     function endGame(winnerPlayer) {
@@ -576,41 +1561,54 @@
 
         if (winnerPlayer === 0) {
             title.textContent = "It's a Draw!";
-            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-gray-700 mb-6 sm:mb-8 drop-shadow-sm";
-            icon.innerHTML = '🤝';
+            title.className = "win-title draw";
+            icon.innerHTML = `<div class="rays"></div>${discHTML(1, 'big')}${discHTML(2, 'big')}`;
             btn.textContent = "Play Again!";
         } else if (winnerPlayer === 1) {
             if (matchOver) {
-                title.innerHTML = `🏆<br>Red Wins the Match!<br><span class='text-xl sm:text-2xl text-gray-600 drop-shadow-none'>(First to ${WINNING_SCORE})</span>`;
+                title.innerHTML = `🏆<br>Red Wins the Match!<br><span class='sub'>(First to ${WINNING_SCORE})</span>`;
                 btn.textContent = "Start New Match!";
             } else {
                 title.textContent = "Red Wins Game!";
                 btn.textContent = "Next Game!";
             }
-            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-red-500 mb-6 sm:mb-8 drop-shadow-sm leading-tight";
-            icon.innerHTML = '🎉🔴🎉';
+            title.className = "win-title red";
+            icon.innerHTML = `<div class="rays"></div>${discHTML(1, 'big')}<span class="crown">👑</span>`;
         } else {
             const name = gameMode === '1P' ? "Robot" : "Yellow";
             const grandTitle = gameMode === '1P' ? "Robot Wins the Match!" : "Yellow Wins the Match!";
 
             if (matchOver) {
-                title.innerHTML = `🏆<br>${grandTitle}<br><span class='text-xl sm:text-2xl text-gray-600 drop-shadow-none'>(First to ${WINNING_SCORE})</span>`;
+                title.innerHTML = `🏆<br>${grandTitle}<br><span class='sub'>(First to ${WINNING_SCORE})</span>`;
                 btn.textContent = "Start New Match!";
             } else {
                 title.textContent = `${name} Wins Game!`;
                 btn.textContent = "Next Game!";
             }
 
-            title.className = "text-3xl sm:text-4xl md:text-5xl font-black text-yellow-500 mb-6 sm:mb-8 drop-shadow-sm leading-tight";
-            icon.innerHTML = gameMode === '1P' ? '🤖⚡' : '🎉🟡🎉';
+            title.className = "win-title yellow";
+            icon.innerHTML = `<div class="rays"></div>${discHTML(2, 'big', gameMode === '1P' ? '🤖' : '')}<span class="crown">👑</span>`;
         }
+
+        // Celebration (visual only)
+        FX.cannons(winnerPlayer);
+        if (matchOver) FX.rain(3.5, winnerPlayer);
     }
 
     function updateScoreDisplay() {
         const p1 = document.getElementById('score-p1');
         const p2 = document.getElementById('score-p2');
-        if(p1) p1.textContent = scores[1];
-        if(p2) p2.textContent = scores[2];
+        [[p1, scores[1]], [p2, scores[2]]].forEach(([el, val]) => {
+            if (!el) return;
+            const changed = el.textContent !== String(val);
+            el.textContent = val;
+            if (changed && val > 0) {
+                el.classList.remove('bump');
+                void el.offsetWidth;
+                el.classList.add('bump');
+            }
+        });
+        renderPips();
     }
 
     function setMode(mode) {
@@ -631,16 +1629,9 @@
         const btn2p = document.getElementById('btn-2p');
 
         // Visual styles for toggling buttons
-        const activeClasses = "flex-1 py-2 sm:py-3 md:py-4 bg-blue-500 text-white font-black rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_#1d4ed8] sm:shadow-[0_6px_0_0_#1d4ed8] md:shadow-[0_8px_0_0_#1d4ed8] translate-y-0 transition-all text-base sm:text-xl md:text-2xl flex items-center justify-center gap-1 sm:gap-2 border-2 border-transparent";
-        const inactiveClasses = "flex-1 py-2 sm:py-3 md:py-4 bg-white/40 text-blue-900 font-bold rounded-xl sm:rounded-2xl shadow-[0_4px_0_0_rgba(255,255,255,0.4)] sm:shadow-[0_6px_0_0_rgba(255,255,255,0.4)] md:shadow-[0_8px_0_0_rgba(255,255,255,0.4)] translate-y-1 sm:translate-y-[2px] md:translate-y-[3px] transition-all text-base sm:text-xl md:text-2xl opacity-80 hover:bg-white/60 flex items-center justify-center gap-1 sm:gap-2 border-2 border-white/50";
-
-        if (mode === '1P') {
-            btn1p.className = activeClasses;
-            btn2p.className = inactiveClasses;
-        } else {
-            btn2p.className = activeClasses;
-            btn1p.className = inactiveClasses;
-        }
+        document.getElementById('modes').dataset.mode = mode;
+        btn1p.classList.toggle('active', mode === '1P');
+        btn2p.classList.toggle('active', mode === '2P');
 
         resetGame();
     }
@@ -668,8 +1659,10 @@
 
         const oldLine = document.getElementById('win-highlight-line');
         if (oldLine) oldLine.remove();
+        document.getElementById('stage').classList.remove('has-win');
 
-        // Clear visual board DOM
+        // Clear visual board DOM (old discs slide out the bottom)
+        spillDiscs();
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 const slot = document.getElementById(`slot-${r}-${c}`);

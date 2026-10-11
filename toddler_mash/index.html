@@ -2,116 +2,267 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ff9ab8">
     <link rel="icon" type="image/png" href="../web/favicon.png">
     <title>Toddler Musical Smash!</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #4a2a6a;
+            --font: 'Fredoka', 'Nunito', 'Varela Round', 'Arial Rounded MT Bold', system-ui, -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
         body {
             overflow: hidden;
             touch-action: none;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             cursor: none;
-            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            font-family: system-ui, -apple-system, sans-serif;
+            background: #ffb3c7;
+            font-family: var(--font);
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
 
+        /* ---------- Background: cross-fading gradient layers ---------- */
+        #bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-layer {
+            position: absolute; inset: 0;
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        /* slow, soft sunburst */
+        #rays {
+            position: absolute; left: 50%; top: 50%;
+            width: 220vmax; height: 220vmax;
+            margin: -110vmax 0 0 -110vmax;
+            z-index: 3;
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.13) 0deg 9deg, rgba(255,255,255,0) 9deg 22.5deg);
+            -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0,0,0,0.5) 35%, transparent 62%);
+                    mask-image: radial-gradient(circle, #000 0%, rgba(0,0,0,0.5) 35%, transparent 62%);
+            animation: spin 120s linear infinite;
+        }
+        #glow {
+            position: absolute; inset: 0; z-index: 4;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255,255,255,0.38), rgba(255,255,255,0) 70%),
+                radial-gradient(ellipse 120% 80% at 50% 120%, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ---------- Clouds ---------- */
+        #clouds { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        .cloud {
+            position: absolute; left: 0;
+            width: var(--w); height: calc(var(--w) * 0.55);
+            opacity: var(--o);
+            animation: drift var(--d) linear infinite;
+            animation-delay: var(--delay);
+            filter: drop-shadow(0 10px 14px rgba(120, 70, 160, 0.10));
+            will-change: transform;
+        }
+        .cloud svg { width: 100%; height: 100%; display: block; animation: bob 7s ease-in-out infinite; }
+        @keyframes drift {
+            from { transform: translateX(-40vw); }
+            to   { transform: translateX(110vw); }
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        canvas { position: fixed; inset: 0; pointer-events: none; display: block; }
+        #fx-back  { z-index: 2; }
+        #stage    { position: fixed; inset: 0; z-index: 10; pointer-events: none; overflow: hidden; }
+        #fx-front { z-index: 30; }
+
+        /* ---------- Pops ---------- */
         .emoji-pop {
             position: absolute;
             user-select: none;
             pointer-events: none;
-            animation: pop-up var(--duration, 1.5s) ease-out forwards;
             z-index: 10;
             will-change: transform, opacity;
             line-height: 1;
+            transform: translate(-50%, -50%) scale(0);
+            /* sticker look: thick white outline + soft colored ground shadow */
+            text-shadow:
+                 0.045em 0 0 #fff, -0.045em 0 0 #fff, 0 0.045em 0 #fff, 0 -0.045em 0 #fff,
+                 0.032em 0.032em 0 #fff, -0.032em 0.032em 0 #fff, 0.032em -0.032em 0 #fff, -0.032em -0.032em 0 #fff,
+                 0 0.11em 0.02em rgba(90, 40, 130, 0.22);
         }
-
         .emoji-pop.rare {
             z-index: 20;
-            filter: drop-shadow(0 0 20px gold);
-            animation: pop-up-rare 4s ease-in-out forwards;
+            display: grid; place-items: center;
+            text-shadow:
+                 0.03em 0 0 #fff, -0.03em 0 0 #fff, 0 0.03em 0 #fff, 0 -0.03em 0 #fff,
+                 0 0 0.12em rgba(255, 210, 60, 0.95), 0 0.06em 0.03em rgba(150, 90, 0, 0.3);
+        }
+        .emoji-pop.rare .glyph { position: relative; z-index: 2; }
+        .emoji-pop.rare .halo {
+            position: absolute; left: 50%; top: 50%;
+            width: 2.1em; height: 2.1em; margin: -1.05em 0 0 -1.05em;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(255,250,200,0.95) 0%, rgba(255,215,90,0.75) 28%, rgba(255,190,60,0) 62%),
+                repeating-conic-gradient(rgba(255,220,90,0.75) 0deg 12deg, rgba(255,220,90,0) 12deg 30deg);
+            -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+                    mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+            animation: spin 6s linear infinite;
         }
 
-        @keyframes pop-up {
-            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); }
-            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.5) rotate(var(--rot-start)); }
-            100% { opacity: 0; transform: translate(var(--dest-x), var(--dest-y)) scale(0.5) rotate(var(--rot-end)); }
-        }
-
-        @keyframes pop-up-rare {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
-            10% { opacity: 1; transform: translate(-50%, -50%) scale(5) rotate(-10deg); }
-            90% { opacity: 1; transform: translate(-50%, -50%) scale(6) rotate(10deg); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(8) rotate(0deg); }
-        }
-
-        .trail-sparkle {
-            position: absolute;
-            pointer-events: none;
-            animation: sparkle-fade 0.8s linear forwards;
-            font-size: 1.5rem;
-            z-index: 5;
-        }
-
-        @keyframes sparkle-fade {
-            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, 100%) scale(0); }
-        }
-
+        /* ---------- Cursor ---------- */
         #custom-cursor {
             position: fixed;
+            left: -200px; top: -200px;
             pointer-events: none;
-            font-size: 3rem;
             z-index: 100;
-            transform: translate(-20%, -20%) rotate(-20deg);
-            transition: transform 0.1s ease-out;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #custom-cursor.on { opacity: 1; }
+        #custom-cursor .c-inner {
+            display: grid; place-items: center;
+            width: 4.2rem; height: 4.2rem;
+            margin: -2.1rem 0 0 -2.1rem;
+            border-radius: 50%;
+            font-size: 2.6rem; line-height: 1;
+            background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75), rgba(255,255,255,0.25) 55%, rgba(255,255,255,0) 72%);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.55), 0 6px 18px rgba(110, 50, 150, 0.22);
+            transform: rotate(-14deg);
+            transition: transform 0.25s cubic-bezier(.3,1.8,.5,1);
+            text-shadow: 0 2px 0 #fff, 0 -2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff;
+        }
+        #custom-cursor.tap .c-inner {
+            transform: rotate(8deg) scale(0.78, 0.68);
+            transition: transform 0.06s ease-out;
         }
 
+        /* ---------- Mute button ---------- */
+        #mute-btn {
+            position: fixed;
+            top: max(16px, env(safe-area-inset-top));
+            right: max(16px, env(safe-area-inset-right));
+            z-index: 50;
+            width: clamp(58px, 8vmin, 76px); height: clamp(58px, 8vmin, 76px);
+            border: none; padding: 0; margin: 0;
+            border-radius: 50%;
+            display: grid; place-items: center;
+            font-size: clamp(26px, 3.6vmin, 34px);
+            cursor: pointer;
+            background: radial-gradient(circle at 35% 28%, #ffffff 0%, #fff6fb 45%, #ffd9ea 100%);
+            box-shadow: 0 6px 0 #f29abd, 0 12px 22px rgba(120, 40, 120, 0.25), inset 0 -4px 8px rgba(255, 140, 190, 0.35);
+            transition: transform 0.2s cubic-bezier(.3,1.8,.5,1), box-shadow 0.2s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #mute-btn:hover { transform: scale(1.06); }
+        #mute-btn:active { transform: translateY(5px) scale(0.96); box-shadow: 0 1px 0 #f29abd, 0 4px 10px rgba(120, 40, 120, 0.25), inset 0 -4px 8px rgba(255, 140, 190, 0.35); }
+        #mute-btn #sound-icon { pointer-events: none; line-height: 1; }
+
+        /* ---------- Hint ---------- */
         #hint {
+            position: fixed; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
             pointer-events: none;
+            z-index: 9;
             animation: fade-out 1s ease-in forwards;
             animation-delay: 4s;
-            z-index: 50;
+            width: max-content; max-width: 92vw;
         }
         @keyframes fade-out { to { opacity: 0; } }
-
-        .confetti {
-            position: absolute;
-            width: 10px; height: 10px;
-            background-color: #ffd700;
-            animation: confetti-fall 3s linear forwards;
-            z-index: 15;
+        #hint .card {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+            gap: 0 0.35em;
+            padding: 0.45em 0.8em 0.55em;
+            border-radius: 1.2em;
+            font-size: clamp(1.9rem, min(7.2vmin, 5.6vw), 4.6rem);
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.7));
+            box-shadow: 0 10px 0 rgba(255,255,255,0.45), 0 24px 50px rgba(110, 40, 140, 0.25);
+            animation: card-in 0.9s cubic-bezier(.25,1.6,.45,1) both;
         }
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        @keyframes card-in {
+            0% { transform: scale(0.3) rotate(-6deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        #hint .word { display: inline-flex; white-space: nowrap; }
+        #hint .ch {
+            display: inline-block;
+            animation: hop 1.4s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 70ms);
+            -webkit-text-stroke: 0.035em rgba(255,255,255,0.0);
+            text-shadow: 0 0.06em 0 rgba(80, 30, 110, 0.18);
+        }
+        #hint .emo { display: inline-block; animation: wiggle 1.2s ease-in-out infinite; }
+        @keyframes hop {
+            0%, 60%, 100% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-0.18em) scale(1.08, 0.94); }
+            40% { transform: translateY(0) scale(1.06, 0.92); }
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-10deg) scale(1); }
+            50% { transform: rotate(10deg) scale(1.12); }
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body>
 
-<!-- Mute Button -->
-<button id="mute-btn" class="fixed top-4 right-4 z-50 bg-white/30 p-3 rounded-full backdrop-blur-md hover:bg-white/50 transition-all">
-    <span id="sound-icon">🔊</span>
-</button>
-
-<!-- Initial hint text -->
-<div id="hint" class="text-white drop-shadow-lg text-3xl md:text-5xl font-bold text-center opacity-80 select-none p-4 bg-black/20 rounded-xl backdrop-blur-sm">
-    Make Some Music! 🎵🎹
+<!-- Background -->
+<div id="bg">
+    <div class="bg-layer" id="bgA"></div>
+    <div class="bg-layer" id="bgB"></div>
+    <div id="rays"></div>
+    <div id="glow"></div>
 </div>
 
+<!-- Drifting clouds -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset="0.65" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#f1e6ff"/>
+        </linearGradient>
+        <symbol id="cloudShape" viewBox="0 0 200 110">
+            <path fill="url(#cloudFill)" d="M38 100 C14 100 4 84 8 70 C12 55 28 50 40 54 C40 32 58 18 80 22 C92 6 122 4 136 22 C156 16 178 30 176 52 C194 56 200 76 192 88 C186 98 176 100 166 100 Z"/>
+            <ellipse cx="78" cy="44" rx="20" ry="9" fill="#fff" opacity="0.9"/>
+        </symbol>
+    </defs>
+</svg>
+<div id="clouds">
+    <div class="cloud" style="--w:min(34vw,300px); top:8%;  --o:.92; --d:85s;  --delay:-20s"><svg><use href="#cloudShape"/></svg></div>
+    <div class="cloud" style="--w:min(22vw,200px); top:26%; --o:.75; --d:110s; --delay:-70s"><svg><use href="#cloudShape"/></svg></div>
+    <div class="cloud" style="--w:min(40vw,360px); top:62%; --o:.6;  --d:140s; --delay:-35s"><svg><use href="#cloudShape"/></svg></div>
+    <div class="cloud" style="--w:min(26vw,240px); top:80%; --o:.8;  --d:95s;  --delay:-60s"><svg><use href="#cloudShape"/></svg></div>
+    <div class="cloud" style="--w:min(18vw,160px); top:44%; --o:.7;  --d:75s;  --delay:-5s"><svg><use href="#cloudShape"/></svg></div>
+</div>
+
+<canvas id="fx-back"></canvas>
+<div id="stage"></div>
+<canvas id="fx-front"></canvas>
+
+<!-- Mute Button -->
+<button id="mute-btn" aria-label="Sound on/off"><span id="sound-icon">🔊</span></button>
+
+<!-- Initial hint text -->
+<div id="hint"><div class="card" id="hint-card">Make Some Music! 🎵🎹</div></div>
+
 <!-- Custom Musical Cursor -->
-<div id="custom-cursor">🎵</div>
+<div id="custom-cursor"><div class="c-inner">🎵</div></div>
 
 <script>
     // Expanded with many musical instruments
@@ -119,12 +270,12 @@
     const RARE_EMOJIS = ["👨‍🎤", "👩‍🎤", "🕺", "💃", "🦄", "🐲", "👑"];
     const TRAIL_EMOJIS = ["♩", "♪", "♫", "♬", "♭", "♮", "♯"];
     const GRADIENTS = [
-        "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)",
-        "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)",
-        "linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)",
-        "linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)",
-        "linear-gradient(to top, #fddb92 0%, #d1fdff 100%)",
-        "linear-gradient(to right, #fa709a 0%, #fee140 100%)"
+        "linear-gradient(45deg, #ff8fb4 0%, #ffb59a 35%, #ffd98f 65%, #ff9ec7 100%)",
+        "linear-gradient(120deg, #7cc4ff 0%, #a9e2ff 35%, #c9b8ff 70%, #8fd0ff 100%)",
+        "linear-gradient(120deg, #6ee7b7 0%, #8fd3f4 40%, #b8f5d0 75%, #7fdcff 100%)",
+        "linear-gradient(120deg, #ffc48f 0%, #f59bd8 40%, #c08cff 75%, #ffb38a 100%)",
+        "linear-gradient(160deg, #ffe08a 0%, #c8f7ff 45%, #ffd1e8 80%, #ffe9a0 100%)",
+        "linear-gradient(90deg, #ff7aa6 0%, #ffb86b 40%, #ffe45c 75%, #ff8fb0 100%)"
     ];
 
     // C Major Pentatonic Scale (always sounds good together)
@@ -137,6 +288,361 @@
     let smashCount = 0;
     let isMuted = false;
     let audioCtx;
+
+    // =====================================================================
+    //  PRESENTATION ENGINE (visual only - canvas particles, pops, background)
+    // =====================================================================
+    const PALETTE = ['#ff4f8b', '#ffb020', '#2fb8f5', '#5ad35a', '#9a6bff', '#ff7a2f', '#ffd93d', '#1fd6b4', '#ff6bd6'];
+    const GOLD = ['#ffd84a', '#ffc21a', '#fff3a8', '#ffb300'];
+    const MAX_POPS = 46;
+    const MAX_PARTICLES = 650;
+    const MAX_RIPPLES = 36;
+    const MAX_WAVES = 10;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    const stage = document.getElementById('stage');
+    const backCv = document.getElementById('fx-back');
+    const frontCv = document.getElementById('fx-front');
+    const bctx = backCv.getContext('2d');
+    const fctx = frontCv.getContext('2d');
+    let W = 0, H = 0;
+
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    // --- background gradient layers (cross-fade) ---
+    const bgLayers = [document.getElementById('bgA'), document.getElementById('bgB')];
+    let bgTop = 0;
+    bgLayers[0].style.backgroundImage = GRADIENTS[0];
+    bgLayers[0].style.zIndex = 1;
+    bgLayers[1].style.zIndex = 0;
+    function showGradient(index) {
+        const next = bgLayers[1 - bgTop];
+        const prev = bgLayers[bgTop];
+        next.style.transition = 'none';
+        next.style.opacity = '0';
+        next.style.backgroundImage = GRADIENTS[index];
+        next.style.zIndex = 2;
+        prev.style.zIndex = 1;
+        void next.offsetWidth;
+        next.style.transition = 'opacity 0.9s ease';
+        next.style.opacity = '1';
+        bgTop = 1 - bgTop;
+    }
+
+    // --- sprites (pre-rendered for speed) ---
+    function makeBubbleSprite() {
+        const s = 128, c = document.createElement('canvas');
+        c.width = c.height = s;
+        const g = c.getContext('2d');
+        const r = s / 2 - 3;
+        let grd = g.createRadialGradient(s * 0.5, s * 0.5, r * 0.2, s * 0.5, s * 0.5, r);
+        grd.addColorStop(0, 'rgba(255,255,255,0.05)');
+        grd.addColorStop(0.75, 'rgba(255,255,255,0.16)');
+        grd.addColorStop(1, 'rgba(255,255,255,0.55)');
+        g.fillStyle = grd;
+        g.beginPath(); g.arc(s / 2, s / 2, r, 0, Math.PI * 2); g.fill();
+        g.lineWidth = 2.5;
+        g.strokeStyle = 'rgba(255,255,255,0.7)'; g.stroke();
+        // iridescent rim
+        g.lineWidth = 3;
+        g.strokeStyle = 'rgba(255,140,220,0.45)';
+        g.beginPath(); g.arc(s / 2, s / 2, r - 3, Math.PI * 0.1, Math.PI * 0.7); g.stroke();
+        g.strokeStyle = 'rgba(110,200,255,0.45)';
+        g.beginPath(); g.arc(s / 2, s / 2, r - 3, Math.PI * 0.75, Math.PI * 1.15); g.stroke();
+        // highlights
+        g.fillStyle = 'rgba(255,255,255,0.9)';
+        g.save(); g.translate(s * 0.34, s * 0.3); g.rotate(-0.6);
+        g.beginPath(); g.ellipse(0, 0, r * 0.28, r * 0.13, 0, 0, Math.PI * 2); g.fill(); g.restore();
+        g.beginPath(); g.arc(s * 0.62, s * 0.24, r * 0.06, 0, Math.PI * 2); g.fill();
+        return c;
+    }
+    const BUBBLE = makeBubbleSprite();
+
+    const glowCache = {};
+    function glowSprite(color) {
+        if (glowCache[color]) return glowCache[color];
+        const s = 64, c = document.createElement('canvas');
+        c.width = c.height = s;
+        const g = c.getContext('2d');
+        const grd = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+        grd.addColorStop(0, 'rgba(255,255,255,1)');
+        grd.addColorStop(0.25, color);
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = grd;
+        g.fillRect(0, 0, s, s);
+        glowCache[color] = c;
+        return c;
+    }
+
+    // --- bubbles ---
+    let bubbles = [];
+    function makeBubble(anywhere) {
+        const r = rand(14, 46) * Math.max(0.7, Math.min(1.3, Math.min(W, H) / 700));
+        return {
+            x: rand(0, W), y: anywhere ? rand(0, H) : H + r + rand(0, 80),
+            r, speed: rand(18, 45), ph: rand(0, Math.PI * 2), sway: rand(10, 28), f: rand(0.3, 0.8),
+            vx: 0, vy: 0, a: rand(0.55, 0.95)
+        };
+    }
+    function initBubbles() {
+        const n = Math.round(Math.max(10, Math.min(26, (W * H) / 55000)));
+        while (bubbles.length < n) bubbles.push(makeBubble(true));
+        bubbles.length = n;
+    }
+
+    function resize() {
+        W = window.innerWidth; H = window.innerHeight;
+        for (const cv of [backCv, frontCv]) {
+            cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+            cv.style.width = W + 'px'; cv.style.height = H + 'px';
+        }
+        bctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        initBubbles();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- particle stores ---
+    const backParts = [], frontParts = [], ripples = [], waves = [];
+    function pushCapped(arr, item, cap) {
+        arr.push(item);
+        if (arr.length > cap) arr.splice(0, arr.length - cap);
+    }
+    function addPart(front, p) {
+        p.t = 0;
+        p.rot = p.rot || 0; p.vr = p.vr || 0; p.g = p.g || 0; p.drag = p.drag == null ? 2 : p.drag;
+        pushCapped(front ? frontParts : backParts, p, MAX_PARTICLES);
+    }
+
+    function fxRipple(x, y, color, maxR, life, width) {
+        pushCapped(ripples, { x, y, color, maxR, life, width, t: 0 }, MAX_RIPPLES);
+    }
+    function fxWave(x, y, color, maxR, life, alpha) {
+        pushCapped(waves, { x, y, color, maxR, life, alpha, t: 0 }, MAX_WAVES);
+    }
+    function fxBurst(x, y, color, count, power, opts = {}) {
+        const shapes = opts.shapes || ['dot', 'dot', 'star', 'sparkle', 'heart'];
+        const cols = opts.colors || null;
+        for (let i = 0; i < count; i++) {
+            const a = (i / count) * Math.PI * 2 + rand(-0.25, 0.25);
+            const sp = power * rand(0.45, 1);
+            const shape = pick(shapes);
+            addPart(true, {
+                shape, x, y,
+                vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - power * 0.15,
+                g: opts.g == null ? 260 : opts.g, drag: 2.6,
+                size: (shape === 'dot' ? rand(4, 9) : rand(9, 17)) * (opts.scale || 1),
+                color: cols ? pick(cols) : (Math.random() < 0.6 ? color : pick(PALETTE)),
+                life: rand(0.6, 1.05) * (opts.life || 1),
+                rot: rand(0, 6.28), vr: rand(-6, 6)
+            });
+        }
+    }
+    function fxPuff(x, y, color) {
+        for (let i = 0; i < 6; i++) {
+            const a = rand(0, Math.PI * 2), sp = rand(40, 120);
+            addPart(true, {
+                shape: i % 2 ? 'sparkle' : 'dot', x, y,
+                vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, drag: 3, g: -20,
+                size: i % 2 ? rand(8, 13) : rand(3, 6), color: i % 3 ? color : '#ffffff',
+                life: rand(0.35, 0.6)
+            });
+        }
+    }
+    function nudgeBubbles(x, y, strength) {
+        for (const b of bubbles) {
+            const dx = b.x - x, dy = b.y - y, d2 = dx * dx + dy * dy;
+            const R = 260 * strength;
+            if (d2 < R * R && d2 > 1) {
+                const d = Math.sqrt(d2), k = (1 - d / R) * 380 * strength;
+                b.vx += (dx / d) * k; b.vy += (dy / d) * k;
+            }
+        }
+    }
+
+    // Visual effects for each spawned item
+    function fxForSpawn(px, py, isBig, isRare, color) {
+        if (isRare) {
+            fxWave(px, py, 'rgba(255,225,120,1)', Math.max(W, H) * 0.9, 1.6, 0.5);
+            fxRipple(px, py, '#ffd84a', Math.min(W, H) * 0.55, 1.2, 14);
+            fxRipple(px, py, '#ffffff', Math.min(W, H) * 0.4, 0.9, 8);
+            fxBurst(px, py, '#ffd84a', 46, 720, { shapes: ['star', 'star', 'sparkle', 'dot'], colors: GOLD, scale: 1.4, life: 1.6, g: 140 });
+            [500, 1100, 1800, 2600].forEach((ms) => setTimeout(() => {
+                fxBurst(px + rand(-60, 60), py + rand(-60, 60), '#ffd84a', 14, 420, { shapes: ['sparkle', 'star'], colors: GOLD, scale: 1.2, g: 60 });
+            }, ms));
+            nudgeBubbles(px, py, 2);
+        } else if (isBig) {
+            fxBurst(px, py, color, 8, 760, { scale: 1.3, life: 1.3 });
+        } else {
+            fxWave(px, py, color, Math.min(W, H) * 0.45, 0.9, 0.28);
+            fxRipple(px, py, color, rand(90, 140) * Math.max(0.8, Math.min(W, H) / 800), 0.7, 9);
+            fxRipple(px, py, '#ffffff', rand(60, 90), 0.5, 5);
+            fxBurst(px, py, color, 12, rand(380, 520));
+            nudgeBubbles(px, py, 1);
+        }
+    }
+
+    // Big "space bar" shockwave
+    function fxShockwave() {
+        const x = W / 2, y = H / 2, R = Math.hypot(W, H) * 0.55;
+        fxWave(x, y, pick(PALETTE), R * 1.3, 1.3, 0.35);
+        fxRipple(x, y, '#ffffff', R, 1.1, 18);
+        setTimeout(() => fxRipple(x, y, pick(PALETTE), R * 0.85, 1.0, 14), 90);
+        setTimeout(() => fxRipple(x, y, pick(PALETTE), R * 0.65, 0.9, 10), 180);
+        fxBurst(x, y, pick(PALETTE), 44, 900, { scale: 1.3, life: 1.4, g: 200 });
+        nudgeBubbles(x, y, 3);
+    }
+
+    // --- Pop elements (DOM, animated with Web Animations) ---
+    const pops = [];
+    function trimPops() {
+        while (pops.length > MAX_POPS) {
+            const old = pops.shift();
+            if (old.anim) old.anim.cancel();
+            old.el.remove();
+        }
+    }
+    function T(tx, ty, sx, sy, r) {
+        return `translate(-50%, -50%) translate(${tx}px, ${ty}px) rotate(${r}deg) scale(${sx}, ${sy})`;
+    }
+    function animatePop(el, sizePx, isBig, rotStart, rotEnd, durationMs, color, px, py) {
+        const f = isBig ? 1.5 : 1;
+        const dx = (Math.random() * 3 - 1.5) * sizePx * f;
+        const dy = (Math.random() * 3 - 1.5) * sizePx * f;
+        const rs = rotStart, re = rotEnd;
+        const anim = el.animate([
+            { offset: 0,    transform: T(0, 0, 0.15, 0.15, 0),          opacity: 0, easing: 'cubic-bezier(.2,.8,.3,1.2)' },
+            { offset: 0.07, transform: T(0, 0, 1.75, 1.2, rs * 0.4),    opacity: 1, easing: 'ease-in-out' },
+            { offset: 0.14, transform: T(0, 0, 1.25, 1.7, rs),          easing: 'ease-in-out' },
+            { offset: 0.21, transform: T(0, 0, 1.58, 1.4, rs),          easing: 'ease-out' },
+            { offset: 0.28, transform: T(0, 0, 1.5, 1.5, rs),           easing: 'cubic-bezier(.4,0,.6,1)' },
+            { offset: 0.84, transform: T(dx * 0.88, dy * 0.88, 1.15, 1.15, re * 0.88), opacity: 1, easing: 'cubic-bezier(.5,0,.9,.5)' },
+            { offset: 1,    transform: T(dx, dy, 0, 0, re),             opacity: 0 }
+        ], { duration: durationMs, fill: 'forwards' });
+        anim.onfinish = () => {
+            fxPuff(px + dx, py + dy, color);
+            removePop(el);
+        };
+        return anim;
+    }
+    function animateRare(el, durationMs) {
+        return el.animate([
+            { offset: 0,    transform: 'translate(-50%,-50%) scale(0) rotate(0deg)',     opacity: 0, easing: 'cubic-bezier(.2,.8,.3,1.3)' },
+            { offset: 0.08, transform: 'translate(-50%,-50%) scale(1.2) rotate(-10deg)', opacity: 1, easing: 'ease-in-out' },
+            { offset: 0.14, transform: 'translate(-50%,-50%) scale(0.9, 1.05) rotate(-6deg)', easing: 'ease-in-out' },
+            { offset: 0.2,  transform: 'translate(-50%,-50%) scale(1.06, 0.97) rotate(-8deg)', easing: 'ease-in-out' },
+            { offset: 0.26, transform: 'translate(-50%,-50%) scale(1) rotate(-8deg)',    easing: 'ease-in-out' },
+            { offset: 0.5,  transform: 'translate(-50%,-50%) scale(1.06) rotate(8deg)',  easing: 'ease-in-out' },
+            { offset: 0.72, transform: 'translate(-50%,-50%) scale(1.02) rotate(-6deg)', easing: 'ease-in-out' },
+            { offset: 0.9,  transform: 'translate(-50%,-50%) scale(1.1) rotate(6deg)',   opacity: 1, easing: 'ease-in' },
+            { offset: 1,    transform: 'translate(-50%,-50%) scale(1.45) rotate(0deg)',  opacity: 0 }
+        ], { duration: durationMs, fill: 'forwards' });
+    }
+    function removePop(el) {
+        const i = pops.findIndex((p) => p.el === el);
+        if (i >= 0) pops.splice(i, 1);
+        el.remove();
+    }
+
+    // --- Spawning Logic ---
+    function spawnItem(x, y, isBig = false) {
+        smashCount++;
+        checkMilestone();
+
+        const isRare = Math.random() > 0.98;
+        const el = document.createElement('div');
+        el.className = `emoji-pop ${isRare ? 'rare' : ''}`;
+        const emoji = isRare ? RARE_EMOJIS[Math.floor(Math.random() * RARE_EMOJIS.length)] : EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+
+        // Keep the giant rare friend fully on screen
+        if (isRare) {
+            x = Math.max(28, Math.min(72, x));
+            y = Math.max(30, Math.min(70, y));
+        }
+        el.style.left = `${x}%`;
+        el.style.top = `${y}%`;
+        const px = (x / 100) * W, py = (y / 100) * H;
+        const color = pick(PALETTE);
+
+        // Physics
+        const baseSize = isBig ? 8 : 4;
+        const remSize = baseSize + Math.random() * 4;
+        const vmin = Math.min(W, H) / 100;
+        const sizePx = Math.min(remSize * 16, remSize * 3.6 * vmin);
+        el.style.fontSize = `${sizePx}px`;
+        const rotStart = Math.random() * 90 - 45;
+        const rotEnd = Math.random() * 720 - 360;
+        const durationMs = (isBig ? 2 + Math.random() : 1.5) * 1000;
+
+        const rec = { el, anim: null };
+        if (isRare) {
+            el.style.fontSize = `${Math.min(46 * vmin, 380)}px`;
+            const halo = document.createElement('div'); halo.className = 'halo';
+            const glyph = document.createElement('span'); glyph.className = 'glyph'; glyph.textContent = emoji;
+            el.appendChild(halo); el.appendChild(glyph);
+            stage.appendChild(el);
+            rec.anim = animateRare(el, 4000);
+            rec.anim.onfinish = () => removePop(el);
+        } else {
+            el.textContent = emoji;
+            stage.appendChild(el);
+            rec.anim = animatePop(el, sizePx, isBig, rotStart, rotEnd, durationMs, color, px, py);
+        }
+        pops.push(rec);
+        trimPops();
+        fxForSpawn(px, py, isBig, isRare, color);
+
+        // --- MUSICAL MAPPING ---
+        // Map X position (0-100) to a note in our Pentatonic SCALE array
+        if (!isRare && !isBig) {
+            const scaleIndex = Math.floor((x / 100) * SCALE.length);
+            const note = SCALE[Math.min(scaleIndex, SCALE.length - 1)];
+            // Random instrument type for variety
+            const instrument = WAVES[Math.floor(Math.random() * WAVES.length)];
+            // Lower volume slightly for harsher wave types
+            const vol = (instrument === 'sawtooth' || instrument === 'square') ? 0.15 : 0.3;
+            playTone(note, instrument, 1, vol);
+        } else if (isRare) {
+            // Magical rare sound
+            playTone(SCALE[0], 'sine', 3, 0.4);
+            playTone(SCALE[4], 'triangle', 3, 0.4, 5); // Detuned slightly for chorus effect
+        }
+    }
+
+    function checkMilestone() {
+        if (smashCount % 20 === 0) {
+            triggerConfetti();
+            // Play a happy little run of notes
+            setTimeout(() => playTone(SCALE[5], 'sine', 0.2), 0);
+            setTimeout(() => playTone(SCALE[7], 'sine', 0.2), 100);
+            setTimeout(() => playTone(SCALE[9], 'sine', 0.4), 200);
+            cycleGradient();
+        }
+    }
+
+    function triggerConfetti() {
+        const shapes = ['confetti', 'confetti', 'confetti', 'dot', 'star', 'heart'];
+        for (let i = 0; i < 110; i++) {
+            const shape = pick(shapes);
+            addPart(true, {
+                shape,
+                x: Math.random() * W, y: -rand(10, H * 0.25),
+                vx: rand(-60, 60), vy: rand(60, 220), g: 90, drag: 0.6,
+                size: shape === 'dot' ? rand(5, 8) : rand(10, 18),
+                color: pick(PALETTE),
+                life: rand(3, 4.6),
+                rot: rand(0, 6.28), vr: rand(-5, 5),
+                flip: rand(5, 12), sway: rand(30, 70), ph: rand(0, 6.28)
+            });
+        }
+    }
+
+    function cycleGradient() {
+        bgIndex = (bgIndex + 1) % GRADIENTS.length;
+        showGradient(bgIndex);
+    }
 
     // --- Mute Toggle ---
     const muteBtn = document.getElementById('mute-btn');
@@ -195,79 +701,192 @@
          playTone(SCALE[8], 'square', 2, 0.1);
     }
 
-    // --- Spawning Logic ---
-    function spawnItem(x, y, isBig = false) {
-        smashCount++;
-        checkMilestone();
-
-        const isRare = Math.random() > 0.98;
-        const el = document.createElement('div');
-        el.className = `emoji-pop ${isRare ? 'rare' : ''}`;
-        el.textContent = isRare ? RARE_EMOJIS[Math.floor(Math.random() * RARE_EMOJIS.length)] : EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-
-        el.style.left = `${x}%`;
-        el.style.top = `${y}%`;
-
-        // Physics
-        const baseSize = isBig ? 8 : 4;
-        el.style.fontSize = `${baseSize + Math.random() * 4}rem`;
-        const destX = (Math.random() * 300 - 150) * (isBig ? 1.5 : 1) + '%';
-        const destY = (Math.random() * 300 - 150) * (isBig ? 1.5 : 1) + '%';
-        el.style.setProperty('--rot-start', `${Math.random() * 90 - 45}deg`);
-        el.style.setProperty('--rot-end', `${Math.random() * 720 - 360}deg`);
-        el.style.setProperty('--dest-x', destX);
-        el.style.setProperty('--dest-y', destY);
-        el.style.setProperty('--duration', `${isBig ? 2 + Math.random() : 1.5}s`);
-
-        document.body.appendChild(el);
-        el.addEventListener('animationend', () => el.remove());
-
-        // --- MUSICAL MAPPING ---
-        // Map X position (0-100) to a note in our Pentatonic SCALE array
-        if (!isRare && !isBig) {
-            const scaleIndex = Math.floor((x / 100) * SCALE.length);
-            const note = SCALE[Math.min(scaleIndex, SCALE.length - 1)];
-            // Random instrument type for variety
-            const instrument = WAVES[Math.floor(Math.random() * WAVES.length)];
-            // Lower volume slightly for harsher wave types
-            const vol = (instrument === 'sawtooth' || instrument === 'square') ? 0.15 : 0.3;
-            playTone(note, instrument, 1, vol);
-        } else if (isRare) {
-            // Magical rare sound
-            playTone(SCALE[0], 'sine', 3, 0.4);
-            playTone(SCALE[4], 'triangle', 3, 0.4, 5); // Detuned slightly for chorus effect
+    // --- Canvas drawing ---
+    function pathStar(c, r, points, inner) {
+        c.beginPath();
+        for (let i = 0; i < points * 2; i++) {
+            const rr = i % 2 ? r * inner : r;
+            const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+            c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
         }
+        c.closePath();
     }
-
-    function checkMilestone() {
-        if (smashCount % 20 === 0) {
-            triggerConfetti();
-            // Play a happy little run of notes
-            setTimeout(() => playTone(SCALE[5], 'sine', 0.2), 0);
-            setTimeout(() => playTone(SCALE[7], 'sine', 0.2), 100);
-            setTimeout(() => playTone(SCALE[9], 'sine', 0.4), 200);
-            cycleGradient();
+    function pathHeart(c, r) {
+        c.beginPath();
+        c.moveTo(0, r * 0.35);
+        c.bezierCurveTo(-r * 1.1, -r * 0.35, -r * 0.45, -r * 1.05, 0, -r * 0.45);
+        c.bezierCurveTo(r * 0.45, -r * 1.05, r * 1.1, -r * 0.35, 0, r * 0.35);
+        c.closePath();
+    }
+    function drawPart(c, p, k) {
+        let alpha = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3;
+        let s = p.size;
+        c.save();
+        c.translate(p.x, p.y);
+        switch (p.shape) {
+            case 'dot':
+                c.globalAlpha = alpha;
+                c.fillStyle = p.color;
+                c.beginPath(); c.arc(0, 0, s * (1 - k * 0.5), 0, Math.PI * 2); c.fill();
+                c.fillStyle = 'rgba(255,255,255,0.7)';
+                c.beginPath(); c.arc(-s * 0.3, -s * 0.3, s * 0.3, 0, Math.PI * 2); c.fill();
+                break;
+            case 'star':
+                c.globalAlpha = alpha;
+                c.rotate(p.rot);
+                pathStar(c, s, 5, 0.5);
+                c.fillStyle = p.color; c.fill();
+                c.lineWidth = Math.max(1.5, s * 0.18); c.strokeStyle = '#fff'; c.lineJoin = 'round'; c.stroke();
+                break;
+            case 'heart':
+                c.globalAlpha = alpha;
+                c.rotate(p.rot * 0.2);
+                pathHeart(c, s);
+                c.fillStyle = p.color; c.fill();
+                c.lineWidth = Math.max(1.5, s * 0.16); c.strokeStyle = '#fff'; c.lineJoin = 'round'; c.stroke();
+                break;
+            case 'sparkle': {
+                const tw = Math.sin(Math.PI * Math.min(1, k * 1.15));
+                c.globalAlpha = Math.max(0, tw);
+                const gs = s * 2.6;
+                c.drawImage(glowSprite(p.color), -gs, -gs, gs * 2, gs * 2);
+                c.rotate(p.rot * 0.3);
+                pathStar(c, s * tw + 0.5, 4, 0.22);
+                c.fillStyle = '#ffffff'; c.fill();
+                break;
+            }
+            case 'confetti': {
+                c.globalAlpha = alpha;
+                c.rotate(p.rot);
+                c.scale(1, Math.cos(p.t * p.flip + p.ph));
+                c.fillStyle = p.color;
+                const w = s, h = s * 0.55, r = h * 0.3;
+                c.beginPath();
+                if (c.roundRect) c.roundRect(-w / 2, -h / 2, w, h, r); else c.rect(-w / 2, -h / 2, w, h);
+                c.fill();
+                break;
+            }
+            case 'note':
+                c.globalAlpha = (1 - k) * 0.95;
+                c.scale(1 - k, 1 - k);
+                c.rotate(p.rot);
+                c.font = `700 ${s}px ${NOTE_FONT}`;
+                c.textAlign = 'center'; c.textBaseline = 'middle';
+                c.lineWidth = s * 0.18; c.strokeStyle = 'rgba(255,255,255,0.95)'; c.lineJoin = 'round';
+                c.strokeText(p.text, 0, 0);
+                c.fillStyle = p.color;
+                c.fillText(p.text, 0, 0);
+                break;
         }
+        c.restore();
     }
-
-    function triggerConfetti() {
-        for (let i = 0; i < 50; i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = Math.random() * 100 + 'vw';
-            c.style.top = '-5vh';
-            c.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            c.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            document.body.appendChild(c);
-            c.addEventListener('animationend', () => c.remove());
+    function stepParts(arr, c, dt) {
+        let w = 0;
+        for (let i = 0; i < arr.length; i++) {
+            const p = arr[i];
+            p.t += dt;
+            if (p.t >= p.life) continue;
+            const damp = Math.exp(-p.drag * dt);
+            p.vx *= damp; p.vy *= damp;
+            p.vy += p.g * dt;
+            p.x += p.vx * dt + (p.sway ? Math.sin(p.t * 2.2 + p.ph) * p.sway * dt : 0);
+            p.y += p.vy * dt;
+            p.rot += p.vr * dt;
+            drawPart(c, p, p.t / p.life);
+            arr[w++] = p;
         }
+        arr.length = w;
     }
+    const easeOut = (k) => 1 - Math.pow(1 - k, 3);
+    const NOTE_FONT = "'Fredoka', 'Segoe UI Symbol', 'Arial Rounded MT Bold', sans-serif";
 
-    function cycleGradient() {
-        bgIndex = (bgIndex + 1) % GRADIENTS.length;
-        document.body.style.background = GRADIENTS[bgIndex];
-        document.body.style.backgroundSize = "400% 400%";
+    let lastT = performance.now();
+    function frame(now) {
+        const dt = Math.min(0.05, Math.max(0, (now - lastT) / 1000));
+        lastT = now;
+        const time = now / 1000;
+
+        // ---- back layer: bubbles, color waves, ripples, trails ----
+        bctx.clearRect(0, 0, W, H);
+        for (const b of bubbles) {
+            b.vx *= Math.exp(-2.5 * dt); b.vy *= Math.exp(-2.5 * dt);
+            b.y += (-b.speed + b.vy) * dt;
+            b.x += b.vx * dt;
+            if (b.y < -b.r * 2 || b.x < -200 || b.x > W + 200) Object.assign(b, makeBubble(false));
+            const sx = b.x + Math.sin(time * b.f + b.ph) * b.sway;
+            const wob = 1 + Math.sin(time * 2.4 + b.ph) * 0.04;
+            bctx.globalAlpha = b.a;
+            bctx.drawImage(BUBBLE, sx - b.r * wob, b.y - b.r / wob, b.r * 2 * wob, b.r * 2 / wob);
+        }
+        bctx.globalAlpha = 1;
+
+        let w = 0;
+        for (let i = 0; i < waves.length; i++) {
+            const v = waves[i];
+            v.t += dt;
+            const k = v.t / v.life;
+            if (k >= 1) continue;
+            const r = Math.max(1, v.maxR * easeOut(k));
+            const g = bctx.createRadialGradient(v.x, v.y, 0, v.x, v.y, r);
+            g.addColorStop(0, v.color);
+            g.addColorStop(1, 'rgba(255,255,255,0)');
+            bctx.globalAlpha = v.alpha * (1 - k);
+            bctx.fillStyle = g;
+            bctx.beginPath(); bctx.arc(v.x, v.y, r, 0, Math.PI * 2); bctx.fill();
+            waves[w++] = v;
+        }
+        waves.length = w;
+        bctx.globalAlpha = 1;
+
+        w = 0;
+        for (let i = 0; i < ripples.length; i++) {
+            const rp = ripples[i];
+            rp.t += dt;
+            const k = rp.t / rp.life;
+            if (k >= 1) continue;
+            const r = Math.max(1, rp.maxR * easeOut(k));
+            bctx.globalAlpha = (1 - k) * 0.9;
+            bctx.lineWidth = Math.max(1, rp.width * (1 - k * 0.7));
+            bctx.strokeStyle = rp.color;
+            bctx.beginPath(); bctx.arc(rp.x, rp.y, r, 0, Math.PI * 2); bctx.stroke();
+            ripples[w++] = rp;
+        }
+        ripples.length = w;
+        bctx.globalAlpha = 1;
+
+        stepParts(backParts, bctx, dt);
+
+        // ---- front layer: bursts, sparkles, confetti ----
+        fctx.clearRect(0, 0, W, H);
+        stepParts(frontParts, fctx, dt);
+
+        requestAnimationFrame(frame);
     }
+    requestAnimationFrame(frame);
+
+    // --- Hint: bouncy rainbow letters ---
+    (function buildHint() {
+        const card = document.getElementById('hint-card');
+        const text = card.textContent;
+        const emojiPart = '🎵🎹';
+        const words = text.replace(emojiPart, '').trim().split(' ');
+        card.textContent = '';
+        let i = 0;
+        const cols = ['#ff4f8b', '#ff7a2f', '#ffb020', '#5ad35a', '#1fb8c6', '#2f8ff5', '#9a6bff', '#ff4fc0'];
+        for (const word of words) {
+            const ws = document.createElement('span'); ws.className = 'word';
+            for (const ch of word) {
+                const s = document.createElement('span');
+                s.className = 'ch'; s.textContent = ch;
+                s.style.setProperty('--i', i);
+                s.style.color = cols[i % cols.length];
+                ws.appendChild(s); i++;
+            }
+            card.appendChild(ws);
+        }
+        const e = document.createElement('span'); e.className = 'emo'; e.textContent = emojiPart;
+        card.appendChild(e);
+    })();
 
     // --- Cursor & Input ---
     const cursor = document.getElementById('custom-cursor');
@@ -276,18 +895,23 @@
     document.addEventListener('pointermove', (e) => {
         cursor.style.left = `${e.clientX}px`;
         cursor.style.top = `${e.clientY}px`;
+        cursor.classList.add('on');
 
         // Musical notation trails
         if (Date.now() - lastTrail > 50) {
             lastTrail = Date.now();
-            const t = document.createElement('div');
-            t.className = 'trail-sparkle';
-            t.textContent = TRAIL_EMOJIS[Math.floor(Math.random() * TRAIL_EMOJIS.length)];
-            t.style.left = `${e.clientX}px`;
-            t.style.top = `${e.clientY}px`;
-            t.style.color = `hsla(${Math.random() * 360}, 100%, 70%, 0.6)`;
-            document.body.appendChild(t);
-            t.addEventListener('animationend', () => t.remove());
+            addPart(false, {
+                shape: 'note',
+                text: TRAIL_EMOJIS[Math.floor(Math.random() * TRAIL_EMOJIS.length)],
+                x: e.clientX, y: e.clientY,
+                vx: rand(-15, 15), vy: rand(30, 50), drag: 0, g: 20,
+                size: rand(24, 34), color: pick(PALETTE),
+                life: 0.8, rot: rand(-0.4, 0.4)
+            });
+            addPart(false, {
+                shape: 'sparkle', x: e.clientX + rand(-14, 14), y: e.clientY + rand(-14, 14),
+                vx: 0, vy: 20, drag: 0, size: rand(5, 9), color: pick(PALETTE), life: 0.6
+            });
         }
     });
 
@@ -296,6 +920,7 @@
         if (e.repeat && Math.random() > 0.3) return;
         initAudio();
         if (e.code === 'Space' || e.code === 'Enter') {
+            fxShockwave();
             for (let i = 0; i < 12; i++) spawnItem(50, 50, true);
             playChord(); // Big chord on spacebar
             cycleGradient();
@@ -307,6 +932,13 @@
     });
 
     document.addEventListener('pointerdown', (e) => {
+        // squish the cursor on every tap (visual only)
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+        cursor.classList.add('on', 'tap');
+        clearTimeout(cursor._t);
+        cursor._t = setTimeout(() => cursor.classList.remove('tap'), 110);
+
         if (e.target.id === 'mute-btn' || e.target.parentNode.id === 'mute-btn') return;
         initAudio();
         spawnItem((e.clientX / window.innerWidth) * 100, (e.clientY / window.innerHeight) * 100);
