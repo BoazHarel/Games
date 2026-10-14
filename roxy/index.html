@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#7cc4f2">
+<link rel="icon" type="image/png" href="../web/favicon.png">
+<title>Roxy's Big Clean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #2b2550;
+  --ink2: #5d5888;
+  --red: #C91A09; --blue: #0055BF; --yellow: #F2CD37; --green: #4B9F4A; --orange: #FE8A18;
+  --purple: #8E4FC9; --azure: #36AEBF; --pink: #F785B1;
+  --panel: #fffaf0;
+  --font: 'Fredoka', 'Nunito', 'Arial Rounded MT Bold', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none;
+  font-family: var(--font); color: var(--ink);
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none;
+  background: linear-gradient(180deg, #8fd0f7 0%, #c8ecff 55%, #f5f0d8 100%);
+}
+button { font-family: inherit; color: inherit; -webkit-tap-highlight-color: transparent; cursor: pointer; touch-action: manipulation; }
+#world { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.screen { position: fixed; inset: 0; display: none; z-index: 10; }
+.screen.on { display: flex; }
+
+/* ---------- LEGO brick buttons ---------- */
+.brick {
+  --c: var(--green);
+  position: relative; border: none; border-radius: 12px;
+  background: var(--c); color: #fff;
+  font-weight: 700; letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.25);
+  box-shadow: inset 0 -7px 0 rgba(0,0,0,0.22), inset 0 3px 0 rgba(255,255,255,0.3), 0 5px 0 rgba(0,0,0,0.18);
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.15s;
+  margin-top: 12px;
+}
+.brick::before {
+  content: ''; position: absolute; left: 10px; right: 10px; top: -11px; height: 13px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,0.35) 0 3px, transparent 3.5px),
+    radial-gradient(ellipse 9px 6px at 50% 35%, var(--c) 0 8.5px, transparent 9px),
+    radial-gradient(ellipse 9px 7px at 50% 55%, rgba(0,0,0,0.25) 0 8.5px, transparent 9px);
+  background-size: 30px 13px; background-repeat: repeat-x; background-position: center top;
+  pointer-events: none;
+}
+.brick:active, .brick.press { transform: translateY(4px); box-shadow: inset 0 -3px 0 rgba(0,0,0,0.22), inset 0 3px 0 rgba(255,255,255,0.3), 0 1px 0 rgba(0,0,0,0.18); }
+.brick.red { --c: var(--red); } .brick.blue { --c: var(--blue); } .brick.yellow { --c: #E9B91F; } .brick.orange { --c: var(--orange); }
+.brick.purple { --c: var(--purple); } .brick.azure { --c: var(--azure); } .brick.pink { --c: var(--pink); } .brick.white { --c: #f4f4f4; color: var(--ink); text-shadow: none; }
+.brick.round { border-radius: 50%; }
+.brick.round::before { left: 50%; width: 30px; margin-left: -15px; right: auto; }
+
+/* ---------- title ---------- */
+#title { align-items: center; justify-content: center; flex-direction: column; gap: 2vh;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.15), rgba(40,30,80,0.45)); }
+.logo { display: flex; gap: 1.2vmin; align-items: flex-end; }
+.logo .L {
+  position: relative; width: 15vmin; height: 15vmin; max-width: 120px; max-height: 120px;
+  border-radius: 1.4vmin; display: grid; place-items: center;
+  font-size: min(11vmin, 88px); font-weight: 700; color: #fff; text-shadow: 0 0.6vmin 0 rgba(0,0,0,0.28);
+  box-shadow: inset 0 -1.4vmin 0 rgba(0,0,0,0.22), inset 0 0.5vmin 0 rgba(255,255,255,0.35), 0 1.2vmin 1.6vmin rgba(30,20,60,0.35);
+  animation: hop 2.6s ease-in-out infinite;
+}
+.logo .L::before {
+  content: ''; position: absolute; top: -2.4vmin; left: 16%; right: 16%; height: 2.8vmin;
+  background: radial-gradient(ellipse 34% 60% at 25% 55%, var(--c) 92%, transparent 100%), radial-gradient(ellipse 34% 60% at 75% 55%, var(--c) 92%, transparent 100%);
+  filter: drop-shadow(0 0.4vmin 0 rgba(0,0,0,0.2));
+}
+.logo .L:nth-child(1) { background: var(--red); --c: var(--red); }
+.logo .L:nth-child(2) { background: var(--yellow); --c: var(--yellow); animation-delay: 0.15s; }
+.logo .L:nth-child(3) { background: var(--blue); --c: var(--blue); animation-delay: 0.3s; }
+.logo .L:nth-child(4) { background: var(--green); --c: var(--green); animation-delay: 0.45s; }
+@keyframes hop { 0%, 70%, 100% { transform: translateY(0) rotate(0); } 78% { transform: translateY(-2vmin) rotate(-3deg); } 86% { transform: translateY(0) rotate(2deg); } }
+.subtitle {
+  font-size: min(7vmin, 54px); font-weight: 700; color: #fff; margin-top: -0.5vh;
+  text-shadow: 0 3px 0 #8E4FC9, 0 6px 14px rgba(40,20,80,0.4);
+  -webkit-text-stroke: 1px rgba(80,40,140,0.3);
+}
+.title-btns { display: flex; gap: 3vmin; margin-top: 2vh; flex-wrap: wrap; justify-content: center; }
+.title-btns .brick { font-size: min(6vmin, 38px); padding: 2.2vmin 5vmin; min-width: 30vmin; }
+.corner { position: fixed; top: max(12px, env(safe-area-inset-top)); right: 14px; z-index: 30; }
+.icon-btn { font-size: 26px; width: 56px; height: 50px; padding: 0; }
+
+/* ---------- panels / headers ---------- */
+.sheet { flex-direction: column; align-items: stretch; background: linear-gradient(180deg, #8fd0f7 0%, #d6f1ff 60%, #fff6dc 100%); overflow: hidden; }
+.sheet-head { display: flex; align-items: center; gap: 14px; padding: max(14px, env(safe-area-inset-top)) 18px 6px; }
+.sheet-head h1 { margin: 0; font-size: clamp(26px, 5vmin, 44px); flex: 1; color: #fff; text-shadow: 0 3px 0 rgba(40,60,140,0.35); }
+.star-total { font-size: clamp(20px, 3.6vmin, 30px); font-weight: 700; background: #fff; border-radius: 30px; padding: 6px 16px; box-shadow: 0 4px 0 rgba(0,0,0,0.12); }
+
+/* ---------- level cards ---------- */
+#levelGrid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 44vw), 1fr)); gap: 22px; padding: 18px 22px 30px; align-content: start; }
+.card {
+  position: relative; border: none; border-radius: 18px; background: #fff; padding: 12px 12px 10px; text-align: center;
+  box-shadow: 0 7px 0 rgba(30,50,110,0.18), 0 10px 24px rgba(30,50,110,0.18);
+  transition: transform 0.12s;
+}
+.card:active { transform: scale(0.97); }
+.card canvas { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; display: block; border-radius: 10px; background: #e9f4fb; }
+.card .nm { font-size: clamp(18px, 3vmin, 24px); font-weight: 700; margin-top: 8px; }
+.card .meta { display: flex; justify-content: center; gap: 12px; align-items: center; font-size: 16px; color: var(--ink2); margin-top: 2px; }
+.card .stars { font-size: 24px; letter-spacing: 2px; }
+.card .num { position: absolute; top: -10px; left: -8px; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 22px; color: #fff; background: var(--red); box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2), 0 3px 0 rgba(0,0,0,0.15); }
+.card.locked { filter: grayscale(0.85); opacity: 0.7; }
+.card.locked::after { content: '🔒'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 56px; }
+
+/* ---------- garage ---------- */
+#garageBody { flex: 1; display: flex; gap: 18px; padding: 6px 18px 18px; min-height: 0; }
+#garagePreviewWrap { flex: 1 1 45%; display: flex; align-items: center; justify-content: center; min-width: 0; position: relative; }
+#garageCv { width: 100%; height: 100%; max-width: 520px; max-height: 520px; aspect-ratio: 1; }
+#roxyName { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); font-size: clamp(28px, 5vmin, 46px); font-weight: 700; color: #fff; text-shadow: 0 3px 0 #8E4FC9, 0 0 18px rgba(80,40,140,0.4); white-space: nowrap; }
+#garagePicker { flex: 1 1 55%; display: flex; flex-direction: column; min-width: 0; background: rgba(255,255,255,0.75); border-radius: 22px; padding: 12px; box-shadow: 0 8px 24px rgba(30,50,110,0.15); }
+#tabs { display: flex; gap: 8px; padding-top: 10px; }
+#tabs .brick { flex: 1; font-size: clamp(16px, 2.6vmin, 22px); padding: 10px 4px; opacity: 0.7; }
+#tabs .brick.on { opacity: 1; transform: translateY(-2px); }
+#options { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; padding: 14px 4px 4px; align-content: start; }
+.opt { position: relative; border: none; border-radius: 16px; background: #fff; padding: 6px 4px 8px; box-shadow: 0 4px 0 rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; font-weight: 600; font-size: 14px; color: var(--ink2); }
+.opt canvas { width: 80px; height: 80px; }
+.opt.sel { background: #fff3b0; box-shadow: 0 0 0 4px #F2CD37, 0 4px 0 rgba(0,0,0,0.1); color: var(--ink); }
+.opt.lock canvas { filter: grayscale(1) brightness(1.1); opacity: 0.45; }
+.opt .lk { position: absolute; top: 26px; left: 0; right: 0; text-align: center; font-size: 18px; font-weight: 700; color: var(--ink); }
+
+/* ---------- play HUD ---------- */
+#hud { position: fixed; left: 0; right: 0; top: 0; height: 64px; z-index: 20; display: none; align-items: center; gap: 10px; padding: 6px 12px 0; padding-top: max(6px, env(safe-area-inset-top)); pointer-events: none; }
+#hud > * { pointer-events: auto; }
+body.playing #hud { display: flex; }
+#hud .brick { margin-top: 10px; }
+#timerBox { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 30px; padding: 4px 14px 4px 10px; box-shadow: 0 4px 0 rgba(0,0,0,0.12); height: 46px; margin-top: 6px; }
+#timer { font-size: 26px; font-weight: 700; min-width: 64px; font-variant-numeric: tabular-nums; }
+#starRow { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+#starRow .st { font-size: 20px; line-height: 1; letter-spacing: 1px; }
+#starRow .st span { display: inline-block; transition: filter 0.3s, transform 0.3s; }
+#starRow .st span.off { filter: grayscale(1) opacity(0.35); transform: scale(0.8); }
+#parBar { width: 64px; height: 6px; border-radius: 3px; background: #eee; overflow: hidden; }
+#parFill { height: 100%; width: 100%; background: linear-gradient(90deg, #f6c623, #ffdf6b); border-radius: 3px; }
+#rooms { flex: 1; display: flex; gap: 6px; justify-content: center; overflow-x: auto; scrollbar-width: none; padding: 8px 4px 0; min-width: 0; }
+#rooms::-webkit-scrollbar { display: none; }
+.chip { position: relative; flex: 0 0 auto; width: 46px; height: 46px; border-radius: 14px; border: none; background: #fff; font-size: 24px; box-shadow: 0 4px 0 rgba(0,0,0,0.12); display: grid; place-items: center; transition: transform 0.15s; }
+.chip.focus { box-shadow: 0 0 0 3px #36AEBF, 0 4px 0 rgba(0,0,0,0.12); transform: translateY(-2px); }
+.chip.req::before { content: '🚩'; position: absolute; top: -10px; right: -6px; font-size: 18px; }
+.chip.clean { background: #c9f5c0; }
+.chip.clean::after { content: '✓'; position: absolute; right: -4px; bottom: -6px; width: 22px; height: 22px; border-radius: 50%; background: #3fb83a; color: #fff; font-size: 15px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+.chip .pc { position: absolute; left: 4px; right: 4px; bottom: 3px; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.08); overflow: hidden; }
+.chip .pc i { display: block; height: 100%; background: #36AEBF; }
+
+#dock { position: fixed; z-index: 20; display: none; gap: 8px; padding: 8px; }
+body.playing #dock { display: flex; }
+body.land #dock { right: 0; top: 64px; bottom: 0; width: var(--dockW, 128px); flex-direction: column; justify-content: center; padding-right: max(8px, env(safe-area-inset-right)); }
+body.port #banner { left: 50%; bottom: calc(var(--dockH, 118px) + 14px); }
+body.port #dock { left: 0; right: 0; bottom: 0; height: var(--dockH, 118px); flex-direction: row; justify-content: center; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.strat { flex: 1 1 0; min-height: 0; min-width: 0; max-height: 120px; max-width: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 2px 8px; font-size: clamp(13px, 2.2vmin, 18px); }
+.strat svg { width: 62%; max-width: 64px; height: auto; flex: 1 1 auto; min-height: 0; }
+.strat span { line-height: 1.1; }
+.strat.on { filter: none; outline: 4px solid #fff; outline-offset: -1px; }
+.strat:not(.on) { filter: saturate(0.75) brightness(0.96); }
+body.port .strat svg { width: 70%; }
+#turbo { --p: 1; }
+#turbo .ring { position: absolute; inset: 6px; border-radius: 10px; pointer-events: none;
+  background: conic-gradient(rgba(255,255,255,0.0) calc(var(--p) * 360deg), rgba(0,0,0,0.35) 0); }
+#turbo.ready { animation: glowy 1.2s ease-in-out infinite; }
+@keyframes glowy { 50% { filter: brightness(1.18); } }
+
+#banner { position: fixed; z-index: 19; left: calc((100vw - var(--dockW, 0px)) / 2); bottom: 22px; transform: translateX(-50%); background: #fff; border-radius: 22px; padding: 10px 22px; font-size: clamp(18px, 3.4vmin, 28px); font-weight: 700; box-shadow: 0 6px 0 rgba(0,0,0,0.12), 0 8px 24px rgba(30,50,110,0.2); display: none; white-space: nowrap; pointer-events: none; }
+body.playing #banner.on { display: block; animation: bob 1.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateX(-50%) translateY(-5px); } }
+#hand { position: fixed; z-index: 25; font-size: 54px; pointer-events: none; display: none; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); transition: left 0.5s ease, top 0.5s ease; }
+#hand.on { display: block; }
+#hand span { display: inline-block; animation: tap 0.9s ease-in-out infinite; }
+@keyframes tap { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-6px,-10px); } }
+#turnHint { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; flex-direction: column; background: rgba(40,30,80,0.82); color: #fff; font-size: 26px; font-weight: 700; text-align: center; gap: 12px; }
+
+/* ---------- overlays ---------- */
+.overlay { position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center; background: rgba(40,30,80,0.42); }
+.overlay.on { display: flex; }
+.pop { background: var(--panel); border-radius: 28px; padding: 22px 28px 26px; text-align: center; box-shadow: 0 12px 0 rgba(0,0,0,0.12), 0 20px 50px rgba(20,10,60,0.4); max-width: min(92vw, 560px); animation: popin 0.45s cubic-bezier(.2,1.6,.4,1); }
+@keyframes popin { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.pop h2 { margin: 0 0 6px; font-size: clamp(30px, 6vmin, 50px); color: var(--purple); }
+.bigstars { font-size: clamp(50px, 11vmin, 84px); display: flex; justify-content: center; gap: 8px; margin: 4px 0; }
+.bigstars span { display: inline-block; transform: scale(0); }
+.bigstars span.in { animation: starIn 0.55s cubic-bezier(.2,1.8,.4,1) forwards; }
+.bigstars span.off { filter: grayscale(1) opacity(0.3); }
+@keyframes starIn { from { transform: scale(0) rotate(-90deg); } to { transform: scale(1) rotate(0); } }
+.wtime { font-size: clamp(22px, 4vmin, 32px); font-weight: 700; }
+.wbest { font-size: 18px; color: var(--ink2); min-height: 24px; }
+.newrec { display: inline-block; background: var(--red); color: #fff; border-radius: 12px; padding: 2px 10px; margin-left: 6px; animation: pulse 0.8s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.08); } }
+.unlocks { margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--orange); min-height: 0; }
+.pop-btns { display: flex; gap: 14px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.pop-btns .brick { font-size: clamp(20px, 3.6vmin, 28px); padding: 12px 22px; min-width: 120px; }
+#winRoxy { width: 120px; height: 120px; }
+</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+
+<!-- Title -->
+<div class="screen" id="title">
+  <div class="logo"><div class="L">R</div><div class="L">O</div><div class="L">X</div><div class="L">Y</div></div>
+  <div class="subtitle">Big Clean!</div>
+  <div class="title-btns">
+    <button class="brick" id="btnPlay">▶ Play</button>
+    <button class="brick purple" id="btnGarage">🎩 Dress up Roxy</button>
+  </div>
+</div>
+
+<!-- Level select -->
+<div class="screen sheet" id="levels">
+  <div class="sheet-head">
+    <button class="brick red icon-btn" id="lvBack" aria-label="Back">⬅</button>
+    <h1>Pick a house</h1>
+    <div class="star-total" id="lvStars">⭐ 0</div>
+  </div>
+  <div id="levelGrid"></div>
+</div>
+
+<!-- Garage -->
+<div class="screen sheet" id="garage">
+  <div class="sheet-head">
+    <button class="brick red icon-btn" id="gaBack" aria-label="Back">⬅</button>
+    <h1>Dress up Roxy</h1>
+    <div class="star-total" id="gaStars">⭐ 0</div>
+  </div>
+  <div id="garageBody">
+    <div id="garagePreviewWrap"><canvas id="garageCv"></canvas><div id="roxyName">Roxy</div></div>
+    <div id="garagePicker">
+      <div id="tabs">
+        <button class="brick red on" data-tab="color">🎨 Color</button>
+        <button class="brick blue" data-tab="hat">🎩 Hat</button>
+        <button class="brick yellow" data-tab="face">😊 Face</button>
+        <button class="brick purple" data-tab="trail">✨ Trail</button>
+      </div>
+      <div id="options"></div>
+    </div>
+  </div>
+</div>
+
+<!-- In-game HUD -->
+<div id="hud">
+  <button class="brick red icon-btn" id="btnHome" aria-label="Leave">🏠</button>
+  <div id="timerBox">
+    <div id="starRow"><div class="st"><span>⭐</span><span>⭐</span><span>⭐</span></div><div id="parBar"><div id="parFill"></div></div></div>
+    <div id="timer">0:00</div>
+  </div>
+  <div id="rooms"></div>
+  <button class="brick azure icon-btn" id="btnSound" aria-label="Sound">🔊</button>
+</div>
+<div id="dock">
+  <button class="brick strat blue" data-s="zigzag" aria-label="Zig-Zag">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9 H41 V18 H7 V27 H41 V36 H7"/><circle cx="7" cy="36" r="4" fill="#fff" stroke="none"/></svg>
+    <span>Zig-Zag</span>
+  </button>
+  <button class="brick strat orange" data-s="snail" aria-label="Snail">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7 H42 V41 H6 V15 H34 V33 H14 V23 H26"/><circle cx="26" cy="23" r="4" fill="#fff" stroke="none"/></svg>
+    <span>Snail</span>
+  </button>
+  <button class="brick strat pink" data-s="bouncy" aria-label="Bouncy">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="40" height="40" rx="5" stroke-width="3" stroke-dasharray="4 5" opacity="0.7"/><path d="M9 33 L22 8 L40 21 L27 40 L12 30"/><circle cx="12" cy="30" r="4" fill="#fff" stroke="none"/></svg>
+    <span>Bouncy</span>
+  </button>
+  <button class="brick strat green" data-s="sniffy" aria-label="Sniffy">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="19" r="11"/><path d="M27 27 L41 41"/><circle cx="15" cy="17" r="2.5" fill="#fff" stroke="none"/><circle cx="22" cy="22" r="2" fill="#fff" stroke="none"/><circle cx="21" cy="14" r="1.6" fill="#fff" stroke="none"/></svg>
+    <span>Sniffy</span>
+  </button>
+  <button class="brick strat yellow" id="turbo" aria-label="Turbo">
+    <div class="ring"></div>
+    <svg viewBox="0 0 48 48"><path d="M27 3 L9 27 H22 L18 45 L39 19 H26 Z" fill="#fff" stroke="rgba(0,0,0,0.15)" stroke-width="2" stroke-linejoin="round"/></svg>
+    <span>Turbo</span>
+  </button>
+</div>
+<div id="banner"></div>
+<div id="hand"><span>👆</span></div>
+<div class="corner"><button class="brick azure icon-btn" id="btnSound2" aria-label="Sound">🔊</button></div>
+
+<!-- Win -->
+<div class="overlay" id="win">
+  <div class="pop">
+    <canvas id="winRoxy"></canvas>
+    <h2 id="winTitle">Sparkly clean!</h2>
+    <div class="bigstars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+    <div class="wtime" id="winTime">0:00</div>
+    <div class="wbest" id="winBest"></div>
+    <div class="unlocks" id="winUnlocks"></div>
+    <div class="pop-btns">
+      <button class="brick blue" id="winAgain">🔁 Again</button>
+      <button class="brick" id="winNext">Next ▶</button>
+      <button class="brick orange" id="winHouses">🏠 Houses</button>
+    </div>
+  </div>
+</div>
+
+<!-- Leave? -->
+<div class="overlay" id="confirm">
+  <div class="pop">
+    <h2>Leave this house?</h2>
+    <div class="pop-btns">
+      <button class="brick red" id="cfYes">🏠 Yes</button>
+      <button class="brick" id="cfNo">🧹 Keep cleaning</button>
+    </div>
+  </div>
+</div>
+
+<div id="turnHint"><div style="font-size:70px">📱↻</div>Turn your phone sideways!</div>
+
+<script src="levels.js"></script>
+<script src="sim.js"></script>
+<script src="art.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

@@ -5,6 +5,7 @@ This is a personal project where I create simple, static HTML games for my kids 
 ## Games
 
 *   **Toddler Mash:** A simple game where toddlers can mash the keyboard and see fun things happen.
+*   **Roxy's Big Clean:** Help Roxy the robot vacuum clean LEGO houses against the clock: pick a cleaning pattern, send her to rooms, and rescue her from socks and toys. Dress her up with hats, colors, faces, and trails.
 
 ## Contributing
 
