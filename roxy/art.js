@@ -181,6 +181,7 @@
 
   function outsideCell(ctx, L, x, y, T) {
     var px = x * T, py = y * T, kind = L.def.outside;
+    if (A.extraDecor.outside && A.extraDecor.outside(ctx, L, x, y, T)) return;
     if (kind === 'moat' || (kind === 'beach' && (L.def.transposed ? x >= L.W - 1 : y >= L.H - 1))) {
       var deep = kind === 'moat' ? '#3C7FC0' : '#3AAFCB';
       ctx.fillStyle = deep; ctx.fillRect(px, py, T, T);
@@ -777,6 +778,7 @@
       stud(ctx, cx, cy - hp, T * 0.1, '#8C5A2B');
       return cv;
     }
+    if (A.extraDecor[kind]) { A.extraDecor[kind](ctx, cx, cy, r, hp, T, seed); return cv; }
     if (kind === 'flowers') {
       for (var f = 0; f < 5; f++) {
         var a = f / 5 * TAU + seed, fx = cx + Math.cos(a) * r * 0.45, fy = cy + Math.sin(a) * r * 0.45;
@@ -802,7 +804,7 @@
 
   function placeDecor(L) {
     var out = [], rnd = RX.rng(L.def.seed * 31 + 5), W = L.W, H = L.H;
-    if (L.def.outside === 'moat') return out;
+    if (L.def.outside === 'moat' || L.def.outside === 'space') return out;
     var nearHouse = function (x, y, d) {
       for (var yy = y - d; yy <= y + d; yy++) for (var xx = x - d; xx <= x + d; xx++) {
         if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
@@ -824,7 +826,7 @@
       var c = cells[(rnd() * cells.length) | 0];
       if (used[c[0] + ',' + c[1]]) continue;
       used[c[0] + ',' + c[1]] = 1;
-      var kind = L.def.outside === 'beach' ? (rnd() < 0.5 ? 'palm' : 'shell') : (rnd() < 0.45 ? 'bush' : 'flowers');
+      var kind = L.def.outside === 'beach' ? (rnd() < 0.5 ? 'palm' : 'shell') : L.def.outside === 'farm' ? ['bush', 'hay', 'flowers'][(rnd() * 3) | 0] : (rnd() < 0.45 ? 'bush' : 'flowers');
       out.push({ x: c[0] + 0.5, y: c[1] + 0.5, kind: kind, seed: rnd() * 6, size: kind === 'bush' ? 0.8 + rnd() * 0.25 : 0.8 });
     }
     return out;
@@ -942,9 +944,9 @@
           A.star(ctx, Math.cos(g * 1.7 + v * 5) * s * 0.1, Math.sin(g * 1.7 + v * 5) * s * 0.09, s * 0.05 * tw, 4, 0.35); ctx.fill();
         }
         break;
-      case 'puddle': case 'juice': case 'mud':
+      case 'puddle': case 'juice': case 'mud': case 'goo': case 'paint':
         var hp = Math.max(0.15, d.hp == null ? 1 : d.hp);
-        var col = k === 'puddle' ? [90, 170, 235] : k === 'juice' ? [255, 150, 30] : [120, 80, 40];
+        var col = k === 'puddle' ? [90, 170, 235] : k === 'juice' ? [255, 150, 30] : k === 'goo' ? [110, 215, 70] : k === 'paint' ? [[230, 60, 60], [60, 120, 230], [250, 200, 40], [170, 80, 210]][Math.floor(v * 4)] : [120, 80, 40];
         ctx.scale(hp, hp);
         ctx.rotate(d.rot);
         ctx.fillStyle = 'rgba(' + col.join(',') + ',0.55)';
@@ -957,9 +959,12 @@
         ctx.fillStyle = 'rgba(255,255,255,0.55)';
         ellipse(ctx, -s * 0.08, -s * 0.07, s * 0.06, s * 0.025, -0.4); ctx.fill();
         break;
+      default:
+        if (A.extraDirt[k]) A.extraDirt[k](ctx, d, s, t, v);
     }
     ctx.restore();
   };
+  A.extraDirt = {}; A.extraToy = {}; A.extraHat = {}; A.extraPet = {}; A.extraDecor = {};
 
   // ---------- toys (things Roxy gets stuck on) ----------
   A.drawToy = function (ctx, toy, x, y, T, t, wob) {
@@ -968,6 +973,7 @@
     ctx.translate(x, y);
     ctx.fillStyle = 'rgba(30,20,10,0.25)'; ellipse(ctx, s * 0.05, s * 0.08, s * 0.3, s * 0.22); ctx.fill();
     ctx.rotate(toy.rot * 0.3 + (wob || 0));
+    if (A.extraToy[toy.kind]) A.extraToy[toy.kind](ctx, toy, s, t);
     switch (toy.kind) {
       case 'sock':
         ctx.fillStyle = C.white; rr(ctx, -s * 0.12, -s * 0.3, s * 0.24, s * 0.42, s * 0.08); ctx.fill();
@@ -1043,6 +1049,7 @@
     ctx.save();
     ctx.translate(x, y);
     ctx.fillStyle = 'rgba(30,20,10,0.2)'; ellipse(ctx, s * 0.05, s * 0.08, s * 0.3, s * 0.2); ctx.fill();
+    if (A.extraPet[kind]) { A.extraPet[kind](ctx, s, a, t, mode); ctx.restore(); return; }
     if (kind === 'dragon') {
       var flap = Math.sin(t * (mode === 'walk' ? 10 : 3)) * 0.35;
       ctx.rotate(a);
@@ -1102,15 +1109,15 @@
     { id: 'lime', name: 'Lime', body: '#A5D610' },
     { id: 'yellow', name: 'Sunny', body: C.yellow },
     { id: 'orange', name: 'Tiger', body: C.orange },
-    { id: 'gold', name: 'Gold', body: '#E3B43A', stars: 8 },
-    { id: 'rainbow', name: 'Rainbow', body: '#ff0000', stars: 12 }
+    { id: 'gold', name: 'Gold', body: '#E3B43A', stars: 10 },
+    { id: 'rainbow', name: 'Rainbow', body: '#ff0000', stars: 20 }
   ];
   A.HATS = [
     { id: 'none', name: 'No hat' }, { id: 'party', name: 'Party' }, { id: 'propeller', name: 'Propeller' },
     { id: 'bow', name: 'Bow' }, { id: 'bunny', name: 'Bunny' }, { id: 'cowboy', name: 'Cowboy' },
     { id: 'tophat', name: 'Top Hat' }, { id: 'chef', name: 'Chef' }, { id: 'pirate', name: 'Pirate' },
     { id: 'flower', name: 'Flower' }, { id: 'viking', name: 'Viking' }, { id: 'crown', name: 'Crown', stars: 3 },
-    { id: 'wizard', name: 'Wizard', stars: 6 }, { id: 'unicorn', name: 'Unicorn', stars: 10 }
+    { id: 'wizard', name: 'Wizard', stars: 8 }, { id: 'unicorn', name: 'Unicorn', stars: 15 }
   ];
   A.FACES = [
     { id: 'happy', name: 'Happy' }, { id: 'googly', name: 'Googly' }, { id: 'hearts', name: 'Love' },
@@ -1118,7 +1125,7 @@
   ];
   A.TRAILS = [
     { id: 'none', name: 'None' }, { id: 'bubbles', name: 'Bubbles' }, { id: 'sparkles', name: 'Sparkles' },
-    { id: 'hearts', name: 'Hearts' }, { id: 'stars', name: 'Stars' }, { id: 'notes', name: 'Music' }, { id: 'rainbow', name: 'Rainbow', stars: 14 }
+    { id: 'hearts', name: 'Hearts' }, { id: 'stars', name: 'Stars' }, { id: 'notes', name: 'Music' }, { id: 'rainbow', name: 'Rainbow', stars: 25 }
   ];
 
   A.bodyColor = function (look, t) {
@@ -1254,6 +1261,7 @@
     ctx.save();
     ctx.translate(x, y);
     ctx.lineJoin = 'round';
+    if (A.extraHat[hat]) A.extraHat[hat](ctx, s, t);
     switch (hat) {
       case 'party':
         ctx.fillStyle = C.mblue;

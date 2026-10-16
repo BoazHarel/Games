@@ -6,13 +6,13 @@
 
   // ---------- saved stuff ----------
   var SAVE_KEY = 'roxy.v1';
-  function defaults() { return { look: { color: 'white', hat: 'party', face: 'happy', trail: 'sparkles' }, levels: {}, audio: 2 }; }
+  function defaults() { return { look: { color: 'white', hat: 'party', face: 'happy', trail: 'sparkles' }, levels: {}, code: {}, codeSeen: {}, audio: 2 }; }
   var save = (function () {
-    try { var s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) { var d = defaults(); d.look = Object.assign(d.look, s.look); d.levels = s.levels || {}; d.audio = s.audio != null ? s.audio : 2; return d; } } catch (e) { }
+    try { var s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) { var d = defaults(); d.look = Object.assign(d.look, s.look); d.levels = s.levels || {}; d.code = s.code || {}; d.codeSeen = s.codeSeen || {}; d.audio = s.audio != null ? s.audio : 2; return d; } } catch (e) { }
     return defaults();
   })();
   function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { } }
-  function totalStars() { var n = 0; for (var k in save.levels) n += save.levels[k].stars || 0; return n; }
+  function totalStars() { var n = 0, k; for (k in save.levels) n += save.levels[k].stars || 0; for (k in save.code) n += save.code[k].stars || 0; return n; }
   function unlocked(i) { return i === 0 || !!(save.levels[RX.LEVELS[i - 1].id] || {}).stars || !!(save.levels[RX.LEVELS[i].id] || {}).stars; }
   function fmt(t) { t = Math.max(0, Math.floor(t)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
 
@@ -122,10 +122,10 @@
 
   function setMode(m) {
     mode = m;
-    ['title', 'levels', 'garage'].forEach(function (id) { $(id).classList.toggle('on', id === m); });
+    ['title', 'levels', 'garage', 'codeLevels', 'code'].forEach(function (id) { $(id).classList.toggle('on', id === m); });
     document.body.classList.toggle('playing', m === 'play');
     $('btnSound2').parentNode.style.display = m === 'title' ? '' : 'none';
-    if (m !== 'play') { $('hand').classList.remove('on'); $('banner').classList.remove('on'); }
+    if (m !== 'play') { $('hand').classList.remove('on'); $('banner').classList.remove('on'); $('win').classList.remove('on'); $('confirm').classList.remove('on'); }
     layout();
   }
 
@@ -721,7 +721,9 @@
   function frame(now) {
     var dt = Math.min(0.05, (now - lastNow) / 1000);
     lastNow = now;
-    if (game) {
+    var coding = mode === 'code' || mode === 'codeLevels';
+    if (coding && RX.CodeMode) RX.CodeMode.frame(now / 1000, dt);
+    if (game && !coding) {
       var paused = $('confirm').classList.contains('on') || document.hidden;
       if (!paused) {
         game.t += dt;
@@ -925,6 +927,7 @@
   function onTap(id, fn) { $(id).addEventListener('click', function (e) { Snd.ensure(); fn(e); }); }
   onTap('btnPlay', function () { Snd.click(); openLevels(); });
   onTap('btnGarage', function () { Snd.click(); openGarage(); });
+  onTap('btnCode', function () { Snd.click(); RX.CodeMode.openLevels(); });
   onTap('lvBack', function () { Snd.click(); setMode('title'); });
   onTap('gaBack', function () { Snd.click(); setMode('title'); });
   document.querySelectorAll('#tabs .brick').forEach(function (b) { b.addEventListener('click', function () { Snd.ensure(); Snd.click(); gTab = b.dataset.tab; buildOptions(); }); });
@@ -935,7 +938,7 @@
   onTap('winNext', function () { Snd.click(); startLevel(Math.min(game.i + 1, RX.LEVELS.length - 1)); });
   onTap('winHouses', function () { Snd.click(); $('win').classList.remove('on'); hush(); openLevels(); });
   var SOUND_ICONS = ['🔇', '🔈', '🔊'];
-  function syncSound() { $('btnSound').textContent = $('btnSound2').textContent = SOUND_ICONS[save.audio]; }
+  function syncSound() { $('btnSound').textContent = $('btnSound2').textContent = SOUND_ICONS[save.audio]; var c = $('cSound'); if (c) c.textContent = SOUND_ICONS[save.audio]; }
   function cycleSound() { save.audio = (save.audio + 2) % 3; persist(); syncSound(); if (save.audio < 2) hush(); Snd.click(); if (save.audio === 2) say('I can talk!', { force: true }); }
   onTap('btnSound', cycleSound);
   onTap('btnSound2', cycleSound);
@@ -955,5 +958,11 @@
     }
     return { time: game.S.time, left: game.S.dirtLeft, stuck: game.S.stuck && game.S.stuck.kind, phase: game.S.phase };
   }
+  // shared with Code Roxy
+  RX.App = {
+    Snd: Snd, say: say, hush: hush, save: save, persist: persist, totalStars: totalStars, fmt: fmt,
+    setMode: function (m) { setMode(m); if (m === 'title' && (!game || !game.demo)) startDemo(); },
+    get mode() { return mode; }, cycleSound: cycleSound, soundIcon: function () { return SOUND_ICONS[save.audio]; }
+  };
   RX.debug = { ff: ff, get game() { return game; }, startLevel: startLevel, openGarage: openGarage, openLevels: openLevels, showWin: showWin, save: save, setMode: setMode, tidyToy: tidyToy, tapRoom: tapRoom };
 })();

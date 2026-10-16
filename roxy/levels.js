@@ -25,6 +25,11 @@
     bluec:   { base: '#7FAEE8', studs: true },
     pinkc:   { base: '#F7B5C6', studs: true },
     stone:   { base: '#8D9296', pattern: 'stone', alt: '#7A7F83' },
+    redcheck:{ base: C.white, pattern: 'checker', alt: '#F2A9A3' },
+    metal:   { base: '#66727C', pattern: 'tiles2', alt: '#5C6872' },
+    lmetal:  { base: '#BCC6CE', pattern: 'tiles2', alt: '#AEB8C1' },
+    spacec:  { base: '#9474CF', studs: true },
+    grassc:  { base: '#7CBF62', studs: true },
     lstone:  { base: '#B4B7B9', pattern: 'stone', alt: '#A3A6A9' }
   };
 
@@ -33,7 +38,8 @@
     studs: ['crumb', 'cheerio', 'dust'], wood: ['dust', 'crumb'], lwood: ['sand', 'crumb'],
     tile: ['crumb', 'juice'], checker: ['crumb', 'cheerio', 'juice'], bath: ['puddle', 'dust'],
     lav: ['brick', 'crumb'], bluec: ['brick', 'dust'], pinkc: ['glitter', 'cheerio'],
-    stone: ['dust', 'hay'], lstone: ['crumb', 'coin'], deck: ['sand', 'shell']
+    stone: ['dust', 'hay'], lstone: ['crumb', 'coin'], deck: ['sand', 'shell'],
+    redcheck: ['crumb', 'feather'], metal: ['dust', 'stardust'], lmetal: ['rock', 'dust'], spacec: ['stardust', 'dust'], grassc: ['leaf', 'mud']
   };
   RX.DEFAULT_MESS = DEFAULT_MESS;
 
@@ -153,6 +159,49 @@
       pet: 'cat'
     },
     {
+      id: 'farm', name: 'Farm House', w: 24, h: 17, outside: 'farm', seed: 66,
+      rooms: [
+        { id: 'kitchen', name: 'Farm Kitchen', icon: '🥧', floor: 'redcheck', wall: C.red, rects: [[2, 2, 8, 5]], mess: { n: 11, k: ['crumb', 'feather', 'juice'] } },
+        { id: 'living', name: 'Cozy Room', icon: '🔥', floor: 'wood', wall: C.yellow, rects: [[11, 2, 11, 5]], mess: { n: 11, k: ['dust', 'hay', 'crumb'] } },
+        { id: 'boots', name: 'Boot Room', icon: '👢', floor: 'stone', wall: C.dgray, rects: [[2, 8, 5, 6]], mess: { n: 10, k: ['mud', 'hay', 'leaf'] } },
+        { id: 'hall', name: 'Hallway', icon: '🐾', floor: 'studs', wall: C.white, rects: [[8, 8, 3, 6]], mess: { n: 7, k: ['mud', 'feather'] } },
+        { id: 'bed', name: 'Bedroom', icon: '🛏️', floor: 'wood', wall: C.orange, rects: [[12, 8, 6, 6]], mess: { n: 8, k: ['dust', 'feather'] } },
+        { id: 'bath', name: 'Bathroom', icon: '🛁', floor: 'bath', wall: C.azure, rects: [[19, 8, 3, 6]], mess: { n: 5, k: ['puddle', 'mud'] } }
+      ],
+      doors: [[10, 4, 'living'], [9, 7, 'hall'], [15, 7, 'bed'], [7, 10, 'boots'], [11, 10, 'bed'], [18, 11, 'bath']],
+      windows: [[4, 1, 2, 'h'], [14, 1, 2, 'h'], [18, 1, 2, 'h'], [1, 4, 2, 'v'], [22, 3, 2, 'v'], [22, 10, 2, 'v'], [1, 10, 2, 'v'], [14, 14, 2, 'h'], [20, 14, 1, 'h']],
+      frontDoor: [4, 14],
+      furniture: [
+        { t: 'counter', x: 2, y: 2, w: 5, h: 1, stove: 2, sinkAt: 4 },
+        { t: 'fridge', x: 7, y: 2 },
+        { t: 'rug', x: 3, y: 4, w: 5, h: 2, color: C.green },
+        { t: 'dtable', x: 4, y: 4, w: 3, h: 1 },
+        { t: 'barrel', x: 2, y: 6 },
+        { t: 'shelf', x: 12, y: 2, w: 2, h: 1 },
+        { t: 'rug', x: 16, y: 3, w: 5, h: 3, color: C.dred },
+        { t: 'sofa', x: 17, y: 2, w: 3, h: 1, face: 's', color: C.red },
+        { t: 'table', x: 18, y: 4 },
+        { t: 'fireplace', x: 21, y: 3, w: 1, h: 2 },
+        { t: 'beanbag', x: 13, y: 6, color: C.nougat },
+        { t: 'plant', x: 21, y: 6 },
+        { t: 'bench', x: 2, y: 9, w: 1, h: 2 },
+        { t: 'hay', x: 2, y: 13 },
+        { t: 'basket', x: 6, y: 13 },
+        { t: 'plant', x: 8, y: 13 },
+        { t: 'shelf', x: 10, y: 13 },
+        { t: 'dresser', x: 12, y: 8, w: 2, h: 1 },
+        { t: 'bed', x: 15, y: 11, w: 2, h: 3, head: 's', color: C.orange },
+        { t: 'nightstand', x: 14, y: 13 },
+        { t: 'toybox', x: 17, y: 8 },
+        { t: 'sink', x: 19, y: 8 },
+        { t: 'toilet', x: 21, y: 8, face: 's' },
+        { t: 'tub', x: 19, y: 13, w: 3, h: 1 }
+      ],
+      dock: [9, 13, 's'],
+      toys: { n: 3, k: ['boot', 'teddy', 'ball'] },
+      pet: 'dog'
+    },
+    {
       id: 'beach', name: 'Beach House', w: 24, h: 17, outside: 'beach', seed: 44,
       rooms: [
         { id: 'great', name: 'Big Room', icon: '🏖️', floor: 'lwood', wall: C.azure, rects: [[2, 2, 12, 7]], mess: { n: 18, k: ['sand', 'shell', 'crumb'] } },
@@ -190,6 +239,49 @@
       dock: [6, 2, 'n'],
       toys: { n: 3, k: ['bucket', 'duck', 'ball', 'teddy'] },
       pet: 'cat'
+    },
+    {
+      id: 'school', name: 'School Day', w: 26, h: 17, outside: 'grass', seed: 77,
+      rooms: [
+        { id: 'class', name: 'Classroom', icon: '✏️', floor: 'tile', wall: C.blue, rects: [[2, 2, 9, 6]], mess: { n: 13, k: ['paper', 'crayon', 'crumb'] } },
+        { id: 'art', name: 'Art Room', icon: '🎨', floor: 'checker', wall: C.orange, rects: [[12, 2, 6, 6]], mess: { n: 10, k: ['paint', 'glitter', 'paper'] } },
+        { id: 'library', name: 'Library', icon: '📚', floor: 'wood', wall: C.bgreen, rects: [[19, 2, 5, 6]], mess: { n: 7, k: ['paper', 'dust'] } },
+        { id: 'hall', name: 'Hallway', icon: '🏫', floor: 'studs', wall: C.white, rects: [[2, 9, 22, 2]], mess: { n: 10, k: ['mud', 'paper', 'leaf'] } },
+        { id: 'lunch', name: 'Lunch Room', icon: '🍎', floor: 'checker', wall: C.yellow, rects: [[2, 12, 10, 3]], mess: { n: 11, k: ['crumb', 'juice', 'cheerio'] } },
+        { id: 'gym', name: 'Gym', icon: '🏀', floor: 'lwood', wall: C.red, rects: [[13, 12, 11, 3]], mess: { n: 9, k: ['dust', 'puddle', 'paper'] } }
+      ],
+      doors: [[5, 8, 'class'], [6, 8, 'class'], [15, 8, 'art'], [21, 8, 'library'], [6, 11, 'lunch'], [7, 11, 'lunch'], [18, 11, 'gym'], [19, 11, 'gym'], [11, 4, 'art']],
+      windows: [[3, 1, 2, 'h'], [8, 1, 2, 'h'], [14, 1, 2, 'h'], [20, 1, 2, 'h'], [1, 4, 2, 'v'], [24, 4, 2, 'v'], [24, 12, 2, 'v'], [1, 13, 1, 'v'], [4, 15, 2, 'h'], [15, 15, 2, 'h'], [20, 15, 2, 'h']],
+      frontDoor: [1, 9],
+      furniture: [
+        { t: 'chalkboard', x: 4, y: 2, w: 4, h: 1 },
+        { t: 'desk', x: 9, y: 2, w: 2, h: 1 },
+        { t: 'schooldesk', x: 3, y: 4 },
+        { t: 'schooldesk', x: 5, y: 4 },
+        { t: 'schooldesk', x: 7, y: 4 },
+        { t: 'schooldesk', x: 3, y: 6 },
+        { t: 'schooldesk', x: 8, y: 6 },
+        { t: 'plant', x: 10, y: 7 },
+        { t: 'easel', x: 13, y: 2 },
+        { t: 'easel', x: 16, y: 2 },
+        { t: 'kidtable', x: 13, y: 5, w: 2, h: 1 },
+        { t: 'sink', x: 17, y: 6 },
+        { t: 'shelf', x: 19, y: 2, w: 5, h: 1 },
+        { t: 'rug', x: 20, y: 4, w: 3, h: 2, color: C.yellow },
+        { t: 'beanbag', x: 19, y: 7, color: C.red },
+        { t: 'beanbag', x: 23, y: 7, color: C.blue },
+        { t: 'locker', x: 9, y: 9, w: 3, h: 1 },
+        { t: 'locker', x: 16, y: 9, w: 2, h: 1 },
+        { t: 'longtable', x: 3, y: 13, w: 3, h: 1 },
+        { t: 'longtable', x: 8, y: 13, w: 3, h: 1 },
+        { t: 'barrel', x: 11, y: 14 },
+        { t: 'rug', x: 14, y: 13, w: 3, h: 2, color: C.blue },
+        { t: 'hoop', x: 23, y: 13 },
+        { t: 'basket', x: 13, y: 12 }
+      ],
+      dock: [3, 10, 's'],
+      toys: { n: 4, k: ['block', 'ball', 'teddy', 'car'] },
+      pet: null
     },
     {
       id: 'castle', name: 'LEGO Castle', w: 26, h: 18, outside: 'moat', seed: 55,
@@ -232,6 +324,42 @@
       dock: [3, 8, 'n'],
       toys: { n: 4, k: ['knight', 'horse', 'teddy', 'ball'] },
       pet: 'dragon'
+    },
+    {
+      id: 'space', name: 'Space Station', w: 24, h: 17, outside: 'space', seed: 88,
+      rooms: [
+        { id: 'lab', name: 'Science Lab', icon: '🔬', floor: 'lmetal', wall: C.azure, rects: [[2, 2, 5, 6]], mess: { n: 8, k: ['goo', 'stardust'] } },
+        { id: 'bridge', name: 'Bridge', icon: '🚀', floor: 'metal', wall: C.dgray, rects: [[8, 2, 8, 4]], mess: { n: 9, k: ['dust', 'stardust', 'rock'] } },
+        { id: 'garden', name: 'Space Garden', icon: '🌱', floor: 'grassc', wall: C.lime, rects: [[17, 2, 5, 6]], mess: { n: 8, k: ['leaf', 'mud'] } },
+        { id: 'hub', name: 'Hub', icon: '🛸', floor: 'lmetal', wall: C.white, rects: [[8, 7, 8, 7]], mess: { n: 14, k: ['rock', 'stardust', 'dust', 'goo'] } },
+        { id: 'pods', name: 'Sleep Pods', icon: '🌙', floor: 'spacec', wall: C.purple, rects: [[2, 9, 5, 5]], mess: { n: 7, k: ['stardust', 'dust'] } },
+        { id: 'galley', name: 'Space Kitchen', icon: '🍕', floor: 'checker', wall: C.orange, rects: [[17, 9, 5, 5]], mess: { n: 8, k: ['crumb', 'goo'] } }
+      ],
+      doors: [[7, 7, 'hub'], [11, 6, 'bridge'], [12, 6, 'bridge'], [16, 7, 'hub'], [7, 11, 'pods'], [16, 11, 'galley'], [4, 8, 'pods']],
+      windows: [[3, 1, 2, 'h'], [10, 1, 4, 'h'], [18, 1, 2, 'h'], [1, 4, 2, 'v'], [22, 4, 2, 'v'], [1, 11, 1, 'v'], [22, 11, 1, 'v'], [4, 14, 1, 'h'], [19, 14, 1, 'h']],
+      frontDoor: [11, 14],
+      furniture: [
+        { t: 'counter', x: 2, y: 2, w: 3, h: 1, sinkAt: 1 },
+        { t: 'cauldron', x: 6, y: 2 },
+        { t: 'console', x: 2, y: 5, w: 1, h: 2 },
+        { t: 'console', x: 9, y: 2, w: 6, h: 1 },
+        { t: 'beanbag', x: 10, y: 4, color: C.dgray },
+        { t: 'beanbag', x: 13, y: 4, color: C.dgray },
+        { t: 'plant', x: 18, y: 3 },
+        { t: 'plant', x: 20, y: 3 },
+        { t: 'plant', x: 18, y: 5, palm: 1 },
+        { t: 'plant', x: 20, y: 5 },
+        { t: 'rug', x: 10, y: 9, w: 4, h: 3, color: C.blue, round: 1 },
+        { t: 'legoset', x: 11, y: 10, w: 2, h: 1 },
+        { t: 'bed', x: 2, y: 10, w: 2, h: 3, head: 'n', color: C.purple },
+        { t: 'bed', x: 5, y: 12, w: 2, h: 2, head: 's', color: C.azure },
+        { t: 'counter', x: 21, y: 9, w: 1, h: 3, stove: 1 },
+        { t: 'dtable', x: 18, y: 12, w: 2, h: 1 },
+        { t: 'fridge', x: 21, y: 13 }
+      ],
+      dock: [12, 13, 's'],
+      toys: { n: 3, k: ['alien', 'rocket', 'ball'] },
+      pet: 'alien'
     }
   ];
 

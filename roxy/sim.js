@@ -12,7 +12,7 @@
     };
   };
 
-  RX.WET = { puddle: 1, juice: 1, mud: 1 };
+  RX.WET = { puddle: 1, juice: 1, mud: 1, goo: 1, paint: 1 };
   RX.STRATS = {
     zigzag: { speed: 1.0 },
     snail: { speed: 1.0 },
