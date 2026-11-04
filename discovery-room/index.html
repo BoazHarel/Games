@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Discovery Room</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <main id="viewport-shell">
+      <div
+        id="stage"
+        data-stop-id=""
+        data-mode="night"
+        data-transitioning="false"
+        data-gal-mode="false"
+      >
+        <div id="scene-layers" aria-hidden="true"></div>
+
+        <nav id="trail-bar" aria-label="Exploration trail" data-depth="0" data-pulsing="false"></nav>
+
+        <h1 id="stop-title"></h1>
+
+        <button
+          id="house-btn"
+          type="button"
+          aria-label="Home (hold 3 seconds for Parent Settings)"
+          data-holding="false"
+          draggable="false"
+        >
+          <svg viewBox="0 0 48 48" width="36" height="36" aria-hidden="true">
+            <path
+              d="M24 8L6 24h6v16h10V30h4v10h10V24h6L24 8z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+
+        <button
+          id="cue-card-btn"
+          type="button"
+          aria-label="Parent conversation prompt"
+          aria-expanded="false"
+          draggable="false"
+        >
+          ?
+        </button>
+
+        <aside id="cue-card" data-open="false" aria-hidden="true">
+          <div class="cue-card-header">
+            <strong id="cue-stop-name"></strong>
+            <button id="cue-close-btn" type="button" aria-label="Close prompt">✕</button>
+          </div>
+          <p class="cue-row">
+            <span class="cue-tag">Daniel (6):</span>
+            <span id="cue-daniel-question"></span>
+          </p>
+          <p id="cue-gal-row" class="cue-row" data-gal-highlighted="false">
+            <span class="cue-tag">Gal (3):</span>
+            <span id="cue-gal-line"></span>
+          </p>
+          <p id="cue-parent-note" class="cue-note" hidden></p>
+        </aside>
+
+        <section
+          id="settings-modal"
+          data-open="false"
+          aria-hidden="true"
+          aria-label="Parent Settings"
+        >
+          <div class="settings-panel">
+            <header class="settings-header">
+              <h2>Parent Settings</h2>
+              <button id="settings-close-btn" type="button" aria-label="Close settings">
+                Close
+              </button>
+            </header>
+
+            <div class="settings-section">
+              <label class="settings-toggle-row" for="gal-mode-toggle">
+                <input id="gal-mode-toggle" type="checkbox" />
+                <span>
+                  <strong>Gal mode (age 3)</strong> — caps depth at L2, enlarges tap areas, max 4
+                  breathing objects below the room, highlights Gal prompt
+                </span>
+              </label>
+            </div>
+
+            <div class="settings-section">
+              <h3>Question Jar</h3>
+              <div class="jar-controls">
+                <input
+                  id="question-jar-input"
+                  type="text"
+                  placeholder="Add a question Daniel asked..."
+                />
+                <button id="question-jar-add-btn" type="button">Add Marble</button>
+              </div>
+              <ul id="question-jar-list"></ul>
+              <div class="jar-backup-controls">
+                <button id="question-jar-export-btn" type="button">Export JSON</button>
+                <button id="question-jar-import-btn" type="button">Import JSON</button>
+              </div>
+              <textarea
+                id="question-jar-json"
+                rows="3"
+                placeholder="Exported or pasted Question Jar JSON..."
+              ></textarea>
+              <p id="question-jar-status" class="jar-status"></p>
+            </div>
+
+            <div class="settings-section">
+              <h3>Lenovo Tab One Viewport &amp; Storage Diagnostics</h3>
+              <div id="diagnostics-readout"></div>
+            </div>
+
+            <div class="settings-section">
+              <h3>Photo Credits</h3>
+              <ul id="photo-credits-list"></ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

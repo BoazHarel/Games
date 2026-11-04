@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "v1-e1-placeholder-18stops",
+  "rootId": "room",
+  "config": {
+    "canvasWidth": 1600,
+    "canvasHeight": 900,
+    "minTapDevicePx": 140,
+    "minTapCssPxFloor": 64,
+    "minDilationPercent": 15,
+    "maxOverlapWarnRatio": 0.1,
+    "flyInDurationMs": 600
+  },
+  "stops": {
+    "room": {
+      "id": "room",
+      "name": "The room",
+      "branch": "root",
+      "level": 0,
+      "paletteColor": "#2b1d12",
+      "paletteColorByMode": {
+        "day": "#3d2817",
+        "night": "#2b1d12"
+      },
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/room/bg-night.webp",
+        "backgroundByMode": {
+          "day": "assets/scenes/room/bg-day.webp",
+          "night": "assets/scenes/room/bg-night.webp"
+        },
+        "thumbnail": "assets/scenes/room/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-window",
+          "label": "Window",
+          "targetStopId": null,
+          "targetByMode": {
+            "day": "b-street",
+            "night": "a-night-sky"
+          },
+          "action": null,
+          "layerImage": "assets/scenes/room/cutouts/window-night.webp",
+          "layerImageByMode": {
+            "day": "assets/scenes/room/cutouts/window-day.webp",
+            "night": "assets/scenes/room/cutouts/window-night.webp"
+          },
+          "moment": "curtain-breeze",
+          "bounds": { "x": 9.0, "y": 11.0, "w": 18.0, "h": 28.0 },
+          "outlinePolygon": [
+            [9.0, 11.0],
+            [27.0, 11.0],
+            [27.0, 39.0],
+            [9.0, 39.0]
+          ],
+          "hitPolygon": [
+            [7.0, 8.0],
+            [29.0, 8.0],
+            [29.0, 42.0],
+            [7.0, 42.0]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-light-switch",
+          "label": "Light switch",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": "toggleDayNight",
+          "layerImage": "assets/scenes/room/cutouts/switch-night.webp",
+          "layerImageByMode": {
+            "day": "assets/scenes/room/cutouts/switch-day.webp",
+            "night": "assets/scenes/room/cutouts/switch-night.webp"
+          },
+          "moment": "switch-click",
+          "bounds": { "x": 35.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [35.0, 16.0],
+            [45.0, 16.0],
+            [45.0, 33.0],
+            [35.0, 33.0]
+          ],
+          "hitPolygon": [
+            [34.0, 14.0],
+            [46.0, 14.0],
+            [46.0, 35.0],
+            [34.0, 35.0]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-desk",
+          "label": "The desk",
+          "targetStopId": "c-desk",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/room/cutouts/desk.webp",
+          "moment": "beaker-fizz",
+          "bounds": { "x": 11.0, "y": 57.0, "w": 20.0, "h": 24.0 },
+          "outlinePolygon": [
+            [11.0, 57.0],
+            [31.0, 57.0],
+            [31.0, 81.0],
+            [11.0, 81.0]
+          ],
+          "hitPolygon": [
+            [9.0, 54.0],
+            [33.0, 54.0],
+            [33.0, 84.0],
+            [9.0, 84.0]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-frog-terrarium",
+          "label": "Frog terrarium",
+          "targetStopId": "d-frog",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/room/cutouts/frog-terrarium.webp",
+          "moment": "throat-puff",
+          "bounds": { "x": 42.0, "y": 58.0, "w": 16.0, "h": 22.0 },
+          "outlinePolygon": [
+            [42.0, 58.0],
+            [58.0, 58.0],
+            [58.0, 80.0],
+            [42.0, 80.0]
+          ],
+          "hitPolygon": [
+            [40.0, 55.0],
+            [60.0, 55.0],
+            [60.0, 83.0],
+            [40.0, 83.0]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-plant",
+          "label": "Plant on the windowsill",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "F",
+          "layerImage": "assets/scenes/room/cutouts/plant.webp",
+          "moment": "leaf-sway",
+          "bounds": { "x": 52.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [52.0, 16.0],
+            [62.0, 16.0],
+            [62.0, 33.0],
+            [52.0, 33.0]
+          ],
+          "hitPolygon": [
+            [51.0, 14.0],
+            [63.0, 14.0],
+            [63.0, 35.0],
+            [51.0, 35.0]
+          ],
+          "galPriority": 5,
+          "sceneryOnlyInV1": true
+        },
+        {
+          "id": "tap-globe",
+          "label": "Globe on the shelf",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "H",
+          "layerImage": "assets/scenes/room/cutouts/globe.webp",
+          "moment": "globe-spin",
+          "bounds": { "x": 70.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [70.0, 16.0],
+            [80.0, 16.0],
+            [80.0, 33.0],
+            [70.0, 33.0]
+          ],
+          "hitPolygon": [
+            [69.0, 14.0],
+            [81.0, 14.0],
+            [81.0, 35.0],
+            [69.0, 35.0]
+          ],
+          "galPriority": 6,
+          "sceneryOnlyInV1": true
+        },
+        {
+          "id": "tap-body-poster",
+          "label": "Body poster on the wall",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "I",
+          "layerImage": "assets/scenes/room/cutouts/body-poster.webp",
+          "moment": "poster-wiggle",
+          "bounds": { "x": 70.0, "y": 58.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [70.0, 58.0],
+            [82.0, 58.0],
+            [82.0, 78.0],
+            [70.0, 78.0]
+          ],
+          "hitPolygon": [
+            [68.0, 55.0],
+            [84.0, 55.0],
+            [84.0, 81.0],
+            [68.0, 81.0]
+          ],
+          "galPriority": 7,
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "children": ["b-street", "a-night-sky", "c-desk", "d-frog"],
+      "links": [],
+      "parentQuestion": "What do you want to look at first?",
+      "galLine": "Tap the frog or the window!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-night-sky": {
+      "id": "a-night-sky",
+      "name": "Night sky",
+      "branch": "A",
+      "level": 1,
+      "paletteColor": "#0f1535",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-night-sky/bg.webp",
+        "thumbnail": "assets/scenes/a-night-sky/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-moon",
+          "label": "Moon",
+          "targetStopId": "a-moon",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/moon.webp",
+          "moment": "moon-smile",
+          "bounds": { "x": 10.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [10.0, 14.0],
+            [20.0, 14.0],
+            [20.0, 31.0],
+            [10.0, 31.0]
+          ],
+          "hitPolygon": [
+            [9.0, 12.0],
+            [21.0, 12.0],
+            [21.0, 33.0],
+            [9.0, 33.0]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-star",
+          "label": "A star",
+          "targetStopId": "a-star",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/star.webp",
+          "moment": "star-twinkle",
+          "bounds": { "x": 38.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [38.0, 14.0],
+            [48.0, 14.0],
+            [48.0, 31.0],
+            [38.0, 31.0]
+          ],
+          "hitPolygon": [
+            [37.0, 12.0],
+            [49.0, 12.0],
+            [49.0, 33.0],
+            [37.0, 33.0]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-planets",
+          "label": "Planets",
+          "targetStopId": "a-planets",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/planets.webp",
+          "moment": "ring-gleam",
+          "bounds": { "x": 66.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [66.0, 14.0],
+            [76.0, 14.0],
+            [76.0, 31.0],
+            [66.0, 31.0]
+          ],
+          "hitPolygon": [
+            [65.0, 12.0],
+            [77.0, 12.0],
+            [77.0, 33.0],
+            [65.0, 33.0]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-constellations",
+          "label": "Constellations",
+          "targetStopId": "a-constellations",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/constellations.webp",
+          "moment": "lines-trace",
+          "bounds": { "x": 10.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [10.0, 56.0],
+            [20.0, 56.0],
+            [20.0, 73.0],
+            [10.0, 73.0]
+          ],
+          "hitPolygon": [
+            [9.0, 54.0],
+            [21.0, 54.0],
+            [21.0, 75.0],
+            [9.0, 75.0]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-shooting-star",
+          "label": "Shooting star or satellite",
+          "targetStopId": "a-shooting-star-satellite",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/shooting-star.webp",
+          "moment": "streak-glow",
+          "bounds": { "x": 38.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [38.0, 56.0],
+            [48.0, 56.0],
+            [48.0, 73.0],
+            [38.0, 73.0]
+          ],
+          "hitPolygon": [
+            [37.0, 54.0],
+            [49.0, 54.0],
+            [49.0, 75.0],
+            [37.0, 75.0]
+          ],
+          "galPriority": 5,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-northern-lights",
+          "label": "Northern lights",
+          "targetStopId": "a-northern-lights",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-night-sky/cutouts/northern-lights.webp",
+          "moment": "aurora-shimmer",
+          "bounds": { "x": 66.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "outlinePolygon": [
+            [66.0, 56.0],
+            [76.0, 56.0],
+            [76.0, 73.0],
+            [66.0, 73.0]
+          ],
+          "hitPolygon": [
+            [65.0, 54.0],
+            [77.0, 54.0],
+            [77.0, 75.0],
+            [65.0, 75.0]
+          ],
+          "galPriority": 6,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "a-moon",
+        "a-star",
+        "a-planets",
+        "a-constellations",
+        "a-shooting-star-satellite",
+        "a-northern-lights"
+      ],
+      "links": [],
+      "parentQuestion": "What do you think is up there, past the stars?",
+      "galLine": "Tap the moon and it smiles. Count the stars with me.",
+      "parentNote": "Supernova and black hole are about stars ending. Keep it 'wow,' not 'dying.'",
+      "credits": null
+    },
+    "a-moon": {
+      "id": "a-moon",
+      "name": "Moon",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#141c42",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-moon/bg.webp",
+        "thumbnail": "assets/scenes/a-moon/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why do you think the moon changes shape?",
+      "galLine": "Tap the moon and it smiles!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-star": {
+      "id": "a-star",
+      "name": "A star",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#161b40",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-star/bg.webp",
+        "thumbnail": "assets/scenes/a-star/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-star-life",
+          "label": "Star life",
+          "targetStopId": "a-star-life",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-star/cutouts/star-life.webp",
+          "moment": "star-pulse",
+          "bounds": { "x": 14.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [14.0, 38.0],
+            [26.0, 38.0],
+            [26.0, 58.0],
+            [14.0, 58.0]
+          ],
+          "hitPolygon": [
+            [12.0, 35.0],
+            [28.0, 35.0],
+            [28.0, 61.0],
+            [12.0, 61.0]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-supernova",
+          "label": "Supernova",
+          "targetStopId": "a-supernova",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-star/cutouts/supernova.webp",
+          "moment": "bright-bloom",
+          "bounds": { "x": 44.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [44.0, 38.0],
+            [56.0, 38.0],
+            [56.0, 58.0],
+            [44.0, 58.0]
+          ],
+          "hitPolygon": [
+            [42.0, 35.0],
+            [58.0, 35.0],
+            [58.0, 61.0],
+            [42.0, 61.0]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-black-hole",
+          "label": "Black hole",
+          "targetStopId": "a-black-hole",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-star/cutouts/black-hole.webp",
+          "moment": "swirl-ring",
+          "bounds": { "x": 72.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [72.0, 38.0],
+            [84.0, 38.0],
+            [84.0, 58.0],
+            [72.0, 58.0]
+          ],
+          "hitPolygon": [
+            [70.0, 35.0],
+            [86.0, 35.0],
+            [86.0, 61.0],
+            [70.0, 61.0]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": ["a-star-life", "a-supernova", "a-black-hole"],
+      "links": [],
+      "parentQuestion": "Is a star bigger or smaller than our house?",
+      "galLine": "Watch the big bright star!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-star-life": {
+      "id": "a-star-life",
+      "name": "Star life",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#1d1a45",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-star-life/bg.webp",
+        "thumbnail": "assets/scenes/a-star-life/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do you think happens when a star gets old?",
+      "galLine": "Baby star to giant star!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-supernova": {
+      "id": "a-supernova",
+      "name": "Supernova",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#23194a",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-supernova/bg.webp",
+        "thumbnail": "assets/scenes/a-supernova/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-nebula",
+          "label": "Nebula",
+          "targetStopId": "a-nebula",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-supernova/cutouts/nebula.webp",
+          "moment": "cloud-shimmer",
+          "bounds": { "x": 14.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [14.0, 38.0],
+            [26.0, 38.0],
+            [26.0, 58.0],
+            [14.0, 58.0]
+          ],
+          "hitPolygon": [
+            [12.0, 35.0],
+            [28.0, 35.0],
+            [28.0, 61.0],
+            [12.0, 61.0]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-neutron-star",
+          "label": "Neutron star",
+          "targetStopId": "a-neutron-star",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-supernova/cutouts/neutron-star.webp",
+          "moment": "core-glow",
+          "bounds": { "x": 44.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [44.0, 38.0],
+            [56.0, 38.0],
+            [56.0, 58.0],
+            [44.0, 58.0]
+          ],
+          "hitPolygon": [
+            [42.0, 35.0],
+            [58.0, 35.0],
+            [58.0, 61.0],
+            [42.0, 61.0]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-pulsar",
+          "label": "Pulsar",
+          "targetStopId": "a-pulsar",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-supernova/cutouts/pulsar.webp",
+          "moment": "lighthouse-blink",
+          "bounds": { "x": 72.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "outlinePolygon": [
+            [72.0, 38.0],
+            [84.0, 38.0],
+            [84.0, 58.0],
+            [72.0, 58.0]
+          ],
+          "hitPolygon": [
+            [70.0, 35.0],
+            [86.0, 35.0],
+            [86.0, 61.0],
+            [70.0, 61.0]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": ["a-nebula", "a-neutron-star", "a-pulsar"],
+      "links": [],
+      "parentQuestion": "This is where the stuff in your bones came from. Want to know how?",
+      "galLine": "Look at the big colourful flash!",
+      "parentNote": "Frame as 'wow', never scary.",
+      "credits": null
+    },
+    "a-nebula": {
+      "id": "a-nebula",
+      "name": "Nebula",
+      "branch": "A",
+      "level": 4,
+      "paletteColor": "#191233",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-nebula/bg.webp",
+        "thumbnail": "assets/scenes/a-nebula/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What colors can you find in the leftover cloud?",
+      "galLine": "Look at all the rainbow clouds!",
+      "parentNote": "Real photo of the Crab Nebula.",
+      "credits": {
+        "source": "NASA / ESA / Hubble Space Telescope",
+        "attribution": "NASA, ESA, J. Hester and A. Loll (Arizona State University)",
+        "license": "Public Domain (NASA)"
+      }
+    },
+    "a-neutron-star": {
+      "id": "a-neutron-star",
+      "name": "Neutron star",
+      "branch": "A",
+      "level": 4,
+      "paletteColor": "#151a3a",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-neutron-star/bg.webp",
+        "thumbnail": "assets/scenes/a-neutron-star/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Something tiny that weighs as much as a mountain?",
+      "galLine": "A tiny bright star!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-pulsar": {
+      "id": "a-pulsar",
+      "name": "Pulsar",
+      "branch": "A",
+      "level": 4,
+      "paletteColor": "#151a3a",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-pulsar/bg.webp",
+        "thumbnail": "assets/scenes/a-pulsar/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why do you think it blinks?",
+      "galLine": "Blink, blink, like a lighthouse!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-black-hole": {
+      "id": "a-black-hole",
+      "name": "Black hole",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#0c0f24",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-black-hole/bg.webp",
+        "thumbnail": "assets/scenes/a-black-hole/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What would happen if you fell in?",
+      "galLine": "Round and round like a whirlpool!",
+      "parentNote": "Frame as 'wow' and curiosity, never scary.",
+      "credits": null
+    },
+    "a-planets": {
+      "id": "a-planets",
+      "name": "Planets",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#141d42",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-planets/bg.webp",
+        "thumbnail": "assets/scenes/a-planets/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Which one would you visit first?",
+      "galLine": "Look at the rings on Saturn!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-constellations": {
+      "id": "a-constellations",
+      "name": "Constellations",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#111838",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-constellations/bg.webp",
+        "thumbnail": "assets/scenes/a-constellations/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "If you made your own shape out of stars, what would it be?",
+      "galLine": "Connect the star dots!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-shooting-star-satellite": {
+      "id": "a-shooting-star-satellite",
+      "name": "Shooting star or satellite",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#111838",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-shooting-star-satellite/bg.webp",
+        "thumbnail": "assets/scenes/a-shooting-star-satellite/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Is that a star, or something people built?",
+      "galLine": "Zoom across the sky!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-northern-lights": {
+      "id": "a-northern-lights",
+      "name": "Northern lights",
+      "branch": "A",
+      "level": 2,
+      "paletteColor": "#102838",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-northern-lights/bg.webp",
+        "thumbnail": "assets/scenes/a-northern-lights/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What colors would you want the sky to be?",
+      "galLine": "Green ribbons in the sky!",
+      "parentNote": null,
+      "credits": null
+    },
+    "b-street": {
+      "id": "b-street",
+      "name": "Street",
+      "branch": "B",
+      "level": 1,
+      "paletteColor": "#2c2438",
+      "end": false,
+      "passThrough": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/b-street/bg.webp",
+        "thumbnail": "assets/scenes/b-street/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-into-town",
+          "label": "Into town",
+          "targetStopId": "g-our-town",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/b-street/cutouts/into-town.webp",
+          "moment": "roof-zoom",
+          "bounds": { "x": 40.0, "y": 18.0, "w": 16.0, "h": 22.0 },
+          "outlinePolygon": [
+            [40.0, 18.0],
+            [56.0, 18.0],
+            [56.0, 40.0],
+            [40.0, 40.0]
+          ],
+          "hitPolygon": [
+            [38.0, 15.0],
+            [58.0, 15.0],
+            [58.0, 43.0],
+            [38.0, 43.0]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-street-cars",
+          "label": "Cars, trucks and the toy car",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "B",
+          "layerImage": "assets/scenes/b-street/cutouts/cars.webp",
+          "moment": "truck-honk",
+          "bounds": { "x": 12.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "outlinePolygon": [
+            [12.0, 58.0],
+            [24.0, 58.0],
+            [24.0, 76.0],
+            [12.0, 76.0]
+          ],
+          "hitPolygon": [
+            [10.0, 55.0],
+            [26.0, 55.0],
+            [26.0, 79.0],
+            [10.0, 79.0]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": true
+        },
+        {
+          "id": "tap-streetlight",
+          "label": "Streetlight and power lines",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "B",
+          "layerImage": "assets/scenes/b-street/cutouts/streetlight.webp",
+          "moment": "lamp-flicker",
+          "bounds": { "x": 38.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "outlinePolygon": [
+            [38.0, 58.0],
+            [50.0, 58.0],
+            [50.0, 76.0],
+            [38.0, 76.0]
+          ],
+          "hitPolygon": [
+            [36.0, 55.0],
+            [52.0, 55.0],
+            [52.0, 79.0],
+            [36.0, 79.0]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": true
+        },
+        {
+          "id": "tap-tree-outside",
+          "label": "Tree outside",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "B",
+          "layerImage": "assets/scenes/b-street/cutouts/tree.webp",
+          "moment": "leaf-rustle",
+          "bounds": { "x": 68.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "outlinePolygon": [
+            [68.0, 58.0],
+            [80.0, 58.0],
+            [80.0, 76.0],
+            [68.0, 76.0]
+          ],
+          "hitPolygon": [
+            [66.0, 55.0],
+            [82.0, 55.0],
+            [82.0, 79.0],
+            [66.0, 79.0]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "children": ["g-our-town"],
+      "links": [],
+      "parentQuestion": "What do you hear outside our window?",
+      "galLine": "What sound does the truck make? Find the dog.",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-our-town": {
+      "id": "g-our-town",
+      "name": "Our town",
+      "branch": "G",
+      "level": 2,
+      "paletteColor": "#26203a",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-our-town/bg.webp",
+        "thumbnail": "assets/scenes/g-our-town/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Who do you think lives and works here?",
+      "galLine": "Find the fire truck! Where's the school?",
+      "parentNote": "Modeled on West Kelowna with lake, hills, and vineyards.",
+      "credits": null
+    },
+    "c-desk": {
+      "id": "c-desk",
+      "name": "The desk",
+      "branch": "C",
+      "level": 1,
+      "paletteColor": "#2e2015",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-desk/bg.webp",
+        "thumbnail": "assets/scenes/c-desk/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What would you like to look at really, really closely?",
+      "galLine": "Pour the colors together.",
+      "parentNote": "The chemistry set is for looking only. Never a 'try this at home' moment.",
+      "credits": null
+    },
+    "d-frog": {
+      "id": "d-frog",
+      "name": "Frog",
+      "branch": "D",
+      "level": 1,
+      "paletteColor": "#18291e",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-frog/bg.webp",
+        "thumbnail": "assets/scenes/d-frog/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do you think a frog eats?",
+      "galLine": "Tap the frog and it hops. Find the bug for the frog.",
+      "parentNote": null,
+      "credits": null
+    }
+  }
+}
