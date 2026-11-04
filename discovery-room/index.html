@@ -7,8 +7,10 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
     <title>Discovery Room</title>
-    <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="styles/main.css" />
+    <meta name="theme-color" content="#2b1d12" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icons/icon-192.webp" type="image/webp" />
+    <link rel="stylesheet" href="./styles/main.css" />
   </head>
   <body>
     <main id="viewport-shell">
@@ -116,6 +118,12 @@
             <div class="settings-section">
               <h3>Lenovo Tab One Viewport &amp; Storage Diagnostics</h3>
               <div id="diagnostics-readout"></div>
+              <div class="jar-backup-controls">
+                <button id="verify-cache-btn" type="button">
+                  Verify 32 MB Cache Capacity
+                </button>
+              </div>
+              <p id="cache-verify-status" class="jar-status" data-diag="cache-verify-status"></p>
             </div>
 
             <div class="settings-section">
@@ -126,6 +134,6 @@
         </section>
       </div>
     </main>
-    <script type="module" src="src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

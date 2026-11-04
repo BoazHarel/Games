@@ -8,6 +8,7 @@ import { createSceneRenderer } from './scene-renderer.js';
 import { createCamera } from './camera.js';
 import { clientPointToStagePct, polygonCentroid, resolveTapHit } from './hit-testing.js';
 import { initUiChrome } from './ui-chrome.js';
+import { initOfflineManager } from './offline.js';
 
 async function initApp() {
   const stageEl = document.getElementById('stage');
@@ -15,10 +16,11 @@ async function initApp() {
   const titleEl = document.getElementById('stop-title');
   const shellEl = document.getElementById('viewport-shell');
 
-  const world = await loadWorld('data/world.json');
+  const world = await loadWorld('./data/world.json');
   const storage = createStorage();
   const galMode = createGalMode();
   const appState = createAppState(world, { storage, galMode });
+  const offline = initOfflineManager({ world, storage });
 
   const viewport = initViewport({
     shellEl,
@@ -68,6 +70,7 @@ async function initApp() {
     storage,
     viewport,
     camera,
+    offline,
     onTrailSelect: async (targetIndex) => {
       if (camera.isLocked()) return;
       const res = historyController.unwindToIndex(targetIndex);
@@ -166,6 +169,7 @@ async function initApp() {
 
     if (zoomResult.navigated) {
       historyController.pushCurrentState();
+      offline.cacheNeighborhoodBranches(targetStopId);
       uiChrome.refresh();
       await camera.flyInToChild({
         tappable,
@@ -187,13 +191,15 @@ async function initApp() {
     viewport,
     sceneRenderer,
     camera,
-    uiChrome
+    uiChrome,
+    offline
   };
 
   await sceneRenderer.renderStop(appState.getCurrentStopId(), {
     mode: appState.getMode(),
     parentStopId: appState.getParentStopId()
   });
+  offline.cacheNeighborhoodBranches(appState.getCurrentStopId());
   uiChrome.refresh();
 }
 

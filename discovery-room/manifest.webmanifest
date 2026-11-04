@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Discovery Room",
+  "short_name": "Discovery Room",
+  "description": "An illustrated storybook bedroom where Daniel and Gal explore what exists.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#2b1d12",
+  "theme_color": "#2b1d12",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icons/icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}

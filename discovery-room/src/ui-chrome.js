@@ -14,6 +14,7 @@ export function initUiChrome(options = {}) {
   const storage = options.storage;
   const viewport = options.viewport;
   const camera = options.camera;
+  const offline = options.offline || null;
   const onTrailSelect = options.onTrailSelect;
   const onHouseTap = options.onHouseTap;
   const onQuestionJarChange = options.onQuestionJarChange;
@@ -46,6 +47,8 @@ export function initUiChrome(options = {}) {
   const jarImportBtn = doc.getElementById('question-jar-import-btn');
   const jarStatusEl = doc.getElementById('question-jar-status');
   const creditsListEl = doc.getElementById('photo-credits-list');
+  const verifyCacheBtn = doc.getElementById('verify-cache-btn');
+  const cacheVerifyStatusEl = doc.getElementById('cache-verify-status');
 
   let cueCardOpen = false;
   let settingsOpen = false;
@@ -151,10 +154,24 @@ export function initUiChrome(options = {}) {
   async function renderDiagnostics() {
     if (!diagReadoutEl) return;
     const vpDiag = viewport ? viewport.getDiagnostics() : {};
-    const stDiag = storage ? await storage.getStorageDiagnostics() : { persisted: false, usageBytes: 0, quotaBytes: 0 };
+    const stDiag = storage
+      ? await storage.getStorageDiagnostics()
+      : { persisted: false, usageBytes: 0, quotaBytes: 0 };
+    const offDiag = offline
+      ? offline.getDiagnostics()
+      : {
+          cacheName: 'n/a',
+          swScope: 'n/a',
+          swState: 'n/a',
+          cachedBranches: []
+        };
 
     const usageKB = Math.round((stDiag.usageBytes || 0) / 1024);
     const quotaMB = Math.round((stDiag.quotaBytes || 0) / (1024 * 1024));
+    const branchesText =
+      Array.isArray(offDiag.cachedBranches) && offDiag.cachedBranches.length > 0
+        ? offDiag.cachedBranches.join(', ')
+        : 'none';
 
     diagReadoutEl.innerHTML = `
       <div class="diag-grid">
@@ -166,6 +183,9 @@ export function initUiChrome(options = {}) {
         <div><span>Min tap target (CSS px):</span> <strong data-diag="min-tap-css">${vpDiag.minTapCssPx}px</strong></div>
         <div><span>Fullscreen active:</span> <strong data-diag="fullscreen">${vpDiag.fullscreen ? 'yes' : 'no'}</strong></div>
         <div><span>Persistent storage:</span> <strong data-diag="persisted">${stDiag.persisted ? 'granted' : 'not granted'} (${usageKB} KB / ${quotaMB} MB)</strong></div>
+        <div><span>SW scope:</span> <strong data-diag="sw-scope">${offDiag.swScope} (${offDiag.swState})</strong></div>
+        <div><span>Versioned cache:</span> <strong data-diag="sw-cache">${offDiag.cacheName}</strong></div>
+        <div><span>Cached branches:</span> <strong data-diag="cached-branches">${branchesText}</strong></div>
       </div>
     `;
   }
@@ -376,6 +396,27 @@ export function initUiChrome(options = {}) {
       } catch (err) {
         if (jarStatusEl) {
           jarStatusEl.textContent = `Import error: ${err.message}`;
+        }
+      }
+    });
+  }
+
+  if (verifyCacheBtn && offline) {
+    verifyCacheBtn.addEventListener('click', async () => {
+      if (cacheVerifyStatusEl) {
+        cacheVerifyStatusEl.textContent = 'Verifying 32 MB cache capacity...';
+      }
+      try {
+        const report = await offline.verifyCacheCapacity();
+        if (cacheVerifyStatusEl) {
+          cacheVerifyStatusEl.textContent = report.passed
+            ? `Verified ${report.verifiedMB} MB (${report.entryCount} entries, ${report.evictedCount} evicted).`
+            : `Failed: ${report.evictedCount} evicted (${report.verifiedMB} MB).`;
+        }
+        await renderDiagnostics();
+      } catch (err) {
+        if (cacheVerifyStatusEl) {
+          cacheVerifyStatusEl.textContent = `Verification error: ${err.message}`;
         }
       }
     });

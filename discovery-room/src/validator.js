@@ -618,6 +618,18 @@ export function validateWorld(world) {
             `${tapPrefix}: sceneryOnlyInV1 tappables must declare unbuiltBranch in B/E/F/H/I (got ${JSON.stringify(tap.unbuiltBranch)}).`
           );
         }
+        if (tap.sceneryStopId !== undefined && tap.sceneryStopId !== null) {
+          const sceneryStop = world.stops[tap.sceneryStopId];
+          if (!sceneryStop) {
+            errors.push(`${tapPrefix}: sceneryStopId "${tap.sceneryStopId}" does not exist in stops.`);
+          } else if (sceneryStop.sceneryOnlyInV1 !== true) {
+            errors.push(`${tapPrefix}: sceneryStopId "${tap.sceneryStopId}" must have sceneryOnlyInV1: true.`);
+          } else if (sceneryStop.level !== stop.level + 1) {
+            errors.push(
+              `${tapPrefix}: sceneryStopId "${tap.sceneryStopId}" level must be ${stop.level + 1} (got ${sceneryStop.level}).`
+            );
+          }
+        }
       } else {
         if (tap.unbuiltBranch) {
           errors.push(
@@ -823,6 +835,13 @@ export function validateWorld(world) {
       visiting.add(currentId);
       visited.add(currentId);
       const currentStop = world.stops[currentId];
+      if (currentStop && Array.isArray(currentStop.tappables)) {
+        for (const tap of currentStop.tappables) {
+          if (tap?.sceneryOnlyInV1 && tap.sceneryStopId && world.stops[tap.sceneryStopId]?.sceneryOnlyInV1) {
+            visited.add(tap.sceneryStopId);
+          }
+        }
+      }
       if (currentStop && Array.isArray(currentStop.children)) {
         for (const childId of currentStop.children) {
           if (!world.stops[childId]) continue;

@@ -492,6 +492,7 @@ body {
 #question-jar-add-btn,
 #question-jar-export-btn,
 #question-jar-import-btn,
+#verify-cache-btn,
 .jar-delete-btn {
   padding: 6px 12px;
   border-radius: 8px;
@@ -539,6 +540,8 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 6px 14px;
   font-size: 0.88rem;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
 }
 
 .credit-item {

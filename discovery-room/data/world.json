@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "v1-e1-placeholder-18stops",
+  "contentVersion": "v1-placeholder-65stops",
   "rootId": "room",
   "config": {
     "canvasWidth": 1600,
@@ -51,18 +51,47 @@
             "night": "assets/scenes/room/cutouts/window-night.webp"
           },
           "moment": "curtain-breeze",
-          "bounds": { "x": 9.0, "y": 11.0, "w": 18.0, "h": 28.0 },
+          "bounds": {
+            "x": 9,
+            "y": 11,
+            "w": 18,
+            "h": 28
+          },
           "outlinePolygon": [
-            [9.0, 11.0],
-            [27.0, 11.0],
-            [27.0, 39.0],
-            [9.0, 39.0]
+            [
+              9,
+              11
+            ],
+            [
+              27,
+              11
+            ],
+            [
+              27,
+              39
+            ],
+            [
+              9,
+              39
+            ]
           ],
           "hitPolygon": [
-            [7.0, 8.0],
-            [29.0, 8.0],
-            [29.0, 42.0],
-            [7.0, 42.0]
+            [
+              7,
+              8
+            ],
+            [
+              29,
+              8
+            ],
+            [
+              29,
+              42
+            ],
+            [
+              7,
+              42
+            ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
@@ -79,18 +108,47 @@
             "night": "assets/scenes/room/cutouts/switch-night.webp"
           },
           "moment": "switch-click",
-          "bounds": { "x": 35.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 35,
+            "y": 16,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [35.0, 16.0],
-            [45.0, 16.0],
-            [45.0, 33.0],
-            [35.0, 33.0]
+            [
+              35,
+              16
+            ],
+            [
+              45,
+              16
+            ],
+            [
+              45,
+              33
+            ],
+            [
+              35,
+              33
+            ]
           ],
           "hitPolygon": [
-            [34.0, 14.0],
-            [46.0, 14.0],
-            [46.0, 35.0],
-            [34.0, 35.0]
+            [
+              34,
+              14
+            ],
+            [
+              46,
+              14
+            ],
+            [
+              46,
+              35
+            ],
+            [
+              34,
+              35
+            ]
           ],
           "galPriority": 2,
           "sceneryOnlyInV1": false
@@ -103,18 +161,47 @@
           "action": null,
           "layerImage": "assets/scenes/room/cutouts/desk.webp",
           "moment": "beaker-fizz",
-          "bounds": { "x": 11.0, "y": 57.0, "w": 20.0, "h": 24.0 },
+          "bounds": {
+            "x": 11,
+            "y": 57,
+            "w": 20,
+            "h": 24
+          },
           "outlinePolygon": [
-            [11.0, 57.0],
-            [31.0, 57.0],
-            [31.0, 81.0],
-            [11.0, 81.0]
+            [
+              11,
+              57
+            ],
+            [
+              31,
+              57
+            ],
+            [
+              31,
+              81
+            ],
+            [
+              11,
+              81
+            ]
           ],
           "hitPolygon": [
-            [9.0, 54.0],
-            [33.0, 54.0],
-            [33.0, 84.0],
-            [9.0, 84.0]
+            [
+              9,
+              54
+            ],
+            [
+              33,
+              54
+            ],
+            [
+              33,
+              84
+            ],
+            [
+              9,
+              84
+            ]
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": false
@@ -127,18 +214,47 @@
           "action": null,
           "layerImage": "assets/scenes/room/cutouts/frog-terrarium.webp",
           "moment": "throat-puff",
-          "bounds": { "x": 42.0, "y": 58.0, "w": 16.0, "h": 22.0 },
+          "bounds": {
+            "x": 42,
+            "y": 58,
+            "w": 16,
+            "h": 22
+          },
           "outlinePolygon": [
-            [42.0, 58.0],
-            [58.0, 58.0],
-            [58.0, 80.0],
-            [42.0, 80.0]
+            [
+              42,
+              58
+            ],
+            [
+              58,
+              58
+            ],
+            [
+              58,
+              80
+            ],
+            [
+              42,
+              80
+            ]
           ],
           "hitPolygon": [
-            [40.0, 55.0],
-            [60.0, 55.0],
-            [60.0, 83.0],
-            [40.0, 83.0]
+            [
+              40,
+              55
+            ],
+            [
+              60,
+              55
+            ],
+            [
+              60,
+              83
+            ],
+            [
+              40,
+              83
+            ]
           ],
           "galPriority": 4,
           "sceneryOnlyInV1": false
@@ -152,18 +268,47 @@
           "unbuiltBranch": "F",
           "layerImage": "assets/scenes/room/cutouts/plant.webp",
           "moment": "leaf-sway",
-          "bounds": { "x": 52.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 52,
+            "y": 16,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [52.0, 16.0],
-            [62.0, 16.0],
-            [62.0, 33.0],
-            [52.0, 33.0]
+            [
+              52,
+              16
+            ],
+            [
+              62,
+              16
+            ],
+            [
+              62,
+              33
+            ],
+            [
+              52,
+              33
+            ]
           ],
           "hitPolygon": [
-            [51.0, 14.0],
-            [63.0, 14.0],
-            [63.0, 35.0],
-            [51.0, 35.0]
+            [
+              51,
+              14
+            ],
+            [
+              63,
+              14
+            ],
+            [
+              63,
+              35
+            ],
+            [
+              51,
+              35
+            ]
           ],
           "galPriority": 5,
           "sceneryOnlyInV1": true
@@ -177,18 +322,47 @@
           "unbuiltBranch": "H",
           "layerImage": "assets/scenes/room/cutouts/globe.webp",
           "moment": "globe-spin",
-          "bounds": { "x": 70.0, "y": 16.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 70,
+            "y": 16,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [70.0, 16.0],
-            [80.0, 16.0],
-            [80.0, 33.0],
-            [70.0, 33.0]
+            [
+              70,
+              16
+            ],
+            [
+              80,
+              16
+            ],
+            [
+              80,
+              33
+            ],
+            [
+              70,
+              33
+            ]
           ],
           "hitPolygon": [
-            [69.0, 14.0],
-            [81.0, 14.0],
-            [81.0, 35.0],
-            [69.0, 35.0]
+            [
+              69,
+              14
+            ],
+            [
+              81,
+              14
+            ],
+            [
+              81,
+              35
+            ],
+            [
+              69,
+              35
+            ]
           ],
           "galPriority": 6,
           "sceneryOnlyInV1": true
@@ -202,24 +376,58 @@
           "unbuiltBranch": "I",
           "layerImage": "assets/scenes/room/cutouts/body-poster.webp",
           "moment": "poster-wiggle",
-          "bounds": { "x": 70.0, "y": 58.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 70,
+            "y": 58,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [70.0, 58.0],
-            [82.0, 58.0],
-            [82.0, 78.0],
-            [70.0, 78.0]
+            [
+              70,
+              58
+            ],
+            [
+              82,
+              58
+            ],
+            [
+              82,
+              78
+            ],
+            [
+              70,
+              78
+            ]
           ],
           "hitPolygon": [
-            [68.0, 55.0],
-            [84.0, 55.0],
-            [84.0, 81.0],
-            [68.0, 81.0]
+            [
+              68,
+              55
+            ],
+            [
+              84,
+              55
+            ],
+            [
+              84,
+              81
+            ],
+            [
+              68,
+              81
+            ]
           ],
           "galPriority": 7,
           "sceneryOnlyInV1": true
         }
       ],
-      "children": ["b-street", "a-night-sky", "c-desk", "d-frog"],
+      "children": [
+        "b-street",
+        "a-night-sky",
+        "c-desk",
+        "d-frog"
+      ],
       "links": [],
       "parentQuestion": "What do you want to look at first?",
       "galLine": "Tap the frog or the window!",
@@ -250,18 +458,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/moon.webp",
           "moment": "moon-smile",
-          "bounds": { "x": 10.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 10,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [10.0, 14.0],
-            [20.0, 14.0],
-            [20.0, 31.0],
-            [10.0, 31.0]
+            [
+              10,
+              14
+            ],
+            [
+              20,
+              14
+            ],
+            [
+              20,
+              31
+            ],
+            [
+              10,
+              31
+            ]
           ],
           "hitPolygon": [
-            [9.0, 12.0],
-            [21.0, 12.0],
-            [21.0, 33.0],
-            [9.0, 33.0]
+            [
+              9,
+              12
+            ],
+            [
+              21,
+              12
+            ],
+            [
+              21,
+              33
+            ],
+            [
+              9,
+              33
+            ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
@@ -274,18 +511,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/star.webp",
           "moment": "star-twinkle",
-          "bounds": { "x": 38.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 38,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [38.0, 14.0],
-            [48.0, 14.0],
-            [48.0, 31.0],
-            [38.0, 31.0]
+            [
+              38,
+              14
+            ],
+            [
+              48,
+              14
+            ],
+            [
+              48,
+              31
+            ],
+            [
+              38,
+              31
+            ]
           ],
           "hitPolygon": [
-            [37.0, 12.0],
-            [49.0, 12.0],
-            [49.0, 33.0],
-            [37.0, 33.0]
+            [
+              37,
+              12
+            ],
+            [
+              49,
+              12
+            ],
+            [
+              49,
+              33
+            ],
+            [
+              37,
+              33
+            ]
           ],
           "galPriority": 2,
           "sceneryOnlyInV1": false
@@ -298,18 +564,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/planets.webp",
           "moment": "ring-gleam",
-          "bounds": { "x": 66.0, "y": 14.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 66,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [66.0, 14.0],
-            [76.0, 14.0],
-            [76.0, 31.0],
-            [66.0, 31.0]
+            [
+              66,
+              14
+            ],
+            [
+              76,
+              14
+            ],
+            [
+              76,
+              31
+            ],
+            [
+              66,
+              31
+            ]
           ],
           "hitPolygon": [
-            [65.0, 12.0],
-            [77.0, 12.0],
-            [77.0, 33.0],
-            [65.0, 33.0]
+            [
+              65,
+              12
+            ],
+            [
+              77,
+              12
+            ],
+            [
+              77,
+              33
+            ],
+            [
+              65,
+              33
+            ]
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": false
@@ -322,18 +617,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/constellations.webp",
           "moment": "lines-trace",
-          "bounds": { "x": 10.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 10,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [10.0, 56.0],
-            [20.0, 56.0],
-            [20.0, 73.0],
-            [10.0, 73.0]
+            [
+              10,
+              56
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              20,
+              73
+            ],
+            [
+              10,
+              73
+            ]
           ],
           "hitPolygon": [
-            [9.0, 54.0],
-            [21.0, 54.0],
-            [21.0, 75.0],
-            [9.0, 75.0]
+            [
+              9,
+              54
+            ],
+            [
+              21,
+              54
+            ],
+            [
+              21,
+              75
+            ],
+            [
+              9,
+              75
+            ]
           ],
           "galPriority": 4,
           "sceneryOnlyInV1": false
@@ -346,18 +670,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/shooting-star.webp",
           "moment": "streak-glow",
-          "bounds": { "x": 38.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 38,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [38.0, 56.0],
-            [48.0, 56.0],
-            [48.0, 73.0],
-            [38.0, 73.0]
+            [
+              38,
+              56
+            ],
+            [
+              48,
+              56
+            ],
+            [
+              48,
+              73
+            ],
+            [
+              38,
+              73
+            ]
           ],
           "hitPolygon": [
-            [37.0, 54.0],
-            [49.0, 54.0],
-            [49.0, 75.0],
-            [37.0, 75.0]
+            [
+              37,
+              54
+            ],
+            [
+              49,
+              54
+            ],
+            [
+              49,
+              75
+            ],
+            [
+              37,
+              75
+            ]
           ],
           "galPriority": 5,
           "sceneryOnlyInV1": false
@@ -370,18 +723,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-night-sky/cutouts/northern-lights.webp",
           "moment": "aurora-shimmer",
-          "bounds": { "x": 66.0, "y": 56.0, "w": 10.0, "h": 17.0 },
+          "bounds": {
+            "x": 66,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
           "outlinePolygon": [
-            [66.0, 56.0],
-            [76.0, 56.0],
-            [76.0, 73.0],
-            [66.0, 73.0]
+            [
+              66,
+              56
+            ],
+            [
+              76,
+              56
+            ],
+            [
+              76,
+              73
+            ],
+            [
+              66,
+              73
+            ]
           ],
           "hitPolygon": [
-            [65.0, 54.0],
-            [77.0, 54.0],
-            [77.0, 75.0],
-            [65.0, 75.0]
+            [
+              65,
+              54
+            ],
+            [
+              77,
+              54
+            ],
+            [
+              77,
+              75
+            ],
+            [
+              65,
+              75
+            ]
           ],
           "galPriority": 6,
           "sceneryOnlyInV1": false
@@ -407,7 +789,7 @@
       "branch": "A",
       "level": 2,
       "paletteColor": "#141c42",
-      "end": true,
+      "end": false,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -416,11 +798,244 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-craters",
+          "label": "Craters",
+          "targetStopId": "a-craters",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-moon/cutouts/craters.webp",
+          "moment": "crater-dust",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-footprints-lander",
+          "label": "Footprints and lunar lander",
+          "targetStopId": "a-footprints-lander",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-moon/cutouts/footprints-lander.webp",
+          "moment": "lander-gleam",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-moon-far-side",
+          "label": "Moon's far side",
+          "targetStopId": "a-moon-far-side",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-moon/cutouts/moon-far-side.webp",
+          "moment": "moon-turn",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "a-craters",
+        "a-footprints-lander",
+        "a-moon-far-side"
+      ],
       "links": [],
       "parentQuestion": "Why do you think the moon changes shape?",
       "galLine": "Tap the moon and it smiles!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-craters": {
+      "id": "a-craters",
+      "name": "Craters",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#161f48",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-craters/bg.webp",
+        "thumbnail": "assets/scenes/a-craters/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do you think made these holes?",
+      "galLine": "Look at all the round moon holes!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-footprints-lander": {
+      "id": "a-footprints-lander",
+      "name": "Footprints and lunar lander",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#18214a",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-footprints-lander/bg.webp",
+        "thumbnail": "assets/scenes/a-footprints-lander/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "People walked here. What would you take with you?",
+      "galLine": "Step, step on the moon!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-moon-far-side": {
+      "id": "a-moon-far-side",
+      "name": "Moon's far side",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#12193d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-moon-far-side/bg.webp",
+        "thumbnail": "assets/scenes/a-moon-far-side/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do you think is on the side we never see?",
+      "galLine": "Peek behind the moon!",
       "parentNote": null,
       "credits": null
     },
@@ -448,18 +1063,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-star/cutouts/star-life.webp",
           "moment": "star-pulse",
-          "bounds": { "x": 14.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [14.0, 38.0],
-            [26.0, 38.0],
-            [26.0, 58.0],
-            [14.0, 58.0]
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
           ],
           "hitPolygon": [
-            [12.0, 35.0],
-            [28.0, 35.0],
-            [28.0, 61.0],
-            [12.0, 61.0]
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
@@ -472,18 +1116,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-star/cutouts/supernova.webp",
           "moment": "bright-bloom",
-          "bounds": { "x": 44.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [44.0, 38.0],
-            [56.0, 38.0],
-            [56.0, 58.0],
-            [44.0, 58.0]
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
           ],
           "hitPolygon": [
-            [42.0, 35.0],
-            [58.0, 35.0],
-            [58.0, 61.0],
-            [42.0, 61.0]
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
           ],
           "galPriority": 2,
           "sceneryOnlyInV1": false
@@ -496,28 +1169,61 @@
           "action": null,
           "layerImage": "assets/scenes/a-star/cutouts/black-hole.webp",
           "moment": "swirl-ring",
-          "bounds": { "x": 72.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [72.0, 38.0],
-            [84.0, 38.0],
-            [84.0, 58.0],
-            [72.0, 58.0]
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
           ],
           "hitPolygon": [
-            [70.0, 35.0],
-            [86.0, 35.0],
-            [86.0, 61.0],
-            [70.0, 61.0]
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": false
         }
       ],
-      "children": ["a-star-life", "a-supernova", "a-black-hole"],
+      "children": [
+        "a-star-life",
+        "a-supernova",
+        "a-black-hole"
+      ],
       "links": [],
       "parentQuestion": "Is a star bigger or smaller than our house?",
       "galLine": "Watch the big bright star!",
-      "parentNote": null,
+      "parentNote": "Supernova and black hole are about stars ending. Keep it 'wow,' not 'dying.'",
       "credits": null
     },
     "a-star-life": {
@@ -567,18 +1273,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-supernova/cutouts/nebula.webp",
           "moment": "cloud-shimmer",
-          "bounds": { "x": 14.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [14.0, 38.0],
-            [26.0, 38.0],
-            [26.0, 58.0],
-            [14.0, 58.0]
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
           ],
           "hitPolygon": [
-            [12.0, 35.0],
-            [28.0, 35.0],
-            [28.0, 61.0],
-            [12.0, 61.0]
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
@@ -591,18 +1326,47 @@
           "action": null,
           "layerImage": "assets/scenes/a-supernova/cutouts/neutron-star.webp",
           "moment": "core-glow",
-          "bounds": { "x": 44.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [44.0, 38.0],
-            [56.0, 38.0],
-            [56.0, 58.0],
-            [44.0, 58.0]
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
           ],
           "hitPolygon": [
-            [42.0, 35.0],
-            [58.0, 35.0],
-            [58.0, 61.0],
-            [42.0, 61.0]
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
           ],
           "galPriority": 2,
           "sceneryOnlyInV1": false
@@ -615,24 +1379,57 @@
           "action": null,
           "layerImage": "assets/scenes/a-supernova/cutouts/pulsar.webp",
           "moment": "lighthouse-blink",
-          "bounds": { "x": 72.0, "y": 38.0, "w": 12.0, "h": 20.0 },
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
           "outlinePolygon": [
-            [72.0, 38.0],
-            [84.0, 38.0],
-            [84.0, 58.0],
-            [72.0, 58.0]
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
           ],
           "hitPolygon": [
-            [70.0, 35.0],
-            [86.0, 35.0],
-            [86.0, 61.0],
-            [70.0, 61.0]
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": false
         }
       ],
-      "children": ["a-nebula", "a-neutron-star", "a-pulsar"],
+      "children": [
+        "a-nebula",
+        "a-neutron-star",
+        "a-pulsar"
+      ],
       "links": [],
       "parentQuestion": "This is where the stuff in your bones came from. Want to know how?",
       "galLine": "Look at the big colourful flash!",
@@ -659,7 +1456,7 @@
       "links": [],
       "parentQuestion": "What colors can you find in the leftover cloud?",
       "galLine": "Look at all the rainbow clouds!",
-      "parentNote": "Real photo of the Crab Nebula.",
+      "parentNote": "Real photo of the Crab Nebula: what a supernova leaves behind.",
       "credits": {
         "source": "NASA / ESA / Hubble Space Telescope",
         "attribution": "NASA, ESA, J. Hester and A. Loll (Arizona State University)",
@@ -741,7 +1538,7 @@
       "branch": "A",
       "level": 2,
       "paletteColor": "#141d42",
-      "end": true,
+      "end": false,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -750,11 +1547,244 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-saturn-rings",
+          "label": "Saturn's rings",
+          "targetStopId": "a-saturn-rings",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-planets/cutouts/saturn-rings.webp",
+          "moment": "ring-tilt",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-jupiter-red-spot",
+          "label": "Jupiter's red spot",
+          "targetStopId": "a-jupiter-red-spot",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-planets/cutouts/jupiter-red-spot.webp",
+          "moment": "spot-swirl",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-mars-rover",
+          "label": "Mars rover",
+          "targetStopId": "a-mars-rover",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/a-planets/cutouts/mars-rover.webp",
+          "moment": "rover-roll",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "a-saturn-rings",
+        "a-jupiter-red-spot",
+        "a-mars-rover"
+      ],
       "links": [],
       "parentQuestion": "Which one would you visit first?",
       "galLine": "Look at the rings on Saturn!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-saturn-rings": {
+      "id": "a-saturn-rings",
+      "name": "Saturn's rings",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#1c234d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-saturn-rings/bg.webp",
+        "thumbnail": "assets/scenes/a-saturn-rings/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What are the rings made of, do you think?",
+      "galLine": "Hula hoops around a planet!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-jupiter-red-spot": {
+      "id": "a-jupiter-red-spot",
+      "name": "Jupiter's red spot",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#281c44",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-jupiter-red-spot/bg.webp",
+        "thumbnail": "assets/scenes/a-jupiter-red-spot/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "This storm is bigger than Earth. Would you fly in?",
+      "galLine": "Swirl, swirl goes the big orange spot!",
+      "parentNote": null,
+      "credits": null
+    },
+    "a-mars-rover": {
+      "id": "a-mars-rover",
+      "name": "Mars rover",
+      "branch": "A",
+      "level": 3,
+      "paletteColor": "#331d38",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/a-mars-rover/bg.webp",
+        "thumbnail": "assets/scenes/a-mars-rover/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What would a robot look for on Mars?",
+      "galLine": "Beep boop, roll on the red rocks!",
       "parentNote": null,
       "credits": null
     },
@@ -852,18 +1882,47 @@
           "action": null,
           "layerImage": "assets/scenes/b-street/cutouts/into-town.webp",
           "moment": "roof-zoom",
-          "bounds": { "x": 40.0, "y": 18.0, "w": 16.0, "h": 22.0 },
+          "bounds": {
+            "x": 40,
+            "y": 18,
+            "w": 16,
+            "h": 22
+          },
           "outlinePolygon": [
-            [40.0, 18.0],
-            [56.0, 18.0],
-            [56.0, 40.0],
-            [40.0, 40.0]
+            [
+              40,
+              18
+            ],
+            [
+              56,
+              18
+            ],
+            [
+              56,
+              40
+            ],
+            [
+              40,
+              40
+            ]
           ],
           "hitPolygon": [
-            [38.0, 15.0],
-            [58.0, 15.0],
-            [58.0, 43.0],
-            [38.0, 43.0]
+            [
+              38,
+              15
+            ],
+            [
+              58,
+              15
+            ],
+            [
+              58,
+              43
+            ],
+            [
+              38,
+              43
+            ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
@@ -877,18 +1936,47 @@
           "unbuiltBranch": "B",
           "layerImage": "assets/scenes/b-street/cutouts/cars.webp",
           "moment": "truck-honk",
-          "bounds": { "x": 12.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "bounds": {
+            "x": 12,
+            "y": 58,
+            "w": 12,
+            "h": 18
+          },
           "outlinePolygon": [
-            [12.0, 58.0],
-            [24.0, 58.0],
-            [24.0, 76.0],
-            [12.0, 76.0]
+            [
+              12,
+              58
+            ],
+            [
+              24,
+              58
+            ],
+            [
+              24,
+              76
+            ],
+            [
+              12,
+              76
+            ]
           ],
           "hitPolygon": [
-            [10.0, 55.0],
-            [26.0, 55.0],
-            [26.0, 79.0],
-            [10.0, 79.0]
+            [
+              10,
+              55
+            ],
+            [
+              26,
+              55
+            ],
+            [
+              26,
+              79
+            ],
+            [
+              10,
+              79
+            ]
           ],
           "galPriority": 2,
           "sceneryOnlyInV1": true
@@ -902,18 +1990,47 @@
           "unbuiltBranch": "B",
           "layerImage": "assets/scenes/b-street/cutouts/streetlight.webp",
           "moment": "lamp-flicker",
-          "bounds": { "x": 38.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "bounds": {
+            "x": 38,
+            "y": 58,
+            "w": 12,
+            "h": 18
+          },
           "outlinePolygon": [
-            [38.0, 58.0],
-            [50.0, 58.0],
-            [50.0, 76.0],
-            [38.0, 76.0]
+            [
+              38,
+              58
+            ],
+            [
+              50,
+              58
+            ],
+            [
+              50,
+              76
+            ],
+            [
+              38,
+              76
+            ]
           ],
           "hitPolygon": [
-            [36.0, 55.0],
-            [52.0, 55.0],
-            [52.0, 79.0],
-            [36.0, 79.0]
+            [
+              36,
+              55
+            ],
+            [
+              52,
+              55
+            ],
+            [
+              52,
+              79
+            ],
+            [
+              36,
+              79
+            ]
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": true
@@ -927,24 +2044,55 @@
           "unbuiltBranch": "B",
           "layerImage": "assets/scenes/b-street/cutouts/tree.webp",
           "moment": "leaf-rustle",
-          "bounds": { "x": 68.0, "y": 58.0, "w": 12.0, "h": 18.0 },
+          "bounds": {
+            "x": 68,
+            "y": 58,
+            "w": 12,
+            "h": 18
+          },
           "outlinePolygon": [
-            [68.0, 58.0],
-            [80.0, 58.0],
-            [80.0, 76.0],
-            [68.0, 76.0]
+            [
+              68,
+              58
+            ],
+            [
+              80,
+              58
+            ],
+            [
+              80,
+              76
+            ],
+            [
+              68,
+              76
+            ]
           ],
           "hitPolygon": [
-            [66.0, 55.0],
-            [82.0, 55.0],
-            [82.0, 79.0],
-            [66.0, 79.0]
+            [
+              66,
+              55
+            ],
+            [
+              82,
+              55
+            ],
+            [
+              82,
+              79
+            ],
+            [
+              66,
+              79
+            ]
           ],
           "galPriority": 4,
           "sceneryOnlyInV1": true
         }
       ],
-      "children": ["g-our-town"],
+      "children": [
+        "g-our-town"
+      ],
       "links": [],
       "parentQuestion": "What do you hear outside our window?",
       "galLine": "What sound does the truck make? Find the dog.",
@@ -957,7 +2105,7 @@
       "branch": "G",
       "level": 2,
       "paletteColor": "#26203a",
-      "end": true,
+      "end": false,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -966,12 +2114,1182 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-town-hall-voting",
+          "label": "Town hall and voting",
+          "targetStopId": "g-town-hall-voting",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-our-town/cutouts/town-hall.webp",
+          "moment": "bell-chime",
+          "bounds": {
+            "x": 10,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              10,
+              14
+            ],
+            [
+              20,
+              14
+            ],
+            [
+              20,
+              31
+            ],
+            [
+              10,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              9,
+              12
+            ],
+            [
+              21,
+              12
+            ],
+            [
+              21,
+              33
+            ],
+            [
+              9,
+              33
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-school",
+          "label": "School",
+          "targetStopId": "g-school",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-our-town/cutouts/school.webp",
+          "moment": "school-wave",
+          "bounds": {
+            "x": 38,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              38,
+              14
+            ],
+            [
+              48,
+              14
+            ],
+            [
+              48,
+              31
+            ],
+            [
+              38,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              37,
+              12
+            ],
+            [
+              49,
+              12
+            ],
+            [
+              49,
+              33
+            ],
+            [
+              37,
+              33
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-fire-station",
+          "label": "Fire station",
+          "targetStopId": "g-fire-station",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-our-town/cutouts/fire-station.webp",
+          "moment": "siren-flash",
+          "bounds": {
+            "x": 66,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              66,
+              14
+            ],
+            [
+              76,
+              14
+            ],
+            [
+              76,
+              31
+            ],
+            [
+              66,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              65,
+              12
+            ],
+            [
+              77,
+              12
+            ],
+            [
+              77,
+              33
+            ],
+            [
+              65,
+              33
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-market",
+          "label": "Market",
+          "targetStopId": "g-market",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-our-town/cutouts/market.webp",
+          "moment": "awning-bounce",
+          "bounds": {
+            "x": 10,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              10,
+              56
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              20,
+              73
+            ],
+            [
+              10,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              9,
+              54
+            ],
+            [
+              21,
+              54
+            ],
+            [
+              21,
+              75
+            ],
+            [
+              9,
+              75
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-library-museum",
+          "label": "Library and museum",
+          "targetStopId": "g-library-museum",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-our-town/cutouts/library-museum.webp",
+          "moment": "door-open",
+          "bounds": {
+            "x": 38,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              38,
+              56
+            ],
+            [
+              48,
+              56
+            ],
+            [
+              48,
+              73
+            ],
+            [
+              38,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              37,
+              54
+            ],
+            [
+              49,
+              54
+            ],
+            [
+              49,
+              75
+            ],
+            [
+              37,
+              75
+            ]
+          ],
+          "galPriority": 5,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-hospital",
+          "label": "Hospital",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "I",
+          "sceneryStopId": "g-hospital",
+          "layerImage": "assets/scenes/g-our-town/cutouts/hospital.webp",
+          "moment": "cross-glow",
+          "bounds": {
+            "x": 66,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              66,
+              56
+            ],
+            [
+              76,
+              56
+            ],
+            [
+              76,
+              73
+            ],
+            [
+              66,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              65,
+              54
+            ],
+            [
+              77,
+              54
+            ],
+            [
+              77,
+              75
+            ],
+            [
+              65,
+              75
+            ]
+          ],
+          "galPriority": 6,
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "children": [
+        "g-town-hall-voting",
+        "g-school",
+        "g-fire-station",
+        "g-market",
+        "g-library-museum"
+      ],
       "links": [],
       "parentQuestion": "Who do you think lives and works here?",
       "galLine": "Find the fire truck! Where's the school?",
       "parentNote": "Modeled on West Kelowna with lake, hills, and vineyards.",
+      "credits": null
+    },
+    "g-town-hall-voting": {
+      "id": "g-town-hall-voting",
+      "name": "Town hall and voting",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#2d243b",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-town-hall-voting/bg.webp",
+        "thumbnail": "assets/scenes/g-town-hall-voting/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-voting",
+          "label": "Voting",
+          "targetStopId": "g-voting",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-town-hall-voting/cutouts/voting.webp",
+          "moment": "ballot-drop",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-rules-laws",
+          "label": "Rules and laws",
+          "targetStopId": "g-rules-laws",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-town-hall-voting/cutouts/rules-laws.webp",
+          "moment": "scroll-unroll",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-mayor-council-table",
+          "label": "Mayor and council table",
+          "targetStopId": "g-mayor-council-table",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-town-hall-voting/cutouts/mayor-council-table.webp",
+          "moment": "gavel-tap",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "g-voting",
+        "g-rules-laws",
+        "g-mayor-council-table"
+      ],
+      "links": [],
+      "parentQuestion": "If everyone wanted to play different games, how would you pick one?",
+      "galLine": "Everyone raises a hand to choose!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-voting": {
+      "id": "g-voting",
+      "name": "Voting",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#2f2540",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-voting/bg.webp",
+        "thumbnail": "assets/scenes/g-voting/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "If we voted on dinner, how would we count?",
+      "galLine": "Drop your card in the box!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-rules-laws": {
+      "id": "g-rules-laws",
+      "name": "Rules and laws",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#2b233d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-rules-laws/bg.webp",
+        "thumbnail": "assets/scenes/g-rules-laws/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Who makes the rules for a whole city?",
+      "galLine": "Red light stop, green light go!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-mayor-council-table": {
+      "id": "g-mayor-council-table",
+      "name": "Mayor and council table",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#322436",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-mayor-council-table/bg.webp",
+        "thumbnail": "assets/scenes/g-mayor-council-table/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "If you were mayor, what would you change?",
+      "galLine": "Sit around the big table and talk!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-school": {
+      "id": "g-school",
+      "name": "School",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#332534",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-school/bg.webp",
+        "thumbnail": "assets/scenes/g-school/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why do we go to school?",
+      "galLine": "Find the playground slide!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-fire-station": {
+      "id": "g-fire-station",
+      "name": "Fire station",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#382028",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-fire-station/bg.webp",
+        "thumbnail": "assets/scenes/g-fire-station/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do firefighters do when there isn't a fire?",
+      "galLine": "Wee-oo, wee-oo! Big red fire truck!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-hospital": {
+      "id": "g-hospital",
+      "name": "Hospital",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#28243b",
+      "end": true,
+      "isRealPhoto": false,
+      "sceneryOnlyInV1": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-hospital/bg.webp",
+        "thumbnail": "assets/scenes/g-hospital/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [
+        {
+          "targetBranch": "I",
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "parentQuestion": "What's inside a hospital?",
+      "galLine": "Helpers and ambulances!",
+      "parentNote": "Renders as non-tappable scenery in v1 until Branch I (Body) is built.",
+      "credits": null
+    },
+    "g-market": {
+      "id": "g-market",
+      "name": "Market",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#332620",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-market/bg.webp",
+        "thumbnail": "assets/scenes/g-market/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-where-food-comes-from",
+          "label": "Where food comes from",
+          "targetStopId": "g-where-food-comes-from",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-market/cutouts/where-food-comes-from.webp",
+          "moment": "crate-tilt",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-coins-money",
+          "label": "Coins and money",
+          "targetStopId": "g-coins-money",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-market/cutouts/coins-money.webp",
+          "moment": "coin-gleam",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-bakery",
+          "label": "Bakery",
+          "targetStopId": "g-bakery",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-market/cutouts/bakery.webp",
+          "moment": "bread-steam",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "g-where-food-comes-from",
+        "g-coins-money",
+        "g-bakery"
+      ],
+      "links": [],
+      "parentQuestion": "Why do things cost money?",
+      "galLine": "Pick the apples and bananas!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-where-food-comes-from": {
+      "id": "g-where-food-comes-from",
+      "name": "Where food comes from",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#2b2d1f",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-where-food-comes-from/bg.webp",
+        "thumbnail": "assets/scenes/g-where-food-comes-from/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "How did this apple get here?",
+      "galLine": "From the tree to the truck to the store!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-coins-money": {
+      "id": "g-coins-money",
+      "name": "Coins and money",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#33291b",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-coins-money/bg.webp",
+        "thumbnail": "assets/scenes/g-coins-money/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What did people use before money?",
+      "galLine": "Shiny round coins — clink, clink!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-bakery": {
+      "id": "g-bakery",
+      "name": "Bakery",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#382519",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-bakery/bg.webp",
+        "thumbnail": "assets/scenes/g-bakery/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What time does the baker wake up?",
+      "galLine": "Warm bread and pretzels!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-library-museum": {
+      "id": "g-library-museum",
+      "name": "Library and museum",
+      "branch": "G",
+      "level": 3,
+      "paletteColor": "#2c2235",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-library-museum/bg.webp",
+        "thumbnail": "assets/scenes/g-library-museum/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-dinosaurs",
+          "label": "Dinosaurs",
+          "targetStopId": "g-dinosaurs",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-library-museum/cutouts/dinosaurs.webp",
+          "moment": "dino-nod",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-castles-pyramids",
+          "label": "Castles and pyramids",
+          "targetStopId": "g-castles-pyramids",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-library-museum/cutouts/castles-pyramids.webp",
+          "moment": "flag-flutter",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-books-being-made",
+          "label": "Books being made",
+          "targetStopId": "g-books-being-made",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/g-library-museum/cutouts/books-being-made.webp",
+          "moment": "page-flip",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "g-dinosaurs",
+        "g-castles-pyramids",
+        "g-books-being-made"
+      ],
+      "links": [],
+      "parentQuestion": "What's the oldest thing you've ever seen?",
+      "galLine": "Look at the giant dinosaur bones!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-dinosaurs": {
+      "id": "g-dinosaurs",
+      "name": "Dinosaurs",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#2d241c",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-dinosaurs/bg.webp",
+        "thumbnail": "assets/scenes/g-dinosaurs/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Where did these giant bones come from?",
+      "galLine": "Stomp, stomp like a big dinosaur!",
+      "parentNote": "Keep it 'wow,' not sad or scary.",
+      "credits": null
+    },
+    "g-castles-pyramids": {
+      "id": "g-castles-pyramids",
+      "name": "Castles and pyramids",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#33281d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-castles-pyramids/bg.webp",
+        "thumbnail": "assets/scenes/g-castles-pyramids/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Who do you think built this?",
+      "galLine": "Tall stone towers and big triangles!",
+      "parentNote": null,
+      "credits": null
+    },
+    "g-books-being-made": {
+      "id": "g-books-being-made",
+      "name": "Books being made",
+      "branch": "G",
+      "level": 4,
+      "paletteColor": "#2e221e",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/g-books-being-made/bg.webp",
+        "thumbnail": "assets/scenes/g-books-being-made/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Who wrote the first book?",
+      "galLine": "Turn the pages of the storybook!",
+      "parentNote": null,
       "credits": null
     },
     "c-desk": {
@@ -980,7 +3298,7 @@
       "branch": "C",
       "level": 1,
       "paletteColor": "#2e2015",
-      "end": true,
+      "end": false,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -989,12 +3307,881 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-beakers",
+          "label": "Beakers",
+          "targetStopId": "c-beakers",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-desk/cutouts/beakers.webp",
+          "moment": "beaker-fizz",
+          "bounds": {
+            "x": 18,
+            "y": 18,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              18,
+              18
+            ],
+            [
+              30,
+              18
+            ],
+            [
+              30,
+              38
+            ],
+            [
+              18,
+              38
+            ]
+          ],
+          "hitPolygon": [
+            [
+              16,
+              15
+            ],
+            [
+              32,
+              15
+            ],
+            [
+              32,
+              41
+            ],
+            [
+              16,
+              41
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-microscope",
+          "label": "Microscope",
+          "targetStopId": "c-microscope",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-desk/cutouts/microscope.webp",
+          "moment": "lens-focus",
+          "bounds": {
+            "x": 66,
+            "y": 18,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              66,
+              18
+            ],
+            [
+              78,
+              18
+            ],
+            [
+              78,
+              38
+            ],
+            [
+              66,
+              38
+            ]
+          ],
+          "hitPolygon": [
+            [
+              64,
+              15
+            ],
+            [
+              80,
+              15
+            ],
+            [
+              80,
+              41
+            ],
+            [
+              64,
+              41
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-magnet",
+          "label": "Magnet",
+          "targetStopId": "c-magnet",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-desk/cutouts/magnet.webp",
+          "moment": "magnet-pull",
+          "bounds": {
+            "x": 18,
+            "y": 56,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              18,
+              56
+            ],
+            [
+              30,
+              56
+            ],
+            [
+              30,
+              76
+            ],
+            [
+              18,
+              76
+            ]
+          ],
+          "hitPolygon": [
+            [
+              16,
+              53
+            ],
+            [
+              32,
+              53
+            ],
+            [
+              32,
+              79
+            ],
+            [
+              16,
+              79
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-magnifying-glass",
+          "label": "Magnifying glass",
+          "targetStopId": "c-magnifying-glass",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-desk/cutouts/magnifying-glass.webp",
+          "moment": "glass-gleam",
+          "bounds": {
+            "x": 66,
+            "y": 56,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              66,
+              56
+            ],
+            [
+              78,
+              56
+            ],
+            [
+              78,
+              76
+            ],
+            [
+              66,
+              76
+            ]
+          ],
+          "hitPolygon": [
+            [
+              64,
+              53
+            ],
+            [
+              80,
+              53
+            ],
+            [
+              80,
+              79
+            ],
+            [
+              64,
+              79
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "c-beakers",
+        "c-microscope",
+        "c-magnet",
+        "c-magnifying-glass"
+      ],
       "links": [],
       "parentQuestion": "What would you like to look at really, really closely?",
       "galLine": "Pour the colors together.",
+      "parentNote": "The chemistry set is for looking only. Never a 'try this at home' moment, never mixing real household chemicals.",
+      "credits": null
+    },
+    "c-beakers": {
+      "id": "c-beakers",
+      "name": "Beakers",
+      "branch": "C",
+      "level": 2,
+      "paletteColor": "#332218",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-beakers/bg.webp",
+        "thumbnail": "assets/scenes/c-beakers/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-solid-liquid-gas",
+          "label": "Solid, liquid, gas",
+          "targetStopId": "c-solid-liquid-gas",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-beakers/cutouts/solid-liquid-gas.webp",
+          "moment": "steam-waft",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-bubbles-fizz",
+          "label": "Bubbles and fizz",
+          "targetStopId": "c-bubbles-fizz",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-beakers/cutouts/bubbles-fizz.webp",
+          "moment": "bubble-pop",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-volcano-fizz",
+          "label": "Volcano fizz",
+          "targetStopId": "c-volcano-fizz",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-beakers/cutouts/volcano-fizz.webp",
+          "moment": "foam-rise",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "c-solid-liquid-gas",
+        "c-bubbles-fizz",
+        "c-volcano-fizz"
+      ],
+      "links": [],
+      "parentQuestion": "What happens when you mix two things?",
+      "galLine": "Tap the beakers and watch them fizz!",
+      "parentNote": "The chemistry set is for looking only. Never a 'try this at home' moment, never mixing real household chemicals.",
+      "credits": null
+    },
+    "c-solid-liquid-gas": {
+      "id": "c-solid-liquid-gas",
+      "name": "Solid, liquid, gas",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#2b2233",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-solid-liquid-gas/bg.webp",
+        "thumbnail": "assets/scenes/c-solid-liquid-gas/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Can you turn water into air?",
+      "galLine": "Ice, splashy water, and puffy steam!",
+      "parentNote": null,
+      "credits": null
+    },
+    "c-bubbles-fizz": {
+      "id": "c-bubbles-fizz",
+      "name": "Bubbles and fizz",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#31213b",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-bubbles-fizz/bg.webp",
+        "thumbnail": "assets/scenes/c-bubbles-fizz/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What's inside a bubble?",
+      "galLine": "Pop, pop, fizzy bubbles!",
       "parentNote": "The chemistry set is for looking only. Never a 'try this at home' moment.",
+      "credits": null
+    },
+    "c-volcano-fizz": {
+      "id": "c-volcano-fizz",
+      "name": "Volcano fizz",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#38211c",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-volcano-fizz/bg.webp",
+        "thumbnail": "assets/scenes/c-volcano-fizz/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why does it bubble over?",
+      "galLine": "Foamy fizz bubbles up!",
+      "parentNote": "The chemistry set is for looking only. Never a 'try this at home' moment, never mixing real household chemicals.",
+      "credits": null
+    },
+    "c-microscope": {
+      "id": "c-microscope",
+      "name": "Microscope",
+      "branch": "C",
+      "level": 2,
+      "paletteColor": "#281e2c",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-microscope/bg.webp",
+        "thumbnail": "assets/scenes/c-microscope/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-onion-cells",
+          "label": "Onion skin cells",
+          "targetStopId": "c-onion-cells",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-microscope/cutouts/onion-cells.webp",
+          "moment": "slide-glow",
+          "bounds": {
+            "x": 18,
+            "y": 18,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              18,
+              18
+            ],
+            [
+              30,
+              18
+            ],
+            [
+              30,
+              38
+            ],
+            [
+              18,
+              38
+            ]
+          ],
+          "hitPolygon": [
+            [
+              16,
+              15
+            ],
+            [
+              32,
+              15
+            ],
+            [
+              32,
+              41
+            ],
+            [
+              16,
+              41
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-pond-water",
+          "label": "Pond water",
+          "targetStopId": "c-pond-water",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-microscope/cutouts/pond-water.webp",
+          "moment": "drop-ripple",
+          "bounds": {
+            "x": 66,
+            "y": 18,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              66,
+              18
+            ],
+            [
+              78,
+              18
+            ],
+            [
+              78,
+              38
+            ],
+            [
+              66,
+              38
+            ]
+          ],
+          "hitPolygon": [
+            [
+              64,
+              15
+            ],
+            [
+              80,
+              15
+            ],
+            [
+              80,
+              41
+            ],
+            [
+              64,
+              41
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-salt-sugar-crystal",
+          "label": "Salt or sugar crystal",
+          "targetStopId": "c-salt-sugar-crystal",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-microscope/cutouts/salt-sugar-crystal.webp",
+          "moment": "crystal-sparkle",
+          "bounds": {
+            "x": 18,
+            "y": 56,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              18,
+              56
+            ],
+            [
+              30,
+              56
+            ],
+            [
+              30,
+              76
+            ],
+            [
+              18,
+              76
+            ]
+          ],
+          "hitPolygon": [
+            [
+              16,
+              53
+            ],
+            [
+              32,
+              53
+            ],
+            [
+              32,
+              79
+            ],
+            [
+              16,
+              79
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-hair-skin",
+          "label": "Your own hair or skin",
+          "targetStopId": "c-hair-skin",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/c-microscope/cutouts/hair-skin.webp",
+          "moment": "strand-wave",
+          "bounds": {
+            "x": 66,
+            "y": 56,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              66,
+              56
+            ],
+            [
+              78,
+              56
+            ],
+            [
+              78,
+              76
+            ],
+            [
+              66,
+              76
+            ]
+          ],
+          "hitPolygon": [
+            [
+              64,
+              53
+            ],
+            [
+              80,
+              53
+            ],
+            [
+              80,
+              79
+            ],
+            [
+              64,
+              79
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "c-onion-cells",
+        "c-pond-water",
+        "c-salt-sugar-crystal",
+        "c-hair-skin"
+      ],
+      "links": [],
+      "parentQuestion": "What do you want to see that's too small for your eyes?",
+      "galLine": "Peek inside the little window!",
+      "parentNote": null,
+      "credits": null
+    },
+    "c-onion-cells": {
+      "id": "c-onion-cells",
+      "name": "Onion skin cells",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#2c2136",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-onion-cells/bg.webp",
+        "thumbnail": "assets/scenes/c-onion-cells/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Everything alive is made of tiny blocks. Want to see yours?",
+      "galLine": "Tiny little bricks!",
+      "parentNote": "Real light micrograph of onion skin cells.",
+      "credits": {
+        "source": "Wikimedia Commons / Light Micrograph",
+        "attribution": "Berkshire Community College Bioscience Image Library — Allium cepa epidermis",
+        "license": "CC0 1.0 Public Domain"
+      }
+    },
+    "c-pond-water": {
+      "id": "c-pond-water",
+      "name": "Pond water",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#1a2e2b",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-pond-water/bg.webp",
+        "thumbnail": "assets/scenes/c-pond-water/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "There are animals in one drop. What are they doing?",
+      "galLine": "Little swimmers in a drop of water!",
+      "parentNote": "Real micrograph of pond water microorganisms.",
+      "credits": {
+        "source": "Wikimedia Commons / Darkfield Micrograph",
+        "attribution": "Frank Fox (mikro-foto.de) — Paramecium and pond microbiota",
+        "license": "CC BY-SA 3.0"
+      }
+    },
+    "c-salt-sugar-crystal": {
+      "id": "c-salt-sugar-crystal",
+      "name": "Salt or sugar crystal",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#252338",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-salt-sugar-crystal/bg.webp",
+        "thumbnail": "assets/scenes/c-salt-sugar-crystal/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why do you think salt looks like little cubes?",
+      "galLine": "Sparkly little blocks!",
+      "parentNote": "Real macro photograph of cubic salt (NaCl) crystals.",
+      "credits": {
+        "source": "Wikimedia Commons / Macro Micrograph",
+        "attribution": "W. Oelen — Halite (NaCl) cubic crystals",
+        "license": "CC BY-SA 3.0"
+      }
+    },
+    "c-hair-skin": {
+      "id": "c-hair-skin",
+      "name": "Your own hair or skin",
+      "branch": "C",
+      "level": 3,
+      "paletteColor": "#2e221b",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-hair-skin/bg.webp",
+        "thumbnail": "assets/scenes/c-hair-skin/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do you think your hair looks like up close?",
+      "galLine": "Touch your hair — look how big one strand is!",
+      "parentNote": "Real micrograph of a human hair strand.",
+      "credits": {
+        "source": "Wikimedia Commons / SEM Micrograph",
+        "attribution": "Dartmouth Electron Microscope Facility — Human hair shaft",
+        "license": "Public Domain"
+      }
+    },
+    "c-magnet": {
+      "id": "c-magnet",
+      "name": "Magnet",
+      "branch": "C",
+      "level": 2,
+      "paletteColor": "#2d1f24",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-magnet/bg.webp",
+        "thumbnail": "assets/scenes/c-magnet/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why does it grab some things and not others?",
+      "galLine": "Click! The magnet grabs the clips!",
+      "parentNote": null,
+      "credits": null
+    },
+    "c-magnifying-glass": {
+      "id": "c-magnifying-glass",
+      "name": "Magnifying glass",
+      "branch": "C",
+      "level": 2,
+      "paletteColor": "#302318",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/c-magnifying-glass/bg.webp",
+        "thumbnail": "assets/scenes/c-magnifying-glass/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What's the smallest thing you've ever seen?",
+      "galLine": "Look through the big round glass!",
+      "parentNote": null,
       "credits": null
     },
     "d-frog": {
@@ -1003,7 +4190,7 @@
       "branch": "D",
       "level": 1,
       "paletteColor": "#18291e",
-      "end": true,
+      "end": false,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -1012,12 +4199,1190 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-life-cycle",
+          "label": "Life cycle",
+          "targetStopId": "d-life-cycle",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-frog/cutouts/life-cycle.webp",
+          "moment": "tadpole-wiggle",
+          "bounds": {
+            "x": 10,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              10,
+              14
+            ],
+            [
+              20,
+              14
+            ],
+            [
+              20,
+              31
+            ],
+            [
+              10,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              9,
+              12
+            ],
+            [
+              21,
+              12
+            ],
+            [
+              21,
+              33
+            ],
+            [
+              9,
+              33
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-tongue",
+          "label": "Tongue",
+          "targetStopId": "d-tongue",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-frog/cutouts/tongue.webp",
+          "moment": "tongue-zap",
+          "bounds": {
+            "x": 38,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              38,
+              14
+            ],
+            [
+              48,
+              14
+            ],
+            [
+              48,
+              31
+            ],
+            [
+              38,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              37,
+              12
+            ],
+            [
+              49,
+              12
+            ],
+            [
+              49,
+              33
+            ],
+            [
+              37,
+              33
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-inside-frog",
+          "label": "Inside the frog",
+          "targetStopId": "d-inside-frog",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-frog/cutouts/inside-frog.webp",
+          "moment": "throat-puff",
+          "bounds": {
+            "x": 66,
+            "y": 14,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              66,
+              14
+            ],
+            [
+              76,
+              14
+            ],
+            [
+              76,
+              31
+            ],
+            [
+              66,
+              31
+            ]
+          ],
+          "hitPolygon": [
+            [
+              65,
+              12
+            ],
+            [
+              77,
+              12
+            ],
+            [
+              77,
+              33
+            ],
+            [
+              65,
+              33
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-skin",
+          "label": "Skin",
+          "targetStopId": "d-skin",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-frog/cutouts/skin.webp",
+          "moment": "water-shimmer",
+          "bounds": {
+            "x": 10,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              10,
+              56
+            ],
+            [
+              20,
+              56
+            ],
+            [
+              20,
+              73
+            ],
+            [
+              10,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              9,
+              54
+            ],
+            [
+              21,
+              54
+            ],
+            [
+              21,
+              75
+            ],
+            [
+              9,
+              75
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-snail-beetle-worm",
+          "label": "Snail, beetle and worm",
+          "targetStopId": "d-snail-beetle-worm",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-frog/cutouts/snail-beetle-worm.webp",
+          "moment": "beetle-scurry",
+          "bounds": {
+            "x": 38,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              38,
+              56
+            ],
+            [
+              48,
+              56
+            ],
+            [
+              48,
+              73
+            ],
+            [
+              38,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              37,
+              54
+            ],
+            [
+              49,
+              54
+            ],
+            [
+              49,
+              75
+            ],
+            [
+              37,
+              75
+            ]
+          ],
+          "galPriority": 5,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-you-have-lungs-too",
+          "label": "You have lungs too",
+          "targetStopId": null,
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": "I",
+          "sceneryStopId": "d-you-have-lungs-too",
+          "layerImage": "assets/scenes/d-frog/cutouts/you-have-lungs-too.webp",
+          "moment": "breath-puff",
+          "bounds": {
+            "x": 66,
+            "y": 56,
+            "w": 10,
+            "h": 17
+          },
+          "outlinePolygon": [
+            [
+              66,
+              56
+            ],
+            [
+              76,
+              56
+            ],
+            [
+              76,
+              73
+            ],
+            [
+              66,
+              73
+            ]
+          ],
+          "hitPolygon": [
+            [
+              65,
+              54
+            ],
+            [
+              77,
+              54
+            ],
+            [
+              77,
+              75
+            ],
+            [
+              65,
+              75
+            ]
+          ],
+          "galPriority": 6,
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "children": [
+        "d-life-cycle",
+        "d-tongue",
+        "d-inside-frog",
+        "d-skin",
+        "d-snail-beetle-worm"
+      ],
       "links": [],
       "parentQuestion": "What do you think a frog eats?",
       "galLine": "Tap the frog and it hops. Find the bug for the frog.",
       "parentNote": null,
+      "credits": null
+    },
+    "d-life-cycle": {
+      "id": "d-life-cycle",
+      "name": "Life cycle",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#1b2e24",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-life-cycle/bg.webp",
+        "thumbnail": "assets/scenes/d-life-cycle/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Were you ever a tiny baby like this?",
+      "galLine": "Tiny egg, wiggly tadpole, hoppy frog!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-tongue": {
+      "id": "d-tongue",
+      "name": "Tongue",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#1f2d21",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-tongue/bg.webp",
+        "thumbnail": "assets/scenes/d-tongue/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "How fast do you think a frog's tongue is?",
+      "galLine": "Zap! Out goes the sticky tongue!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-inside-frog": {
+      "id": "d-inside-frog",
+      "name": "Inside the frog",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#24281e",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-inside-frog/bg.webp",
+        "thumbnail": "assets/scenes/d-inside-frog/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-heart",
+          "label": "Heart",
+          "targetStopId": "d-heart",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-inside-frog/cutouts/heart.webp",
+          "moment": "heart-beat",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-lungs",
+          "label": "Lungs",
+          "targetStopId": "d-lungs",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-inside-frog/cutouts/lungs.webp",
+          "moment": "lung-puff",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-tummy",
+          "label": "Tummy",
+          "targetStopId": "d-tummy",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-inside-frog/cutouts/tummy.webp",
+          "moment": "tummy-rumble",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "d-heart",
+        "d-lungs",
+        "d-tummy"
+      ],
+      "links": [],
+      "parentQuestion": "Does a frog have a heart like you?",
+      "galLine": "Peek inside the friendly frog!",
+      "parentNote": "Friendly cutaway, never a gruesome dissection.",
+      "credits": null
+    },
+    "d-heart": {
+      "id": "d-heart",
+      "name": "Heart",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#331d22",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-heart/bg.webp",
+        "thumbnail": "assets/scenes/d-heart/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-heart-cells",
+          "label": "Heart cells",
+          "targetStopId": "d-heart-cells",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-heart/cutouts/heart-cells.webp",
+          "moment": "cell-pulse",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-blood-cells",
+          "label": "Blood cells",
+          "targetStopId": "d-blood-cells",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-heart/cutouts/blood-cells.webp",
+          "moment": "blood-flow",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-blood-vessels",
+          "label": "Blood vessels",
+          "targetStopId": "d-blood-vessels",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-heart/cutouts/blood-vessels.webp",
+          "moment": "vessel-branch",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "d-heart-cells",
+        "d-blood-cells",
+        "d-blood-vessels"
+      ],
+      "links": [],
+      "parentQuestion": "How fast does a frog's heart beat?",
+      "galLine": "Thump, thump goes the little heart!",
+      "parentNote": "Friendly cutaway, never a dissection.",
+      "credits": null
+    },
+    "d-heart-cells": {
+      "id": "d-heart-cells",
+      "name": "Heart cells",
+      "branch": "D",
+      "level": 4,
+      "paletteColor": "#2e1824",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-heart-cells/bg.webp",
+        "thumbnail": "assets/scenes/d-heart-cells/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Your heart is made of cells like these too. Want to feel it beat?",
+      "galLine": "Put your hand on your chest — thump, thump!",
+      "parentNote": "Real micrograph of cardiac muscle cells.",
+      "credits": {
+        "source": "Wikimedia Commons / Fluorescence Micrograph",
+        "attribution": "National Institutes of Health (NIH) — Cardiomyocytes",
+        "license": "Public Domain (US Gov)"
+      }
+    },
+    "d-blood-cells": {
+      "id": "d-blood-cells",
+      "name": "Blood cells",
+      "branch": "D",
+      "level": 4,
+      "paletteColor": "#361920",
+      "end": true,
+      "isRealPhoto": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-blood-cells/bg.webp",
+        "thumbnail": "assets/scenes/d-blood-cells/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do these little red boats carry through the body?",
+      "galLine": "Little red circles floating along!",
+      "parentNote": "Real micrograph of red blood cells.",
+      "credits": {
+        "source": "Wikimedia Commons / SEM Micrograph",
+        "attribution": "National Cancer Institute (NCI) / Bruce Wetzel & Harry Schaefer — Red blood cells",
+        "license": "Public Domain (US Gov)"
+      }
+    },
+    "d-blood-vessels": {
+      "id": "d-blood-vessels",
+      "name": "Blood vessels",
+      "branch": "D",
+      "level": 4,
+      "paletteColor": "#2d1a22",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-blood-vessels/bg.webp",
+        "thumbnail": "assets/scenes/d-blood-vessels/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Why do blood tubes branch out like a tree?",
+      "galLine": "Little roads like tree branches!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-lungs": {
+      "id": "d-lungs",
+      "name": "Lungs",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#2b2228",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-lungs/bg.webp",
+        "thumbnail": "assets/scenes/d-lungs/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Do frogs breathe like us?",
+      "galLine": "Puff, puff — take a big breath!",
+      "parentNote": "Friendly cutaway, never a dissection.",
+      "credits": null
+    },
+    "d-tummy": {
+      "id": "d-tummy",
+      "name": "Tummy",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#2b251c",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-tummy/bg.webp",
+        "thumbnail": "assets/scenes/d-tummy/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Where does the bug go after the frog eats it?",
+      "galLine": "Yum, a bug in the frog's tummy!",
+      "parentNote": "Friendly cutaway, never a dissection.",
+      "credits": null
+    },
+    "d-skin": {
+      "id": "d-skin",
+      "name": "Skin",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#1a2e22",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-skin/bg.webp",
+        "thumbnail": "assets/scenes/d-skin/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Frogs drink through their skin. What would that feel like?",
+      "galLine": "Cool, smooth, splashy frog skin!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-snail-beetle-worm": {
+      "id": "d-snail-beetle-worm",
+      "name": "Snail, beetle and worm",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#242b1b",
+      "end": false,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-snail-beetle-worm/bg.webp",
+        "thumbnail": "assets/scenes/d-snail-beetle-worm/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [
+        {
+          "id": "tap-food-chain",
+          "label": "Food chain",
+          "targetStopId": "d-food-chain",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-snail-beetle-worm/cutouts/food-chain.webp",
+          "moment": "leaf-nibble",
+          "bounds": {
+            "x": 14,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              14,
+              38
+            ],
+            [
+              26,
+              38
+            ],
+            [
+              26,
+              58
+            ],
+            [
+              14,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              35
+            ],
+            [
+              28,
+              35
+            ],
+            [
+              28,
+              61
+            ],
+            [
+              12,
+              61
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-snail-shell-spiral",
+          "label": "Snail shell spiral",
+          "targetStopId": "d-snail-shell-spiral",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-snail-beetle-worm/cutouts/snail-shell-spiral.webp",
+          "moment": "shell-peek",
+          "bounds": {
+            "x": 44,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              44,
+              38
+            ],
+            [
+              56,
+              38
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              44,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              42,
+              35
+            ],
+            [
+              58,
+              35
+            ],
+            [
+              58,
+              61
+            ],
+            [
+              42,
+              61
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-worm-tunnels",
+          "label": "Worm tunnels",
+          "targetStopId": "d-worm-tunnels",
+          "targetByMode": null,
+          "action": null,
+          "layerImage": "assets/scenes/d-snail-beetle-worm/cutouts/worm-tunnels.webp",
+          "moment": "worm-wiggle",
+          "bounds": {
+            "x": 72,
+            "y": 38,
+            "w": 12,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              72,
+              38
+            ],
+            [
+              84,
+              38
+            ],
+            [
+              84,
+              58
+            ],
+            [
+              72,
+              58
+            ]
+          ],
+          "hitPolygon": [
+            [
+              70,
+              35
+            ],
+            [
+              86,
+              35
+            ],
+            [
+              86,
+              61
+            ],
+            [
+              70,
+              61
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "d-food-chain",
+        "d-snail-shell-spiral",
+        "d-worm-tunnels"
+      ],
+      "links": [],
+      "parentQuestion": "Who else lives in here?",
+      "galLine": "Find the snail and the wiggly worm!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-food-chain": {
+      "id": "d-food-chain",
+      "name": "Food chain",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#222c1d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-food-chain/bg.webp",
+        "thumbnail": "assets/scenes/d-food-chain/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Who eats who?",
+      "galLine": "Leaf, bug, and hungry frog!",
+      "parentNote": "Gentle, no gore.",
+      "credits": null
+    },
+    "d-snail-shell-spiral": {
+      "id": "d-snail-shell-spiral",
+      "name": "Snail shell spiral",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#2b261d",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-snail-shell-spiral/bg.webp",
+        "thumbnail": "assets/scenes/d-snail-shell-spiral/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "Where does the snail go when it hides?",
+      "galLine": "Round and round goes the snail's cozy house!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-worm-tunnels": {
+      "id": "d-worm-tunnels",
+      "name": "Worm tunnels",
+      "branch": "D",
+      "level": 3,
+      "paletteColor": "#292018",
+      "end": true,
+      "isRealPhoto": false,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-worm-tunnels/bg.webp",
+        "thumbnail": "assets/scenes/d-worm-tunnels/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [],
+      "parentQuestion": "What do worms do for the soil?",
+      "galLine": "Wiggle, wiggle under the dirt!",
+      "parentNote": null,
+      "credits": null
+    },
+    "d-you-have-lungs-too": {
+      "id": "d-you-have-lungs-too",
+      "name": "You have lungs too",
+      "branch": "D",
+      "level": 2,
+      "paletteColor": "#24281e",
+      "end": true,
+      "isRealPhoto": false,
+      "sceneryOnlyInV1": true,
+      "reviewStatus": "approved",
+      "image": {
+        "background": "assets/scenes/d-you-have-lungs-too/bg.webp",
+        "thumbnail": "assets/scenes/d-you-have-lungs-too/thumb.webp",
+        "width": 1600,
+        "height": 900
+      },
+      "tappables": [],
+      "children": [],
+      "links": [
+        {
+          "targetBranch": "I",
+          "sceneryOnlyInV1": true
+        }
+      ],
+      "parentQuestion": "Take a big breath!",
+      "galLine": "Take a big breath in and out!",
+      "parentNote": "Renders as non-tappable scenery in v1 until Branch I (Body) is built.",
       "credits": null
     }
   }

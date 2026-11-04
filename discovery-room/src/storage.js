@@ -220,13 +220,44 @@ export function createStorage(options = {}) {
     return normalized;
   }
 
-  async function getStorageDiagnostics() {
+  let persistRequested = false;
+
+  async function requestPersistentStorage(navOverride) {
+    let persisted = false;
+    try {
+      const nav =
+        navOverride !== undefined
+          ? navOverride
+          : typeof navigator !== 'undefined'
+            ? navigator
+            : null;
+      if (nav?.storage) {
+        persistRequested = true;
+        if (typeof nav.storage.persisted === 'function') {
+          persisted = Boolean(await nav.storage.persisted());
+        }
+        if (!persisted && typeof nav.storage.persist === 'function') {
+          persisted = Boolean(await nav.storage.persist());
+        }
+      }
+    } catch {
+      // Ignore storage permission errors
+    }
+    return persisted;
+  }
+
+  async function getStorageDiagnostics(navOverride) {
     let persisted = false;
     let usageBytes = 0;
     let quotaBytes = 0;
 
     try {
-      const nav = typeof navigator !== 'undefined' ? navigator : null;
+      const nav =
+        navOverride !== undefined
+          ? navOverride
+          : typeof navigator !== 'undefined'
+            ? navigator
+            : null;
       if (nav?.storage) {
         if (typeof nav.storage.persisted === 'function') {
           persisted = Boolean(await nav.storage.persisted());
@@ -243,6 +274,7 @@ export function createStorage(options = {}) {
 
     return {
       persisted,
+      persistRequested,
       usageBytes,
       quotaBytes
     };
@@ -272,6 +304,7 @@ export function createStorage(options = {}) {
     removeQuestion,
     exportQuestionsJson,
     importQuestionsJson,
+    requestPersistentStorage,
     getStorageDiagnostics,
     subscribe
   };
