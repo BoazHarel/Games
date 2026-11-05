@@ -64,13 +64,19 @@ body {
 .tappable-layer {
   position: absolute;
   border-radius: 16px;
-  border: 2px solid rgba(255, 244, 214, 0.38);
-  background: rgba(255, 244, 214, 0.06);
+  border: none;
+  background: transparent;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0;
+}
+
+#stage[data-placeholder="true"] .tappable-layer {
+  border: 2px solid rgba(255, 244, 214, 0.65);
+  background: rgba(255, 244, 214, 0.16);
   padding: 6px;
 }
 
@@ -86,7 +92,7 @@ body {
   will-change: transform, opacity;
 }
 
-.tappable-layer.is-action {
+#stage[data-placeholder="true"] .tappable-layer.is-action {
   border-color: rgba(255, 218, 128, 0.85);
   background: rgba(255, 218, 128, 0.2);
 }
@@ -96,10 +102,13 @@ body {
 }
 
 .tappable-layer[data-scenery="true"] {
+  cursor: default;
+}
+
+#stage[data-placeholder="true"] .tappable-layer[data-scenery="true"] {
   border-style: dashed;
   border-color: rgba(255, 244, 214, 0.24);
   background: rgba(255, 244, 214, 0.05);
-  cursor: default;
 }
 
 .tappable-layer.is-playing-moment .tappable-visual {
@@ -111,8 +120,8 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  opacity: 0.94;
+  object-fit: fill;
+  opacity: 1;
   pointer-events: none;
 }
 

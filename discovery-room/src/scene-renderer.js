@@ -243,6 +243,7 @@ export function createSceneRenderer(world, options = {}) {
     stageEl.dataset.end = String(Boolean(stop.end));
     stageEl.dataset.realPhoto = String(Boolean(stop.isRealPhoto));
     stageEl.dataset.galMode = String(galEnabled);
+    stageEl.dataset.placeholder = String(showPlaceholderLabels);
     stageEl.dataset.decodedReady = 'true';
 
     if (titleEl) {
@@ -286,7 +287,9 @@ export function createSceneRenderer(world, options = {}) {
         el.classList.add('is-action');
       }
 
+      const labelText = tap.label || targetStop?.name || tap.id;
       el.dataset.tappableId = tap.id;
+      el.dataset.label = labelText;
       el.dataset.scenery = String(isScenery);
       el.dataset.breathing = String(isBreathing);
       if (targetId) {
@@ -326,7 +329,6 @@ export function createSceneRenderer(world, options = {}) {
 
       // Placeholder tappable name badge so a person can tell placeholder objects apart
       if (showPlaceholderLabels) {
-        const labelText = tap.label || targetStop?.name || tap.id;
         const labelEl = doc.createElement('span');
         labelEl.className = 'tappable-label';
         labelEl.textContent = labelText;
