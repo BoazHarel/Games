@@ -824,6 +824,131 @@ export function validateWorld(world) {
         }
       }
     }
+
+    // Optional example stop "more friends" validation (Issue #50)
+    if (stop.moreFriends !== undefined) {
+      if (!Array.isArray(stop.moreFriends)) {
+        errors.push(`${prefix}: moreFriends must be an array.`);
+      } else if (stop.moreFriends.length < 2 || stop.moreFriends.length > 3) {
+        errors.push(
+          `${prefix}: moreFriends must contain 2 to 3 animals (got ${stop.moreFriends.length}).`
+        );
+      } else {
+        const friendIds = new Set();
+        for (const friend of stop.moreFriends) {
+          const friendPrefix = `${prefix} friend "${friend?.id || 'unknown'}"`;
+          if (!friend || typeof friend !== 'object') {
+            errors.push(`${friendPrefix}: must be an object.`);
+            continue;
+          }
+          if (!friend.id || typeof friend.id !== 'string') {
+            errors.push(`${friendPrefix}: missing or non-string id.`);
+          } else if (friendIds.has(friend.id)) {
+            errors.push(`${friendPrefix}: duplicate friend id "${friend.id}".`);
+          } else {
+            friendIds.add(friend.id);
+          }
+
+          if (!friend.label || typeof friend.label !== 'string') {
+            errors.push(`${friendPrefix}: missing or non-string label.`);
+          }
+          if (!friend.layerImage || typeof friend.layerImage !== 'string') {
+            errors.push(`${friendPrefix}: missing or non-string layerImage.`);
+          }
+          if (!friend.actionAnimation || typeof friend.actionAnimation !== 'string') {
+            errors.push(`${friendPrefix}: missing or non-string actionAnimation.`);
+          }
+
+          for (const forbiddenKey of FORBIDDEN_HAND_ENTERED_KEYS) {
+            if (Object.prototype.hasOwnProperty.call(friend, forbiddenKey)) {
+              errors.push(
+                `${friendPrefix}: hand-entered validation key "${forbiddenKey}" is forbidden.`
+              );
+            }
+          }
+
+          if (
+            !friend.bounds ||
+            typeof friend.bounds.x !== 'number' ||
+            typeof friend.bounds.y !== 'number' ||
+            typeof friend.bounds.w !== 'number' ||
+            typeof friend.bounds.h !== 'number'
+          ) {
+            errors.push(`${friendPrefix}: bounds must define numeric x, y, w, h.`);
+          }
+
+          const outlineValid = validatePolygonArray(
+            friend.outlinePolygon,
+            `${friendPrefix}.outlinePolygon`,
+            errors
+          );
+          const hitValid = validatePolygonArray(
+            friend.hitPolygon,
+            `${friendPrefix}.hitPolygon`,
+            errors
+          );
+          if (!outlineValid || !hitValid) {
+            continue;
+          }
+
+          const outlineStage = projectPolygon(
+            friend.outlinePolygon,
+            canvasWidth || 1600,
+            canvasHeight || 900
+          );
+          const hitStage = projectPolygon(
+            friend.hitPolygon,
+            canvasWidth || 1600,
+            canvasHeight || 900
+          );
+          const outlineArea = polygonArea(outlineStage);
+          const hitArea = polygonArea(hitStage);
+          const outlineBBox = polygonBBox(outlineStage);
+          const hitBBox = polygonBBox(hitStage);
+
+          if (outlineArea <= EPSILON || outlineBBox.width <= EPSILON || outlineBBox.height <= EPSILON) {
+            errors.push(`${friendPrefix}: outlinePolygon is degenerate.`);
+            continue;
+          }
+          if (hitArea <= EPSILON || hitBBox.width <= EPSILON || hitBBox.height <= EPSILON) {
+            errors.push(`${friendPrefix}: hitPolygon is degenerate.`);
+            continue;
+          }
+
+          const widthRatio = hitBBox.width / outlineBBox.width;
+          const heightRatio = hitBBox.height / outlineBBox.height;
+          const linearAreaRatio = Math.sqrt(hitArea / outlineArea);
+
+          if (
+            widthRatio < requiredDilationFactor - EPSILON ||
+            heightRatio < requiredDilationFactor - EPSILON ||
+            linearAreaRatio < requiredDilationFactor - EPSILON
+          ) {
+            errors.push(
+              `${friendPrefix}: geometry-computed hitPolygon dilation must be >= ${minDilationPercent}% over outlinePolygon.`
+            );
+          }
+
+          const hit1340 = projectPolygon(friend.hitPolygon, fitted1340.width, fitted1340.height);
+          const bbox1340 = polygonBBox(hit1340);
+          const minDim1340 = Math.min(bbox1340.width, bbox1340.height);
+          if (minDim1340 < minTapDevicePx - EPSILON) {
+            errors.push(
+              `${friendPrefix}: hit target min dimension ${minDim1340.toFixed(1)} device px is below ${minTapDevicePx} px floor at 1340x800.`
+            );
+          }
+
+          const hit1024 = projectPolygon(friend.hitPolygon, fitted1024.width, fitted1024.height);
+          const bbox1024 = polygonBBox(hit1024);
+          const minDim1024 = Math.min(bbox1024.width, bbox1024.height);
+          if (minDim1024 < minTapCssPxFloor - EPSILON) {
+            errors.push(
+              `${friendPrefix}: hit target min dimension ${minDim1024.toFixed(1)} CSS px is below ${minTapCssPxFloor} px floor at 1024x600.`
+            );
+          }
+        }
+      }
+    }
   }
 
   // Graph reachability and cycle detection from rootId

@@ -44,6 +44,8 @@ async function initApp() {
     flyInDurationMs: world.config?.flyInDurationMs ?? 600
   });
 
+  const friendActionTimers = new Map();
+
   let uiChrome = null;
 
   const historyController = createHistoryController(appState, {
@@ -130,6 +132,53 @@ async function initApp() {
     if (!pointPct) return;
 
     const diag = viewport.getDiagnostics();
+
+    // Check "more friends" on example stops first (Issue #50: frog, horse, fish, bird)
+    if (Array.isArray(currentStop.moreFriends) && currentStop.moreFriends.length > 0) {
+      let friendHit = resolveTapHit(pointPct, currentStop.moreFriends, {
+        canvasWidth: world.config?.canvasWidth || 1600,
+        canvasHeight: world.config?.canvasHeight || 900,
+        fittedStageWidth: diag.fittedStageWidth,
+        fittedStageHeight: diag.fittedStageHeight,
+        devicePixelRatio: diag.devicePixelRatio,
+        galMode: galMode.isEnabled(),
+        config: world.config
+      });
+
+      // Fallback when synthetic test clicks land directly on a friend layer
+      if (!friendHit?.tappable && e.target) {
+        const friendLayerEl = e.target.closest?.('[data-friend-id]');
+        if (friendLayerEl) {
+          const fId = friendLayerEl.dataset.friendId;
+          const found = currentStop.moreFriends.find((f) => f.id === fId);
+          if (found) friendHit = { tappable: found };
+        }
+      }
+
+      if (friendHit?.tappable) {
+        const friend = friendHit.tappable;
+        const friendEl = layersEl.querySelector(`[data-friend-id="${friend.id}"]`);
+        if (friendEl) {
+          friendEl.classList.remove('is-resting');
+          friendEl.classList.add('is-full-color');
+          if (friendActionTimers.has(friend.id)) {
+            clearTimeout(friendActionTimers.get(friend.id));
+          }
+          friendEl.classList.remove('is-playing-action');
+          // Force reflow to immediately restart ~2s CSS action keyframe on rapid repeat taps
+          void friendEl.offsetWidth;
+          friendEl.classList.add('is-playing-action');
+          const timer = setTimeout(() => {
+            friendEl.classList.remove('is-playing-action');
+            friendEl.classList.add('is-settled-color');
+            friendActionTimers.delete(friend.id);
+          }, 2000);
+          friendActionTimers.set(friend.id, timer);
+        }
+        return;
+      }
+    }
+
     const hit = resolveTapHit(pointPct, currentStop.tappables, {
       canvasWidth: world.config?.canvasWidth || 1600,
       canvasHeight: world.config?.canvasHeight || 900,
@@ -168,6 +217,9 @@ async function initApp() {
     }
 
     if (zoomResult.navigated) {
+      if (typeof storage.clearTodaysSurprise === 'function') {
+        storage.clearTodaysSurprise();
+      }
       historyController.pushCurrentState();
       offline.cacheNeighborhoodBranches(targetStopId);
       uiChrome.refresh();

@@ -51,6 +51,12 @@ body {
   will-change: transform, opacity;
 }
 
+#stage[data-transitioning="true"] #scene-layers,
+#stage[data-transitioning="true"] .tappable-layer,
+#stage[data-transitioning="true"] .more-friend-layer {
+  pointer-events: none !important;
+}
+
 .scene-bg-image {
   position: absolute;
   inset: 0;
@@ -180,6 +186,258 @@ body {
   height: 8px;
   border-radius: 50%;
   display: inline-block;
+}
+
+/* Today's Surprise glow (Brief §06 / Chunk 3) */
+.tappable-layer.is-todays-surprise {
+  z-index: 10;
+}
+
+.surprise-glow {
+  position: absolute;
+  inset: -14px;
+  border-radius: 24px;
+  border: 3px solid rgba(255, 232, 90, 0.95);
+  background: radial-gradient(circle at 50% 50%, rgba(255, 240, 140, 0.72) 0%, rgba(255, 210, 60, 0.42) 55%, rgba(255, 170, 20, 0.16) 80%, transparent 100%);
+  pointer-events: none;
+  animation: surprise-pulse 2.0s ease-in-out infinite;
+  will-change: transform, opacity;
+  z-index: 10;
+}
+
+.surprise-glow::after {
+  content: '✦';
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffe066;
+  color: #5c3b00;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+@keyframes surprise-pulse {
+  0%,
+  100% {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Issue #50: 'More Friends' peek and action on example stops */
+.more-friends-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.more-friend-layer {
+  position: absolute;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  touch-action: none;
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.friend-visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: scale(1);
+  will-change: transform, opacity;
+}
+
+.friend-cutout {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+.more-friend-layer.is-resting {
+  opacity: 0.38;
+  transform: scale(0.92);
+}
+
+.more-friend-layer.is-resting .friend-visual {
+  animation: gentle-breathe 3.4s ease-in-out infinite;
+}
+
+.more-friend-layer.is-full-color,
+.more-friend-layer.is-settled-color {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.more-friend-layer.is-playing-action {
+  z-index: 30;
+  opacity: 1;
+}
+
+.more-friend-layer.is-playing-action[data-action="horse-gallop"] .friend-visual {
+  animation: horse-gallop 2.0s cubic-bezier(0.25, 1, 0.5, 1) 1;
+}
+
+.more-friend-layer.is-playing-action[data-action="fish-swim"] .friend-visual {
+  animation: fish-swim 2.0s cubic-bezier(0.25, 1, 0.5, 1) 1;
+}
+
+.more-friend-layer.is-playing-action[data-action="bird-fly"] .friend-visual {
+  animation: bird-fly 2.0s cubic-bezier(0.25, 1, 0.5, 1) 1;
+}
+
+@keyframes horse-gallop {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(-180%, 30%, 0) scale(1.35) rotate(-6deg);
+  }
+  50% {
+    transform: translate3d(-320%, 50%, 0) scale(1.45) rotate(4deg);
+  }
+  75% {
+    transform: translate3d(-160%, 25%, 0) scale(1.25) rotate(-2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes fish-swim {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(-130%, -35%, 0) scale(1.35) rotate(-16deg);
+  }
+  50% {
+    transform: translate3d(-240%, -20%, 0) scale(1.45) rotate(4deg);
+  }
+  75% {
+    transform: translate3d(-120%, 15%, 0) scale(1.2) rotate(-6deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes bird-fly {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(120%, 45%, 0) scale(1.35) rotate(10deg);
+  }
+  50% {
+    transform: translate3d(220%, 80%, 0) scale(1.45) rotate(-6deg);
+  }
+  75% {
+    transform: translate3d(100%, 35%, 0) scale(1.2) rotate(4deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+/* Tuned micro-moments */
+.tappable-layer.is-playing-moment[data-moment="throat-puff"] .tappable-visual {
+  animation: moment-throat-puff 320ms ease-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="tongue-zap"] .tappable-visual {
+  animation: moment-tongue-zap 300ms ease-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="tadpole-wiggle"] .tappable-visual {
+  animation: moment-wiggle 340ms ease-in-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="water-shimmer"] .tappable-visual {
+  animation: moment-shimmer 320ms ease-in-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="beetle-scurry"] .tappable-visual {
+  animation: moment-scurry 300ms ease-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="twinkle"] .tappable-visual {
+  animation: moment-twinkle 340ms ease-in-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="beaker-fizz"] .tappable-visual {
+  animation: moment-fizz 320ms ease-out 1;
+}
+
+.tappable-layer.is-playing-moment[data-moment="switch-click"] .tappable-visual {
+  animation: moment-click 240ms ease-out 1;
+}
+
+@keyframes moment-throat-puff {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  70% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes moment-tongue-zap {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  35% { transform: translate3d(-4%, 2%, 0) scale(1.09); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes moment-wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-5deg) scale(1.06); }
+  50% { transform: rotate(5deg) scale(1.08); }
+  75% { transform: rotate(-3deg) scale(1.03); }
+}
+
+@keyframes moment-shimmer {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.88; transform: scale(1.05); }
+}
+
+@keyframes moment-scurry {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  30% { transform: translate3d(2%, -2%, 0) scale(1.06); }
+  60% { transform: translate3d(-2%, 2%, 0) scale(1.08); }
+}
+
+@keyframes moment-twinkle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: 0.9; }
+}
+
+@keyframes moment-fizz {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.08) translate3d(0, -2%, 0); }
+  60% { transform: scale(1.04) translate3d(0, 1%, 0); }
+}
+
+@keyframes moment-click {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.95); opacity: 0.9; }
 }
 
 @keyframes gentle-breathe {

@@ -19,6 +19,11 @@ export function getStopAssetUrls(stop, mode = 'night') {
       if (layerUrl) urls.push(layerUrl);
     }
   }
+  if (Array.isArray(stop.moreFriends)) {
+    for (const friend of stop.moreFriends) {
+      if (friend?.layerImage) urls.push(friend.layerImage);
+    }
+  }
   return [...new Set(urls)];
 }
 
@@ -275,6 +280,14 @@ export function createSceneRenderer(world, options = {}) {
       const targetId = resolveTappableTarget(tap, mode);
       const targetStop = targetId ? world.stops[targetId] : null;
       const isVisited = Boolean(targetId && storage && storage.isVisited(targetId));
+      const isSurprise =
+        stop.id === 'room' &&
+        !isScenery &&
+        Boolean(
+          storage &&
+            typeof storage.isTodaysSurpriseActive === 'function' &&
+            storage.isTodaysSurpriseActive(tap.id)
+        );
 
       el.className = 'tappable-layer';
       if (isBreathing) {
@@ -285,6 +298,10 @@ export function createSceneRenderer(world, options = {}) {
       }
       if (tap.action) {
         el.classList.add('is-action');
+      }
+      if (isSurprise) {
+        el.classList.add('is-todays-surprise');
+        el.dataset.surprise = 'true';
       }
 
       const labelText = tap.label || targetStop?.name || tap.id;
@@ -335,6 +352,13 @@ export function createSceneRenderer(world, options = {}) {
         visualEl.appendChild(labelEl);
       }
 
+      if (isSurprise) {
+        const glowEl = doc.createElement('div');
+        glowEl.className = 'surprise-glow';
+        glowEl.setAttribute('aria-hidden', 'true');
+        visualEl.appendChild(glowEl);
+      }
+
       el.appendChild(visualEl);
 
       // Soft session-visited dot ("we went here")
@@ -365,7 +389,39 @@ export function createSceneRenderer(world, options = {}) {
       layersEl.appendChild(el);
     }
 
-    // 5. Update decoded neighborhood pool (retains current + parent + immediate children; evicts others)
+    // 5. Render "more friends" on example stops (Issue #50: frog, and similar example stops)
+    if (Array.isArray(stop.moreFriends) && stop.moreFriends.length > 0) {
+      const friendsContainer = doc.createElement('div');
+      friendsContainer.className = 'more-friends-container';
+      for (const friend of stop.moreFriends) {
+        const friendEl = doc.createElement('div');
+        friendEl.className = 'more-friend-layer is-resting';
+        friendEl.dataset.friendId = friend.id;
+        friendEl.dataset.label = friend.label;
+        friendEl.dataset.action = friend.actionAnimation;
+        friendEl.style.left = `${friend.bounds.x}%`;
+        friendEl.style.top = `${friend.bounds.y}%`;
+        friendEl.style.width = `${friend.bounds.w}%`;
+        friendEl.style.height = `${friend.bounds.h}%`;
+
+        const visual = doc.createElement('div');
+        visual.className = 'friend-visual';
+
+        const cutImg = doc.createElement('img');
+        cutImg.className = 'friend-cutout';
+        cutImg.src = friend.layerImage;
+        cutImg.alt = friend.label;
+        cutImg.draggable = false;
+        cutImg.decoding = 'async';
+        visual.appendChild(cutImg);
+
+        friendEl.appendChild(visual);
+        friendsContainer.appendChild(friendEl);
+      }
+      layersEl.appendChild(friendsContainer);
+    }
+
+    // 6. Update decoded neighborhood pool (retains current + parent + immediate children; evicts others)
     await decodedPool.updateNeighborhood(stopId, parentStopId, mode);
 
     return decodedEntry;

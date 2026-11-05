@@ -1,5 +1,6 @@
 const VISITED_SESSION_KEY = 'discovery-room:visited';
 const QUESTION_JAR_STORAGE_KEY = 'discovery-room:question-jar';
+const TODAYS_SURPRISE_SESSION_KEY = 'discovery-room:todays-surprise';
 
 export const MARBLE_COLORS = [
   '#f4b942',
@@ -104,6 +105,34 @@ export function createStorage(options = {}) {
       // Ignore
     }
     notify();
+  }
+
+  function getTodaysSurpriseTappableId(candidateIds = ['tap-window', 'tap-desk', 'tap-frog-terrarium']) {
+    try {
+      const stored = sessionStore.getItem(TODAYS_SURPRISE_SESSION_KEY);
+      if (stored === 'dismissed') return null;
+      if (stored && candidateIds.includes(stored)) return stored;
+      if (!Array.isArray(candidateIds) || candidateIds.length === 0) return null;
+      const picked = candidateIds[Math.floor(Math.random() * candidateIds.length)];
+      sessionStore.setItem(TODAYS_SURPRISE_SESSION_KEY, picked);
+      return picked;
+    } catch {
+      return candidateIds[0] || null;
+    }
+  }
+
+  function clearTodaysSurprise() {
+    try {
+      sessionStore.setItem(TODAYS_SURPRISE_SESSION_KEY, 'dismissed');
+    } catch {
+      // Ignore
+    }
+    notify();
+  }
+
+  function isTodaysSurpriseActive(tappableId) {
+    if (!tappableId) return false;
+    return getTodaysSurpriseTappableId() === tappableId;
   }
 
   function normalizeQuestionEntry(entry, index = 0) {
@@ -299,6 +328,9 @@ export function createStorage(options = {}) {
     isVisited,
     getVisitedStopIds,
     clearVisited,
+    getTodaysSurpriseTappableId,
+    clearTodaysSurprise,
+    isTodaysSurpriseActive,
     getQuestions,
     addQuestion,
     removeQuestion,

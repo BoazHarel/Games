@@ -6483,8 +6483,261 @@
       "links": [],
       "parentQuestion": "What do you think a frog eats?",
       "galLine": "Tap the frog and it hops. Find the bug for the frog.",
-      "parentNote": null,
-      "credits": null
+      "parentNote": "Friendly cutaway tone guard. Example animals (horse, fish, bird) are Pillow-drawn stand-ins; pending repaint in the locked style during next image window.",
+      "credits": null,
+      "moreFriends": [
+        {
+          "id": "friend-horse",
+          "label": "Horse",
+          "layerImage": "assets/scenes/d-frog/more-friends/horse.webp",
+          "actionAnimation": "horse-gallop",
+          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "bounds": {
+            "x": 82,
+            "y": 3,
+            "w": 17,
+            "h": 21
+          },
+          "outlinePolygon": [
+            [
+              84,
+              7
+            ],
+            [
+              89,
+              4
+            ],
+            [
+              96,
+              4
+            ],
+            [
+              98,
+              12
+            ],
+            [
+              97,
+              21
+            ],
+            [
+              91,
+              23
+            ],
+            [
+              84,
+              22
+            ],
+            [
+              83,
+              14
+            ]
+          ],
+          "hitPolygon": [
+            [
+              81.53,
+              14.1
+            ],
+            [
+              82.72,
+              5.72
+            ],
+            [
+              88.7,
+              2.14
+            ],
+            [
+              97.07,
+              2.14
+            ],
+            [
+              99.47,
+              11.7
+            ],
+            [
+              98.27,
+              22.47
+            ],
+            [
+              91.09,
+              24.86
+            ],
+            [
+              82.72,
+              23.66
+            ]
+          ]
+        },
+        {
+          "id": "friend-fish",
+          "label": "Fish",
+          "layerImage": "assets/scenes/d-frog/more-friends/fish.webp",
+          "actionAnimation": "fish-swim",
+          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "bounds": {
+            "x": 64,
+            "y": 44,
+            "w": 16,
+            "h": 18
+          },
+          "outlinePolygon": [
+            [
+              67,
+              48
+            ],
+            [
+              72,
+              46
+            ],
+            [
+              77,
+              47
+            ],
+            [
+              78,
+              52
+            ],
+            [
+              77,
+              57
+            ],
+            [
+              72,
+              58
+            ],
+            [
+              67,
+              57
+            ],
+            [
+              65,
+              52
+            ]
+          ],
+          "hitPolygon": [
+            [
+              63.65,
+              51.92
+            ],
+            [
+              66.05,
+              45.56
+            ],
+            [
+              72.03,
+              42.37
+            ],
+            [
+              78.01,
+              43.96
+            ],
+            [
+              79.2,
+              51.92
+            ],
+            [
+              79.2,
+              51.97
+            ],
+            [
+              78.01,
+              59.88
+            ],
+            [
+              72.03,
+              61.48
+            ],
+            [
+              66.05,
+              59.88
+            ],
+            [
+              63.65,
+              51.97
+            ]
+          ]
+        },
+        {
+          "id": "friend-bird",
+          "label": "Bird",
+          "layerImage": "assets/scenes/d-frog/more-friends/bird.webp",
+          "actionAnimation": "bird-fly",
+          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "bounds": {
+            "x": 36,
+            "y": 3,
+            "w": 18,
+            "h": 22
+          },
+          "outlinePolygon": [
+            [
+              38,
+              7
+            ],
+            [
+              42,
+              4
+            ],
+            [
+              50,
+              5
+            ],
+            [
+              53,
+              11
+            ],
+            [
+              52,
+              19
+            ],
+            [
+              47,
+              24
+            ],
+            [
+              40,
+              24
+            ],
+            [
+              37,
+              15
+            ]
+          ],
+          "hitPolygon": [
+            [
+              35.47,
+              15.21
+            ],
+            [
+              36.66,
+              5.64
+            ],
+            [
+              41.45,
+              2.05
+            ],
+            [
+              51.01,
+              3.25
+            ],
+            [
+              54.6,
+              10.43
+            ],
+            [
+              53.41,
+              19.99
+            ],
+            [
+              47.43,
+              25.97
+            ],
+            [
+              39.05,
+              25.97
+            ]
+          ]
+        }
+      ]
     },
     "d-life-cycle": {
       "id": "d-life-cycle",

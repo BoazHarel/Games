@@ -89,6 +89,13 @@ function getStopAllAssetUrls(stop) {
       }
     }
   }
+  if (Array.isArray(stop.moreFriends)) {
+    for (const friend of stop.moreFriends) {
+      if (friend?.layerImage) {
+        urls.add(normalizeRelativeAssetPath(friend.layerImage));
+      }
+    }
+  }
   return [...urls].sort();
 }
 
