@@ -4381,77 +4381,77 @@
           "layerImage": "assets/scenes/g-library-museum/cutouts/dinosaurs.webp",
           "moment": "dino-nod",
           "bounds": {
-            "x": 14,
-            "y": 38,
-            "w": 12,
-            "h": 20
+            "x": 5,
+            "y": 24,
+            "w": 28,
+            "h": 54
           },
           "outlinePolygon": [
             [
-              15.68,
-              48
+              6.81,
+              38.28
             ],
             [
-              16.95,
-              42.91
+              10.4,
+              29.87
             ],
             [
-              20,
-              40.8
+              13.48,
+              27.39
             ],
             [
-              23.05,
-              42.91
+              27.6,
+              29.87
             ],
             [
-              24.32,
-              48
+              31.19,
+              38.28
             ],
             [
-              23.05,
-              53.09
+              27.6,
+              71.94
             ],
             [
-              20,
-              55.2
+              24.52,
+              74.42
             ],
             [
-              16.95,
-              53.09
+              10.4,
+              71.94
             ]
           ],
           "hitPolygon": [
             [
-              14.63,
-              48
+              4.42,
+              35.94
             ],
             [
-              16.21,
-              41.25
+              8.71,
+              25.88
             ],
             [
-              20,
-              38.45
+              12.4,
+              22.92
             ],
             [
-              23.79,
-              41.25
+              29.29,
+              25.88
             ],
             [
-              25.37,
-              48
+              33.58,
+              35.94
             ],
             [
-              23.79,
-              54.75
+              29.29,
+              76.2
             ],
             [
-              20,
-              57.55
+              25.6,
+              79.16
             ],
             [
-              16.21,
-              54.75
+              8.71,
+              76.2
             ]
           ],
           "galPriority": 1,
@@ -4466,77 +4466,77 @@
           "layerImage": "assets/scenes/g-library-museum/cutouts/castles-pyramids.webp",
           "moment": "flag-flutter",
           "bounds": {
-            "x": 44,
-            "y": 38,
-            "w": 12,
-            "h": 20
+            "x": 36,
+            "y": 22,
+            "w": 28,
+            "h": 54
           },
           "outlinePolygon": [
             [
-              45.68,
-              48
+              37.81,
+              36.28
             ],
             [
-              46.95,
-              42.91
+              41.4,
+              27.87
             ],
             [
-              50,
-              40.8
+              44.48,
+              25.39
             ],
             [
-              53.05,
-              42.91
+              58.6,
+              27.87
             ],
             [
-              54.32,
-              48
+              62.19,
+              36.28
             ],
             [
-              53.05,
-              53.09
+              58.6,
+              69.94
             ],
             [
-              50,
-              55.2
+              55.52,
+              72.42
             ],
             [
-              46.95,
-              53.09
+              41.4,
+              69.94
             ]
           ],
           "hitPolygon": [
             [
-              44.63,
-              48
+              35.42,
+              33.94
             ],
             [
-              46.21,
-              41.25
+              39.71,
+              23.88
             ],
             [
-              50,
-              38.45
+              43.4,
+              20.92
             ],
             [
-              53.79,
-              41.25
+              60.29,
+              23.88
             ],
             [
-              55.37,
-              48
+              64.58,
+              33.94
             ],
             [
-              53.79,
-              54.75
+              60.29,
+              74.2
             ],
             [
-              50,
-              57.55
+              56.6,
+              77.16
             ],
             [
-              46.21,
-              54.75
+              39.71,
+              74.2
             ]
           ],
           "galPriority": 2,
@@ -4551,77 +4551,77 @@
           "layerImage": "assets/scenes/g-library-museum/cutouts/books-being-made.webp",
           "moment": "page-flip",
           "bounds": {
-            "x": 72,
-            "y": 38,
-            "w": 12,
-            "h": 20
+            "x": 68,
+            "y": 24,
+            "w": 28,
+            "h": 54
           },
           "outlinePolygon": [
             [
-              73.68,
-              48
+              69.81,
+              38.28
             ],
             [
-              74.95,
-              42.91
+              73.4,
+              29.87
             ],
             [
-              78,
-              40.8
+              76.48,
+              27.39
             ],
             [
-              81.05,
-              42.91
+              90.6,
+              29.87
             ],
             [
-              82.32,
-              48
+              94.19,
+              38.28
             ],
             [
-              81.05,
-              53.09
+              90.6,
+              71.94
             ],
             [
-              78,
-              55.2
+              87.52,
+              74.42
             ],
             [
-              74.95,
-              53.09
+              73.4,
+              71.94
             ]
           ],
           "hitPolygon": [
             [
-              72.63,
-              48
+              67.42,
+              35.94
             ],
             [
-              74.21,
-              41.25
+              71.71,
+              25.88
             ],
             [
-              78,
-              38.45
+              75.4,
+              22.92
             ],
             [
-              81.79,
-              41.25
+              92.29,
+              25.88
             ],
             [
-              83.37,
-              48
+              96.58,
+              35.94
             ],
             [
-              81.79,
-              54.75
+              92.29,
+              76.2
             ],
             [
-              78,
-              57.55
+              88.6,
+              79.16
             ],
             [
-              74.21,
-              54.75
+              71.71,
+              76.2
             ]
           ],
           "galPriority": 3,
@@ -6491,7 +6491,7 @@
           "label": "Horse",
           "layerImage": "assets/scenes/d-frog/more-friends/horse.webp",
           "actionAnimation": "horse-gallop",
-          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "artNote": "Repainted in locked storybook gouache style (formerly stand-in); moved bird clear of trail bar",
           "bounds": {
             "x": 82,
             "y": 3,
@@ -6572,7 +6572,7 @@
           "label": "Fish",
           "layerImage": "assets/scenes/d-frog/more-friends/fish.webp",
           "actionAnimation": "fish-swim",
-          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "artNote": "Repainted in locked storybook gouache style (formerly stand-in); moved bird clear of trail bar",
           "bounds": {
             "x": 64,
             "y": 44,
@@ -6661,45 +6661,45 @@
           "label": "Bird",
           "layerImage": "assets/scenes/d-frog/more-friends/bird.webp",
           "actionAnimation": "bird-fly",
-          "artNote": "Pillow-drawn stand-in; pending repaint in the locked style during next image window",
+          "artNote": "Repainted in locked storybook gouache style (formerly stand-in); moved bird clear of trail bar",
           "bounds": {
-            "x": 36,
-            "y": 3,
+            "x": 32,
+            "y": 16,
             "w": 18,
             "h": 22
           },
           "outlinePolygon": [
             [
+              34,
+              20
+            ],
+            [
               38,
-              7
+              17
             ],
             [
-              42,
-              4
+              46,
+              18
             ],
             [
-              50,
-              5
-            ],
-            [
-              53,
-              11
-            ],
-            [
-              52,
-              19
-            ],
-            [
-              47,
+              49,
               24
             ],
             [
-              40,
-              24
+              48,
+              32
             ],
             [
-              37,
-              15
+              43,
+              37
+            ],
+            [
+              36,
+              37
+            ],
+            [
+              33,
+              28
             ]
           ],
           "hitPolygon": [
