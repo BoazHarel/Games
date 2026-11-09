@@ -324,7 +324,7 @@ export function createSceneRenderer(world, options = {}) {
       el.style.width = `${tap.bounds.w}%`;
       el.style.height = `${tap.bounds.h}%`;
 
-      // Inner visual wrapper carries the GPU-composited 3s breathing transform
+      // Inner visual wrapper carries the GPU-composited 3s soft opacity twinkle breathing
       // so the outer .tappable-layer bounding box stays stationary for hit-testing & Playwright stability
       const visualEl = doc.createElement('div');
       visualEl.className = 'tappable-visual';
