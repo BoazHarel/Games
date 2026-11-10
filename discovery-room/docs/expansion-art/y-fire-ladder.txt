@@ -1,0 +1,3 @@
+Title: Fire Engine Ladder
+Parent stop: y-fire-engine
+Prompt: How high can the silver ladder reach?

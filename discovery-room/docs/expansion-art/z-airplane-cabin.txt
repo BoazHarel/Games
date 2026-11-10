@@ -1,0 +1,3 @@
+Title: Airplane Passenger Cabin
+Parent stop: z-airport-jetway
+Prompt: Where would you like to sit?

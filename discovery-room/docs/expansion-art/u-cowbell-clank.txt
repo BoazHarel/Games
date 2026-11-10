@@ -1,0 +1,3 @@
+Title: Cowbell Clank
+Parent stop: u-kid-band
+Prompt: What sound does the cowbell make?

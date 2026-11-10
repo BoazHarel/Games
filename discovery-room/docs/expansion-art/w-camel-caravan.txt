@@ -1,0 +1,3 @@
+Title: Camel caravan
+Parent stop: Desert dunes
+Prompt: Why don't the camels sink in the sand?

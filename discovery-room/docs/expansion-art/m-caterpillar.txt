@@ -1,0 +1,3 @@
+Title: Caterpillar
+Parent stop: Butterfly
+Prompt: What happens inside the chrysalis?

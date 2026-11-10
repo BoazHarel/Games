@@ -1,0 +1,3 @@
+Title: Soft Bed Blanket
+Parent stop: t-bedtime-story
+Prompt: How far do you pull the blanket up?

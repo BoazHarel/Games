@@ -1,0 +1,3 @@
+Title: Glowing Mushrooms
+Parent stop: fa-magic-garden
+Prompt: Who is sitting on the glowing mushroom?

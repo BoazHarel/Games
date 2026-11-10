@@ -1,0 +1,3 @@
+Title: Beetle
+Parent stop: Bug garden
+Prompt: Why is its shell so shiny?

@@ -1,0 +1,3 @@
+Title: Strawberry Patch
+Parent stop: t-backyard-garden
+Prompt: Which berry is ready to pick?

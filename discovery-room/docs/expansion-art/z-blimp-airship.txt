@@ -1,0 +1,3 @@
+Title: Gentle Giant Blimp Airship
+Parent stop: z-sky-soaring
+Prompt: What is the giant silver balloon doing over town?

@@ -1,0 +1,3 @@
+Title: Radiosonde Sensor Box
+Parent stop: z-weather-balloon
+Prompt: What is hanging under the little parachute?

@@ -1,0 +1,3 @@
+Title: Emperor penguins
+Parent stop: v-penguin-cove
+Prompt: Where does the chick stay warm?

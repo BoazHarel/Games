@@ -1,0 +1,3 @@
+Title: Laundry Day
+Parent stop: room
+Prompt: What is spinning, what is warm, and what is dancing in the breeze?

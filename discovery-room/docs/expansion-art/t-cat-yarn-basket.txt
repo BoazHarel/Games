@@ -1,0 +1,3 @@
+Title: Cat Yarn Basket
+Parent stop: t-sleeping-cat
+Prompt: Which ball of yarn would you roll?

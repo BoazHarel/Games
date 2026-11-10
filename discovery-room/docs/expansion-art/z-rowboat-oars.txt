@@ -1,0 +1,3 @@
+Title: Wooden Oars and Brass Oarlocks
+Parent stop: z-rowboat-pond
+Prompt: What holds the oar on the boat?

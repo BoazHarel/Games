@@ -1,0 +1,3 @@
+Title: Kindergarten Classroom
+Parent stop: g-school
+Prompt: What would you build with the blocks?

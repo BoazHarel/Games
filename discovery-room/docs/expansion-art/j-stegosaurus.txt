@@ -1,0 +1,3 @@
+Title: Stegosaurus
+Parent stop: Dinosaur land
+Prompt: What are those plates on its back for?

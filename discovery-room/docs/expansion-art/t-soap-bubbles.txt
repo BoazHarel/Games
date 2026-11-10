@@ -1,0 +1,3 @@
+Title: Soap Bubbles
+Parent stop: t-bubble-bath
+Prompt: What colors do you see in a bubble?

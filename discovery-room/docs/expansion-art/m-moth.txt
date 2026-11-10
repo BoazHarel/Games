@@ -1,0 +1,3 @@
+Title: Moth
+Parent stop: Bug garden
+Prompt: How is a moth different from a butterfly?

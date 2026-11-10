@@ -1,0 +1,3 @@
+Title: Hen and Chicks
+Parent stop: Farm
+Prompt: How many chicks can you count?

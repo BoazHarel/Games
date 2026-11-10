@@ -1,0 +1,3 @@
+Title: Baking Cookies
+Parent stop: t-cozy-kitchen
+Prompt: What shapes can we press into the dough?

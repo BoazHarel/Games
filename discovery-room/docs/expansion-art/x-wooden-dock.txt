@@ -1,0 +1,3 @@
+Title: Wooden dock
+Parent stop: x-river-bend-fishing
+Prompt: What is the bobber doing on the water?

@@ -1,0 +1,3 @@
+Title: Puppet Show
+Parent stop: fa-toy-shop
+Prompt: Who is on the little stage?

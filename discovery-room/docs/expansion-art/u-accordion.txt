@@ -1,0 +1,3 @@
+Title: Accordion
+Parent stop: u-kid-band
+Prompt: What happens when the bellows open and close?

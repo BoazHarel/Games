@@ -1,0 +1,3 @@
+Title: Star Cluster
+Parent stop: s-space
+Prompt: Which star is the brightest?

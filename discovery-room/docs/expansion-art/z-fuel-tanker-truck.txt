@@ -1,0 +1,3 @@
+Title: Airport Fuel Tanker Truck
+Parent stop: z-airport
+Prompt: What does the silver truck carry to the airplane?

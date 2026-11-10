@@ -1,0 +1,3 @@
+Title: Fire Station Garage
+Parent stop: g-fire-station
+Prompt: What is waiting inside the big red doors?

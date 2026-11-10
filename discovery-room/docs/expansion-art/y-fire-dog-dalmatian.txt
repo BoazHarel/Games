@@ -1,0 +1,3 @@
+Title: Firehouse Dalmatian
+Parent stop: y-fire-station-garage
+Prompt: What does the spotted dog do when the engine comes home?

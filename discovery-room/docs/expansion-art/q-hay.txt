@@ -1,0 +1,3 @@
+Title: Hay
+Parent stop: Farm
+Prompt: How many hay bales can you count?

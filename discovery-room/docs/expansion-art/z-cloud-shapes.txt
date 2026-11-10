@@ -1,0 +1,3 @@
+Title: Friendly Cloud Shapes
+Parent stop: z-hot-air-balloon
+Prompt: What shapes can you find in the clouds?

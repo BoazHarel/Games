@@ -1,0 +1,3 @@
+Title: Ladybug
+Parent stop: Bug garden
+Prompt: Why do you think it has spots?

@@ -1,0 +1,3 @@
+Title: Deer in the Yard
+Parent stop: room
+Prompt: What is the deer looking at?

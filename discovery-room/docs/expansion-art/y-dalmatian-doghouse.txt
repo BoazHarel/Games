@@ -1,0 +1,3 @@
+Title: Dalmatian's Cozy Corner
+Parent stop: y-fire-dog-dalmatian
+Prompt: Where does the fire dog take a nap?

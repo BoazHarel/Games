@@ -1,0 +1,3 @@
+Title: Eagle over the Green Hills
+Parent stop: z-soaring-eagle
+Prompt: How does the eagle stay up so quietly?

@@ -1,0 +1,3 @@
+Title: Scaffolding
+Parent stop: Construction in town
+Prompt: How do the wooden poles help build the little house?

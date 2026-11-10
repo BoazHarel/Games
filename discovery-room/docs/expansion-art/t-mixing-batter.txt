@@ -1,0 +1,3 @@
+Title: Mixing Batter
+Parent stop: t-pancake-breakfast
+Prompt: What happens when we stir the batter?

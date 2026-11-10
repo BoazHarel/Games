@@ -1,0 +1,3 @@
+Title: A Galaxy
+Parent stop: s-space
+Prompt: How many stars are in a swirl?

@@ -1,0 +1,3 @@
+Title: Zebra
+Parent stop: Jungle
+Prompt: Are a zebra's stripes black or white?

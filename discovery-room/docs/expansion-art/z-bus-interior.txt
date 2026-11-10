@@ -1,0 +1,3 @@
+Title: Inside the Bus
+Parent stop: z-city-bus
+Prompt: What do you see out the bus window?

@@ -1,0 +1,3 @@
+Title: Rescue Helicopter over the Meadow
+Parent stop: z-rescue-helicopter
+Prompt: Who is waving to the red helicopter?

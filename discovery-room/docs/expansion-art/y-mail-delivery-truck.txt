@@ -1,0 +1,3 @@
+Title: Mail Delivery Truck
+Parent stop: y-post-office
+Prompt: What is stacked inside the blue truck?

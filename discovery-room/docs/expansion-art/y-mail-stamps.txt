@@ -1,0 +1,3 @@
+Title: Postage Stamps and Letters
+Parent stop: y-mail-sorting-room
+Prompt: Which picture is on the stamp?

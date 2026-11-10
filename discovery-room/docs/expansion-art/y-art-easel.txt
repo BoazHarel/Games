@@ -1,0 +1,3 @@
+Title: Classroom Art Easel
+Parent stop: y-kindergarten-classroom
+Prompt: What colors would you paint with?

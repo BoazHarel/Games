@@ -1,0 +1,3 @@
+Title: Volcano
+Parent stop: Dinosaur land
+Prompt: What do you think is inside that mountain?

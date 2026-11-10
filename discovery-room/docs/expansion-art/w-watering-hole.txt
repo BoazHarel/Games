@@ -1,0 +1,3 @@
+Title: Watering hole
+Parent stop: Sunny savanna
+Prompt: Who comes to drink at the pool?

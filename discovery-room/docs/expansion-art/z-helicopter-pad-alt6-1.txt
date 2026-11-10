@@ -1,0 +1,3 @@
+Title: Helicopter on the Yellow Circle
+Parent stop: z-helicopter-pad
+Prompt: Who helps the helicopter land?

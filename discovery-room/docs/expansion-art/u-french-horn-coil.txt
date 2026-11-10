@@ -1,0 +1,3 @@
+Title: French Horn Coil
+Parent stop: u-little-orchestra
+Prompt: Where does the horn's sound come out?

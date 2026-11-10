@@ -1,0 +1,3 @@
+Title: Bakery Kitchen
+Parent stop: g-bakery
+Prompt: What is baking in the warm kitchen?

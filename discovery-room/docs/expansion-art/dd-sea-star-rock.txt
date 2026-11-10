@@ -1,0 +1,3 @@
+Title: Sea Star Rock
+Parent stop: dd-tide-pool
+Prompt: How many arms does the sea star have?

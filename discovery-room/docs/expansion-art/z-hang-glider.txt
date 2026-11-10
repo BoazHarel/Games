@@ -1,0 +1,3 @@
+Title: Triangular Hang Glider from the Bluff
+Parent stop: z-sky-soaring
+Prompt: What does the pilot hold to steer?

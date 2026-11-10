@@ -1,0 +1,3 @@
+Title: Mars
+Parent stop: s-planets
+Prompt: What color is this planet?

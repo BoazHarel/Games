@@ -1,0 +1,3 @@
+Title: Busy beaver
+Parent stop: x-beaver-dam
+Prompt: What is the beaver holding?

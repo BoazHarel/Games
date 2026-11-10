@@ -1,0 +1,3 @@
+Title: Mail Truck
+Parent stop: Street
+Prompt: Who might get one of those colorful letters?

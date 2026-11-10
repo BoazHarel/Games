@@ -1,0 +1,3 @@
+Title: Picture Book Nook
+Parent stop: y-storytime-library
+Prompt: What is happening in the open picture book?

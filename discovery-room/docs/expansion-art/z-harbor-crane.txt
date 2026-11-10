@@ -1,0 +1,3 @@
+Title: Dockside Container Crane
+Parent stop: z-harbor
+Prompt: What is the big red crane lifting?

@@ -1,0 +1,3 @@
+Title: Geese and a Swallow
+Parent stop: z-birds-in-flight
+Prompt: Which bird is smaller than the geese?

@@ -1,0 +1,3 @@
+Title: Firefighter Gear
+Parent stop: y-fire-station-garage
+Prompt: What does a firefighter put on first?

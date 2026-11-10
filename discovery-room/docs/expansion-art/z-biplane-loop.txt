@@ -1,0 +1,3 @@
+Title: Vintage Red Aerobatic Biplane
+Parent stop: z-sky-soaring
+Prompt: Who is waving from the red airplane?

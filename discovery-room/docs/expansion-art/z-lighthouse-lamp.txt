@@ -1,0 +1,3 @@
+Title: Lighthouse Fresnel Lens
+Parent stop: z-lighthouse
+Prompt: How does the big glass make the light shine far?

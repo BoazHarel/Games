@@ -1,0 +1,3 @@
+Title: Giraffe
+Parent stop: Jungle
+Prompt: Why is a giraffe's neck so long?

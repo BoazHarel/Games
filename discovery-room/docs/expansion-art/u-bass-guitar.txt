@@ -1,0 +1,3 @@
+Title: Bass Guitar
+Parent stop: u-kid-band
+Prompt: Which string sounds the lowest?

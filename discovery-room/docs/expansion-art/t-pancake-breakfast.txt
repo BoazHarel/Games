@@ -1,0 +1,3 @@
+Title: Pancake Breakfast
+Parent stop: t-cozy-kitchen
+Prompt: What goes on a pancake?

@@ -1,0 +1,3 @@
+Title: Carved Beaver-Tail Wooden Paddle
+Parent stop: z-canoe-trip
+Prompt: What happens in the water when the paddle moves?

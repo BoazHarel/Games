@@ -1,0 +1,3 @@
+Title: Kazoo Hum
+Parent stop: u-kid-band
+Prompt: Can you hum into the little kazoo?

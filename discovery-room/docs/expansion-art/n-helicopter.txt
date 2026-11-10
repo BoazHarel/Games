@@ -1,0 +1,3 @@
+Title: Helicopter
+Parent stop: Things that go
+Prompt: How is it different from a plane?

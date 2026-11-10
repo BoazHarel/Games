@@ -1,0 +1,3 @@
+Title: Telescope
+Parent stop: s-space
+Prompt: What could you look at through that?

@@ -1,0 +1,3 @@
+Title: Making Soup
+Parent stop: t-cozy-kitchen
+Prompt: What vegetables went into the pot?

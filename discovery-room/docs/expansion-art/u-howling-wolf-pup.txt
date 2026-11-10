@@ -1,0 +1,3 @@
+Title: Howling Wolf Pup
+Parent stop: u-animal-sounds
+Prompt: What song is the little pup singing to the moon?

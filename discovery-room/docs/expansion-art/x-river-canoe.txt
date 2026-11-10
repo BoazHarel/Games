@@ -1,0 +1,3 @@
+Title: River canoe
+Parent stop: x-river-bend-fishing
+Prompt: What do we bring so the canoe ride stays safe?

@@ -1,0 +1,3 @@
+Title: Puppy Checkup
+Parent stop: y-vet-clinic
+Prompt: How does the puppy feel at the checkup?

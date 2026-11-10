@@ -1,0 +1,3 @@
+Title: Cozy Narrowboat Cabin
+Parent stop: z-canal-narrowboat
+Prompt: Where would you sleep on the boat?

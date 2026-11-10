@@ -1,0 +1,3 @@
+Title: Storybook Carousel
+Parent stop: fa-circus-tent
+Prompt: Which wooden pony is riding the brass pole?

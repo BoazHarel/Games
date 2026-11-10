@@ -1,0 +1,3 @@
+Title: Baby camel
+Parent stop: Camel caravan
+Prompt: What does a baby camel's coat feel like?

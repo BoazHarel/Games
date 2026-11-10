@@ -1,0 +1,3 @@
+Title: Freeze Dance
+Parent stop: u-dance-party
+Prompt: Can you freeze like a statue?

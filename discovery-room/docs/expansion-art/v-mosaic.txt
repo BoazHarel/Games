@@ -1,0 +1,3 @@
+Title: Mosaic
+Parent stop: v-easel
+Prompt: How is this picture made of pieces?

@@ -1,0 +1,3 @@
+Title: Lion Cub Growl
+Parent stop: u-animal-sounds
+Prompt: Can you make a tiny roar?

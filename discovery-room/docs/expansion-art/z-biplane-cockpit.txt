@@ -1,0 +1,3 @@
+Title: Open-Air Biplane Cockpit
+Parent stop: z-biplane-loop
+Prompt: What do you hold to fly the plane?

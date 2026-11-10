@@ -1,0 +1,3 @@
+Title: Fire Truck
+Parent stop: Street
+Prompt: Where does the ladder reach?

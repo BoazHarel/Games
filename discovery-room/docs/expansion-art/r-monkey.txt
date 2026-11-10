@@ -1,0 +1,3 @@
+Title: Monkey
+Parent stop: Jungle
+Prompt: How does a monkey hold on with its tail?

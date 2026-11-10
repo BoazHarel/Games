@@ -1,0 +1,3 @@
+Title: Puppy Water Bowl
+Parent stop: t-happy-puppy
+Prompt: What do the ripples do when a drop falls in?

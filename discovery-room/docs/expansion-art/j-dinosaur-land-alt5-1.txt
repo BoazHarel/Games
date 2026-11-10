@@ -1,0 +1,3 @@
+Title: Dinosaur land, close path
+Parent stop: j-dinosaur-land
+Prompt: What does the long-neck see when it looks down the path?

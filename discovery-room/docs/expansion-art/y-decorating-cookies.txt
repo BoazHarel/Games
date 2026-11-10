@@ -1,0 +1,3 @@
+Title: Decorating Cookies
+Parent stop: y-bakery-kitchen
+Prompt: Which cookie would you decorate?

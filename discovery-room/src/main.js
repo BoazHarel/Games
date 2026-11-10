@@ -133,8 +133,9 @@ async function initApp() {
 
     const diag = viewport.getDiagnostics();
 
-    // Check "more friends" on example stops first (Issue #50: frog, horse, fish, bird)
-    if (Array.isArray(currentStop.moreFriends) && currentStop.moreFriends.length > 0) {
+    // Check "more friends" on example stops first (Issue #50: frog, horse, fish, bird) - unless user/test clicked directly on a [data-tappable-id] element
+    const clickedTappableEl = e.target?.closest?.('[data-tappable-id]');
+    if (!clickedTappableEl && Array.isArray(currentStop.moreFriends) && currentStop.moreFriends.length > 0) {
       let friendHit = resolveTapHit(pointPct, currentStop.moreFriends, {
         canvasWidth: world.config?.canvasWidth || 1600,
         canvasHeight: world.config?.canvasHeight || 900,

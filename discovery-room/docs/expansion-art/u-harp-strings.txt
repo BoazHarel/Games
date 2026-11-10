@@ -1,0 +1,3 @@
+Title: Harp Strings
+Parent stop: u-luthier-workshop
+Prompt: Which string would you pluck first?

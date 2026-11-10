@@ -1,0 +1,3 @@
+Title: Barn
+Parent stop: Farm
+Prompt: What do you think is stored in the hay?

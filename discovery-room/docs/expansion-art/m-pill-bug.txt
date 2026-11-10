@@ -1,0 +1,3 @@
+Title: Pill bug
+Parent stop: Bug garden
+Prompt: What happens if it curls into a ball?

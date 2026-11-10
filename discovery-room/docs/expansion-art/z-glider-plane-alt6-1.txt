@@ -1,0 +1,3 @@
+Title: Sailplane over Patchwork Fields
+Parent stop: z-glider-plane
+Prompt: How can this plane fly without an engine?

@@ -1,0 +1,3 @@
+Title: Coastal Lighthouse
+Parent stop: z-harbor
+Prompt: Who keeps the light shining for the boats?

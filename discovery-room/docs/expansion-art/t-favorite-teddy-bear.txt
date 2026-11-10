@@ -1,0 +1,3 @@
+Title: Favorite Teddy Bear
+Parent stop: t-bedtime-story
+Prompt: Where does Teddy like to be hugged?

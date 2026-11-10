@@ -1,0 +1,3 @@
+Title: River bend fishing
+Parent stop: x-winding-river
+Prompt: What is the red canoe waiting for?

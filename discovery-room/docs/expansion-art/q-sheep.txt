@@ -1,0 +1,3 @@
+Title: Sheep
+Parent stop: Farm
+Prompt: What do we make from a sheep's wool?

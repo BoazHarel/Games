@@ -1,0 +1,3 @@
+Title: Fire Engine
+Parent stop: y-fire-station-garage
+Prompt: What can the big red engine do?

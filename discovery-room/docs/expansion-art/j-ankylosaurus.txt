@@ -1,0 +1,3 @@
+Title: Ankylosaurus
+Parent stop: Dinosaur land
+Prompt: What is that round ball on its tail?

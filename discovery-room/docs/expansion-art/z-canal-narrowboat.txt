@@ -1,0 +1,3 @@
+Title: Painted Canal Narrowboat
+Parent stop: z-canal-lock
+Prompt: What is growing on the cabin roof?

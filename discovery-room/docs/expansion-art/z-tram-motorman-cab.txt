@@ -1,0 +1,3 @@
+Title: Tram Motorman Control Cab
+Parent stop: z-electric-tram
+Prompt: What do you hold to make the streetcar go?

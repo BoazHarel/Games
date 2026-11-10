@@ -1,0 +1,3 @@
+Title: Garbage Truck
+Parent stop: Street
+Prompt: Which bin do you think gets picked up first?

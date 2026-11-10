@@ -1,0 +1,3 @@
+Title: Clownfish
+Parent stop: Coral reef
+Prompt: Who's hiding in there?

@@ -1,0 +1,3 @@
+Title: Scooter
+Parent stop: Street
+Prompt: Where would you scoot along this path?

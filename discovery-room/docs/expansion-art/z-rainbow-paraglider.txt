@@ -1,0 +1,3 @@
+Title: Colorful Paraglider Canopy
+Parent stop: z-sky-soaring
+Prompt: How does the colorful wing stay up?

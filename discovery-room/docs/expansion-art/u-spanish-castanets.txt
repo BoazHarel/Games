@@ -1,0 +1,3 @@
+Title: Spanish Castanets
+Parent stop: u-world-percussion
+Prompt: What sound do the wooden shells make?

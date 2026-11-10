@@ -1,0 +1,3 @@
+Title: Rooster Crow
+Parent stop: u-animal-sounds
+Prompt: What does the rooster say to the morning?

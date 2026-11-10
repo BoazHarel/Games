@@ -1,0 +1,3 @@
+Title: Pickup Truck
+Parent stop: Street
+Prompt: What is riding in the back?

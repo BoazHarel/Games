@@ -1,0 +1,3 @@
+Title: Bicycle
+Parent stop: Street
+Prompt: Where would you ride this bicycle?

@@ -1,0 +1,3 @@
+Title: Swan Pedal Boat
+Parent stop: z-harbor
+Prompt: How does the swan boat move?

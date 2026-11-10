@@ -1,0 +1,3 @@
+Title: Blender Whirr
+Parent stop: u-kitchen-band
+Prompt: What color is the twirling drink?

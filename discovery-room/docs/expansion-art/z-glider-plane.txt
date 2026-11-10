@@ -1,0 +1,3 @@
+Title: Graceful Sailplane Glider
+Parent stop: z-sky-soaring
+Prompt: How can a plane fly without an engine?

@@ -1,0 +1,3 @@
+Title: Butterfly
+Parent stop: Bug garden
+Prompt: Was a butterfly always a butterfly?

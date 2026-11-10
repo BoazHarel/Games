@@ -1,0 +1,3 @@
+Title: Bug garden
+Parent stop: Ladybug on the windowsill
+Prompt: How many bugs do you think live in our yard?

@@ -1,0 +1,3 @@
+Title: Jungle Gym Dome
+Parent stop: y-town-playground
+Prompt: How would you climb to the top ring?

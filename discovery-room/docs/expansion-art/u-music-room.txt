@@ -1,0 +1,3 @@
+Title: Music Room
+Parent stop: room
+Prompt: What sound is waiting in this room?

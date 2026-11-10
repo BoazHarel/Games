@@ -1,0 +1,3 @@
+Title: Airport Rescue Truck on the Grass
+Parent stop: z-fire-rescue-truck
+Prompt: How does this truck help at the airport?

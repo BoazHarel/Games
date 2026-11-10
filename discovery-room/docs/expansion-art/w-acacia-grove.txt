@@ -1,0 +1,3 @@
+Title: Acacia grove
+Parent stop: Sunny savanna
+Prompt: How do the giraffes reach the high leaves?

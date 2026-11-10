@@ -1,0 +1,3 @@
+Title: Ukulele Strum
+Parent stop: u-folk-instruments
+Prompt: How many strings can you count?

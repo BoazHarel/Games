@@ -1,0 +1,3 @@
+Title: Tambourine and Maracas
+Parent stop: u-kid-band
+Prompt: Which one jingles, and which one shakes?

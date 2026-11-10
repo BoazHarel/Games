@@ -1,0 +1,3 @@
+Title: Market Weighing Scale
+Parent stop: y-fruit-crates
+Prompt: Which side of the scale is heavier?

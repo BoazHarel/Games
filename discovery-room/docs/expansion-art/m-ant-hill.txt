@@ -1,0 +1,3 @@
+Title: Ant hill
+Parent stop: Bug garden
+Prompt: What's happening under the ground?

@@ -1,0 +1,3 @@
+Title: Singing Microphone
+Parent stop: u-kid-band
+Prompt: What song would you sing?

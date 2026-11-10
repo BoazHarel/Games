@@ -1,0 +1,3 @@
+Title: Bunny, Heart, and Whale Clouds
+Parent stop: z-cloud-shapes
+Prompt: What shapes can you find in the clouds?

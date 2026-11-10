@@ -1,0 +1,3 @@
+Title: Storytime Library
+Parent stop: g-library-museum
+Prompt: Which picture book would you open first?

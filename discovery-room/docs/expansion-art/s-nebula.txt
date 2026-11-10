@@ -1,0 +1,3 @@
+Title: Nebula
+Parent stop: s-space
+Prompt: What colors do you see in that cloud?

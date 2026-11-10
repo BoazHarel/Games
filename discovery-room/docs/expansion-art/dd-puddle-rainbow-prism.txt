@@ -1,0 +1,3 @@
+Title: Puddle Rainbow Prism
+Parent stop: o-rainbow
+Prompt: Where did the rainbow colors come from?

@@ -1,0 +1,3 @@
+Title: Sparkly Toothbrush
+Parent stop: t-brushing-teeth
+Prompt: Where does the pink toothpaste sit?

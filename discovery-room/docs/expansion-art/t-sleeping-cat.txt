@@ -1,0 +1,3 @@
+Title: Sleeping Cat
+Parent stop: t-pets-at-home
+Prompt: How does the cat stay cozy while it naps?

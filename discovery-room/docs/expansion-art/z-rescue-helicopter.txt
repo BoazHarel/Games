@@ -1,0 +1,3 @@
+Title: Rescue Helicopter
+Parent stop: z-helicopter-pad
+Prompt: How does the rescue helicopter help?

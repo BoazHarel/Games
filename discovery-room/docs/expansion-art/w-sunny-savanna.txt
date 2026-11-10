@@ -1,0 +1,3 @@
+Title: Sunny savanna
+Parent stop: The room
+Prompt: Who lives in the tall golden grass?

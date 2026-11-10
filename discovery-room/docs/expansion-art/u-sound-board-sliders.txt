@@ -1,0 +1,3 @@
+Title: Sound Board Sliders
+Parent stop: u-kid-band
+Prompt: What happens when you slide the red one?

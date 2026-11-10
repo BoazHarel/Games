@@ -1,0 +1,3 @@
+Title: Wooden Guiro Frog
+Parent stop: u-world-percussion
+Prompt: What sound does the stick make on the frog's back?

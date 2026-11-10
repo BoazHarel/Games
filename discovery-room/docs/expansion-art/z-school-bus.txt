@@ -1,0 +1,3 @@
+Title: Yellow School Bus
+Parent stop: z-town-transit
+Prompt: Where is the yellow bus going?

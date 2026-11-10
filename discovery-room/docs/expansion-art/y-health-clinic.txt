@@ -1,0 +1,3 @@
+Title: Friendly Health Clinic
+Parent stop: g-hospital
+Prompt: What helps the doctor listen to a heartbeat?

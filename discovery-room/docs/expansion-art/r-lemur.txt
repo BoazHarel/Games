@@ -1,0 +1,3 @@
+Title: Lemur
+Parent stop: Jungle
+Prompt: What is that striped tail for?

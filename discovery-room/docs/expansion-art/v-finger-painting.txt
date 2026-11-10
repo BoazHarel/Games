@@ -1,0 +1,3 @@
+Title: Finger painting
+Parent stop: v-easel
+Prompt: What can your fingers paint?

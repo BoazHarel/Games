@@ -1,0 +1,3 @@
+Title: Sailboat Cockpit Deck
+Parent stop: z-sailboat-marina
+Prompt: What do you hold to turn the sailboat?

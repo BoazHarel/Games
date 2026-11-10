@@ -1,0 +1,3 @@
+Title: Flute and Clarinet
+Parent stop: u-little-orchestra
+Prompt: Which one sounds like a bird?

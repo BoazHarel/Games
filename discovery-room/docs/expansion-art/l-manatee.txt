@@ -1,0 +1,3 @@
+Title: Manatee
+Parent stop: Under the sea
+Prompt: Does a manatee look more like a whale or a hippo?

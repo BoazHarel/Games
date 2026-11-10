@@ -1,0 +1,3 @@
+Title: Horse and foal
+Parent stop: Horse
+Prompt: Who does the little horse stay close to?

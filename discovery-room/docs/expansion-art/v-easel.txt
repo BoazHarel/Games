@@ -1,0 +1,3 @@
+Title: Easel
+Parent stop: room
+Prompt: What would you paint?

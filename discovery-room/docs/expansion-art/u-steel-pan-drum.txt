@@ -1,0 +1,3 @@
+Title: Steel Pan Drum
+Parent stop: u-world-percussion
+Prompt: Which patch sings the highest?

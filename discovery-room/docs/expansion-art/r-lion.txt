@@ -1,0 +1,3 @@
+Title: Lion
+Parent stop: Jungle
+Prompt: Why do you think a lion has a mane?

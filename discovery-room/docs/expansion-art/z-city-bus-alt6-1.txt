@@ -1,0 +1,3 @@
+Title: Red Bus at the Corner
+Parent stop: z-city-bus
+Prompt: Where would you like to sit on the bus?

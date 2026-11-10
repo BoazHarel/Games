@@ -1,0 +1,3 @@
+Title: Hermit Crab Shell
+Parent stop: dd-anemone-garden
+Prompt: Where does the little crab live?

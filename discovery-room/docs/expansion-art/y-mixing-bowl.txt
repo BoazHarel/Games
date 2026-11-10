@@ -1,0 +1,3 @@
+Title: Baker's Mixing Bowl
+Parent stop: y-bakery-kitchen
+Prompt: What goes into the big yellow bowl?

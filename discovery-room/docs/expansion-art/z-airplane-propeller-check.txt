@@ -1,0 +1,3 @@
+Title: Propeller Maintenance Workbench
+Parent stop: z-airplane-hangar
+Prompt: What tools help the propeller?

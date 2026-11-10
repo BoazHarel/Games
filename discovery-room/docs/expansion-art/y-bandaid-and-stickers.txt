@@ -1,0 +1,3 @@
+Title: Bandages and Stickers
+Parent stop: y-doctor-exam-room
+Prompt: Which sticker would you pick?

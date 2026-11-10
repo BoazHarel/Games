@@ -1,0 +1,3 @@
+Title: Cedar Strip Canoe on the River
+Parent stop: z-harbor
+Prompt: Where is the wooden paddle resting?

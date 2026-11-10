@@ -1,0 +1,3 @@
+Title: Gentle Dragon
+Parent stop: fa-friendly-castle
+Prompt: What does a gentle dragon like to do?

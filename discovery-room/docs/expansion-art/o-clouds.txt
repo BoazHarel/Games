@@ -1,0 +1,3 @@
+Title: Clouds
+Parent stop: Weather
+Prompt: What do you see in that cloud?

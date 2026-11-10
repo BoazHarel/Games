@@ -1,0 +1,3 @@
+Title: Pigment powders
+Parent stop: v-paint-from-nature
+Prompt: Which color would you make?

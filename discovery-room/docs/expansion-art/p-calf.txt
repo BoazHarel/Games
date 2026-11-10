@@ -1,0 +1,3 @@
+Title: Calf
+Parent stop: p-animal-babies
+Prompt: How does the calf stay close?

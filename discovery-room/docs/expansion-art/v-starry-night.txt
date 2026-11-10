@@ -1,0 +1,3 @@
+Title: Starry night
+Parent stop: v-easel
+Prompt: Does this sky look like ours?

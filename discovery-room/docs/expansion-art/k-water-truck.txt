@@ -1,0 +1,3 @@
+Title: Water Truck
+Parent stop: Construction in town
+Prompt: Why is the truck spraying water on the path?

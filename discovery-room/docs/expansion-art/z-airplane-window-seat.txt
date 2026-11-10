@@ -1,0 +1,3 @@
+Title: Airplane Window Seat View
+Parent stop: z-airplane-cabin
+Prompt: What do you see under the wing?

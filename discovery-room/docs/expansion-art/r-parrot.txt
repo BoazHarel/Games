@@ -1,0 +1,3 @@
+Title: Parrot
+Parent stop: Jungle
+Prompt: What colors can you find on this parrot?

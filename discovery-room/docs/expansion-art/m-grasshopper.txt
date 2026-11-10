@@ -1,0 +1,3 @@
+Title: Grasshopper
+Parent stop: Bug garden
+Prompt: How does a grasshopper jump so far?

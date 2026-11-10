@@ -1,0 +1,3 @@
+Title: Farm garden close-up
+Parent stop: q-farm
+Prompt: What is growing beside the pig?

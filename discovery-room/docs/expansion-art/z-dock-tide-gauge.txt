@@ -1,0 +1,3 @@
+Title: Harbor Tide Measuring Gauge Post
+Parent stop: z-harbor
+Prompt: How high is the water on the striped post?

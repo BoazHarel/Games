@@ -1,0 +1,3 @@
+Title: Kalimba Thumb Piano
+Parent stop: u-world-percussion
+Prompt: Which metal tooth would you pluck?

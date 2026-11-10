@@ -1,0 +1,3 @@
+Title: Pirate Ship
+Parent stop: room
+Prompt: Where is the friendly ship sailing?

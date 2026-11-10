@@ -1,0 +1,3 @@
+Title: Wooden Violin Ribs
+Parent stop: u-luthier-workshop
+Prompt: How does warm wood learn to curve?

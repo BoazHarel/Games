@@ -1,0 +1,3 @@
+Title: Gong
+Parent stop: u-rhythm-drums
+Prompt: What happens when the soft mallet meets the gong?

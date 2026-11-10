@@ -1,0 +1,3 @@
+Title: Park Footbridge and Ducks
+Parent stop: z-bicycle-path
+Prompt: Who is swimming under the little bridge?

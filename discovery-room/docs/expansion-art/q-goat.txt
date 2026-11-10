@@ -1,0 +1,3 @@
+Title: Goat
+Parent stop: Farm
+Prompt: What is the goat nibbling?

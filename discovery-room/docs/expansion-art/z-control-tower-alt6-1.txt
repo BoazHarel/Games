@@ -1,0 +1,3 @@
+Title: Control Tower and the Yellow Plane
+Parent stop: z-control-tower
+Prompt: What can you see from the top of the tower?

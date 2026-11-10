@@ -1,0 +1,3 @@
+Title: Castle Courtyard
+Parent stop: fa-friendly-castle
+Prompt: What is cooking in the castle bakery?

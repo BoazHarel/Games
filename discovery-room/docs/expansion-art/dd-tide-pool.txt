@@ -1,0 +1,3 @@
+Title: Tide Pool
+Parent stop: l-coral-reef
+Prompt: What stayed behind when the wave rolled back?

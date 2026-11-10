@@ -1,0 +1,3 @@
+Title: Chrysalis
+Parent stop: Bug garden
+Prompt: What do you think is sleeping inside?

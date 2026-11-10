@@ -1,0 +1,3 @@
+Title: Glowing igloo village
+Parent stop: a-northern-lights
+Prompt: What is glowing in the snow?

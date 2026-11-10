@@ -1,0 +1,3 @@
+Title: Peacock
+Parent stop: Jungle
+Prompt: What are those spots on the tail?

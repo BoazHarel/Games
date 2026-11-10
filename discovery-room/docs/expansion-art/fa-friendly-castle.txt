@@ -1,0 +1,3 @@
+Title: Friendly Castle
+Parent stop: g-castles-pyramids
+Prompt: Who would you visit at the friendly castle?

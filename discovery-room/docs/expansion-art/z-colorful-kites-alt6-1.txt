@@ -1,0 +1,3 @@
+Title: Kites on the Hill
+Parent stop: z-colorful-kites
+Prompt: Which kite would you fly?

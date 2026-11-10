@@ -1,0 +1,3 @@
+Title: Striped Balloon over the Meadow
+Parent stop: z-hot-air-balloon
+Prompt: What is glowing under the big balloon?

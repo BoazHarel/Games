@@ -1,0 +1,3 @@
+Title: Scarecrow
+Parent stop: Farm
+Prompt: What job does a scarecrow do?

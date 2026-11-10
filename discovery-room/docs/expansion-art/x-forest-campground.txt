@@ -1,0 +1,3 @@
+Title: Forest campground
+Parent stop: x-whispering-woods
+Prompt: What would you bring on a camping night?

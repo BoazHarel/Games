@@ -1,0 +1,3 @@
+Title: Penguin cove
+Parent stop: room
+Prompt: Who is sliding on the shiny ice?

@@ -1,0 +1,3 @@
+Title: Pirate Ship Deck
+Parent stop: fa-pirate-ship
+Prompt: What would you steer the ship toward?

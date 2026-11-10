@@ -1,0 +1,3 @@
+Title: Satellite
+Parent stop: s-space
+Prompt: What is that little ship doing up there?

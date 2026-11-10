@@ -1,0 +1,3 @@
+Title: Fossil Magnifier
+Parent stop: dd-fossil-prep-table
+Prompt: What tiny leaf is hiding under the glass?

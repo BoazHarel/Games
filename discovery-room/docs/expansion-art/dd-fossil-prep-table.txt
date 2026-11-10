@@ -1,0 +1,3 @@
+Title: Fossil Prep Table
+Parent stop: j-fossil-dig
+Prompt: How do scientists look closely at a fossil?

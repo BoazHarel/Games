@@ -1,0 +1,3 @@
+Title: Weaving loom
+Parent stop: v-easel
+Prompt: How do the colors become a cloth?

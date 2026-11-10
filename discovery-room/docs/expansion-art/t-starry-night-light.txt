@@ -1,0 +1,3 @@
+Title: Starry Night Light
+Parent stop: t-bedtime-story
+Prompt: What glows beside the bed?

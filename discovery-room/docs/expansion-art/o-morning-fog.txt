@@ -1,0 +1,3 @@
+Title: Morning Fog
+Parent stop: room
+Prompt: Where did the hills go?

@@ -1,0 +1,3 @@
+Title: Sunrise
+Parent stop: room
+Prompt: Where does the morning sun come from?

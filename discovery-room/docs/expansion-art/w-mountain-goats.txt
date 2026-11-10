@@ -1,0 +1,3 @@
+Title: Mountain goats
+Parent stop: Tall mountains
+Prompt: How do their feet hold on to the rocks?

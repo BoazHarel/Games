@@ -1,0 +1,3 @@
+Title: Airfield Radar Screen
+Parent stop: z-control-tower
+Prompt: Which glowing dot is an airplane?

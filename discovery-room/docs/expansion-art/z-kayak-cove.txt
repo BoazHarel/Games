@@ -1,0 +1,3 @@
+Title: Sheltered Kayak Cove
+Parent stop: z-harbor
+Prompt: Who is swimming beside the yellow kayak?

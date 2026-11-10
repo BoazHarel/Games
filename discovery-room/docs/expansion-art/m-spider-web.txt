@@ -1,0 +1,3 @@
+Title: Spider web
+Parent stop: Bug garden
+Prompt: Who made this web?

@@ -1,0 +1,3 @@
+Title: Kayak Cove from the Water
+Parent stop: z-kayak-cove
+Prompt: Who is sitting beside the yellow kayak?

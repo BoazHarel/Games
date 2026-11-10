@@ -1,0 +1,3 @@
+Title: Underground Ant Nest
+Parent stop: m-ant-hill
+Prompt: What rooms are under the grass?

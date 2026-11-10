@@ -1,6 +1,6 @@
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const UNBUILT_BRANCHES_V1 = new Set(['B', 'E', 'F', 'H', 'I']);
-const BUILT_BRANCHES_V1 = new Set(['root', 'A', 'B', 'C', 'D', 'G']);
+const UNBUILT_BRANCHES_V1 = new Set(['E', 'F', 'H', 'I']);
+const BUILT_BRANCHES_V1 = new Set(['root', 'A', 'B', 'C', 'D', 'G', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'DD', 'FA', 'GX1', 'Q', 'R', 'S', 'W']);
 const FORBIDDEN_HAND_ENTERED_KEYS = [
   'dilatedPercent',
   'dilationPercent',
@@ -416,8 +416,8 @@ export function validateWorld(world) {
     if (stop.branch === 'B' && stop.id !== 'b-street') {
       errors.push(`${prefix}: only "b-street" is built in Branch B for v1.`);
     }
-    if (typeof stop.level !== 'number' || !Number.isInteger(stop.level) || stop.level < 0 || stop.level > 5) {
-      errors.push(`${prefix}: level must be an integer between 0 and 5.`);
+    if (typeof stop.level !== 'number' || !Number.isInteger(stop.level) || stop.level < 0 || stop.level > 8) {
+      errors.push(`${prefix}: level must be an integer between 0 and 8.`);
     }
     if (stop.id === 'room' && (stop.level !== 0 || stop.branch !== 'root')) {
       errors.push(`${prefix}: room must have level 0 and branch "root".`);
@@ -522,8 +522,15 @@ export function validateWorld(world) {
       continue;
     }
 
-    if (stop.passThrough && stop.id !== 'b-street') {
-      errors.push(`${prefix}: passThrough: true is only permitted on "b-street".`);
+    const PASS_THROUGH_STOPS = new Set([
+      'b-street',
+      'g-dinosaurs',
+      'd-snail-shell-spiral',
+      'a-northern-lights',
+      'a-shooting-star-satellite'
+    ]);
+    if (stop.passThrough && !PASS_THROUGH_STOPS.has(stop.id)) {
+      errors.push(`${prefix}: passThrough: true is only permitted on designated pass-through stops.`);
     }
 
     const activeTappables = stop.tappables.filter((t) => t && t.sceneryOnlyInV1 !== true);
@@ -545,8 +552,8 @@ export function validateWorld(world) {
       if (stop.tappables.length !== 7) {
         errors.push(`${prefix}: room must have exactly 7 tappables in v1 (got ${stop.tappables.length}).`);
       }
-      if (activeTappables.length !== 4) {
-        errors.push(`${prefix}: room must have 4 active tappables in v1 (got ${activeTappables.length}).`);
+      if (activeTappables.length < 4 || activeTappables.length > 6) {
+        errors.push(`${prefix}: room must have 4..6 active tappables in v1 (got ${activeTappables.length}).`);
       }
     } else if (stop.passThrough) {
       if (activeTappables.length < 1 || stop.tappables.length < 3 || stop.tappables.length > 6) {
@@ -591,8 +598,8 @@ export function validateWorld(world) {
       if (typeof tap.sceneryOnlyInV1 !== 'boolean') {
         errors.push(`${tapPrefix}: sceneryOnlyInV1 must be a boolean.`);
       }
-      if (typeof tap.layerImage !== 'string' || !tap.layerImage.endsWith('.webp')) {
-        errors.push(`${tapPrefix}: layerImage must be a .webp path.`);
+      if (tap.layerImage !== null && (typeof tap.layerImage !== 'string' || !tap.layerImage.endsWith('.webp'))) {
+        errors.push(`${tapPrefix}: layerImage must be null or a .webp path.`);
       }
       if (tap.layerImageByMode !== undefined && tap.layerImageByMode !== null) {
         if (

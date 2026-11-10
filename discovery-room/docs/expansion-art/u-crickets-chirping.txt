@@ -1,0 +1,3 @@
+Title: Crickets Chirping
+Parent stop: u-animal-sounds
+Prompt: How does a cricket play its tiny song?

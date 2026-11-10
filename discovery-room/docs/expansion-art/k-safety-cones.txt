@@ -1,0 +1,3 @@
+Title: Safety Cones
+Parent stop: Construction in town
+Prompt: Why are the orange cones standing in a row?

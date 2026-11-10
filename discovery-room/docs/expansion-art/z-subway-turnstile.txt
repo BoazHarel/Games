@@ -1,0 +1,3 @@
+Title: Metro Turnstile Gate
+Parent stop: z-subway-station
+Prompt: Which way does the green arrow point?

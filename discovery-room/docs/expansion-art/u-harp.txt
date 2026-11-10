@@ -1,0 +1,3 @@
+Title: Harp
+Parent stop: u-little-orchestra
+Prompt: How do the strings make such a soft song?

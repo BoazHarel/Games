@@ -1,0 +1,3 @@
+Title: Lily pond
+Parent stop: x-winding-river
+Prompt: Who is sitting on the lily pad?

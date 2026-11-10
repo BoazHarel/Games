@@ -1,0 +1,3 @@
+Title: Cymbals Clash
+Parent stop: u-little-orchestra
+Prompt: What happens when the two plates meet?

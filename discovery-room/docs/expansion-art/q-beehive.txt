@@ -1,0 +1,3 @@
+Title: Beehive
+Parent stop: Farm
+Prompt: Where do the bees take the flower nectar?

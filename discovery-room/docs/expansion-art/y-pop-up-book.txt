@@ -1,0 +1,3 @@
+Title: Pop-Up Storybook
+Parent stop: y-picture-book-nook
+Prompt: Who is peeking out of the paper castle?

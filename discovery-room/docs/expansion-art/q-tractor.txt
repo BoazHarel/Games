@@ -1,0 +1,3 @@
+Title: Tractor
+Parent stop: Farm
+Prompt: What job does a tractor do?

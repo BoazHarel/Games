@@ -1,0 +1,3 @@
+Title: Cozy tent
+Parent stop: x-forest-campground
+Prompt: Where would you sleep inside the tent?

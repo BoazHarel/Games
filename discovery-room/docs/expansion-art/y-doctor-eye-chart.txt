@@ -1,0 +1,3 @@
+Title: Picture Eye Chart
+Parent stop: y-health-clinic
+Prompt: Can you find the tiny star?

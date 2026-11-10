@@ -1,0 +1,3 @@
+Title: Sailboat
+Parent stop: Boat
+Prompt: Why is this boat tied to the dock?

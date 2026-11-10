@@ -321,8 +321,8 @@ export function createSceneRenderer(world, options = {}) {
 
       el.style.left = `${tap.bounds.x}%`;
       el.style.top = `${tap.bounds.y}%`;
-      el.style.width = `${tap.bounds.w}%`;
-      el.style.height = `${tap.bounds.h}%`;
+      el.style.width = `${tap.bounds.w ?? tap.bounds.width}%`;
+      el.style.height = `${tap.bounds.h ?? tap.bounds.height}%`;
 
       // Inner visual wrapper carries the GPU-composited 3s soft opacity twinkle breathing
       // so the outer .tappable-layer bounding box stays stationary for hit-testing & Playwright stability

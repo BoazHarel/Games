@@ -1,0 +1,3 @@
+Title: Doctor Examination Room
+Parent stop: y-health-clinic
+Prompt: What is the crinkly paper for?
