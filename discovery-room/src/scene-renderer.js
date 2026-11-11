@@ -359,6 +359,14 @@ export function createSceneRenderer(world, options = {}) {
         visualEl.appendChild(glowEl);
       }
 
+      // Calm, obvious tappable affordance cue (storybook warm halo beacon)
+      if (!isScenery) {
+        const cueEl = doc.createElement('div');
+        cueEl.className = 'tappable-cue';
+        cueEl.setAttribute('aria-hidden', 'true');
+        visualEl.appendChild(cueEl);
+      }
+
       el.appendChild(visualEl);
 
       // Soft session-visited dot ("we went here")

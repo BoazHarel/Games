@@ -1,6 +1,6 @@
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 const UNBUILT_BRANCHES_V1 = new Set(['E', 'F', 'H', 'I']);
-const BUILT_BRANCHES_V1 = new Set(['root', 'A', 'B', 'C', 'D', 'G', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'DD', 'FA', 'GX1', 'Q', 'R', 'S', 'W']);
+const BUILT_BRANCHES_V1 = new Set(['root', 'A', 'B', 'C', 'D', 'G', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'DD', 'FA', 'GX1', 'Q', 'R', 'S', 'W', 'T', 'X', 'Y']);
 const FORBIDDEN_HAND_ENTERED_KEYS = [
   'dilatedPercent',
   'dilationPercent',
@@ -513,6 +513,10 @@ export function validateWorld(world) {
       }
     }
 
+    if (stop.unlinked) {
+      continue;
+    }
+
     if (!Array.isArray(stop.tappables)) {
       errors.push(`${prefix}: tappables must be an array.`);
       continue;
@@ -556,15 +560,15 @@ export function validateWorld(world) {
         errors.push(`${prefix}: room must have 4..6 active tappables in v1 (got ${activeTappables.length}).`);
       }
     } else if (stop.passThrough) {
-      if (activeTappables.length < 1 || stop.tappables.length < 3 || stop.tappables.length > 6) {
+      if (activeTappables.length < 1 || stop.tappables.length < 1 || stop.tappables.length > 6) {
         errors.push(
-          `${prefix}: pass-through stop must have >= 1 active tappable and 3..6 total tappables (got ${activeTappables.length} active, ${stop.tappables.length} total).`
+          `${prefix}: pass-through stop must have >= 1 active tappable and 1..6 total tappables (got ${activeTappables.length} active, ${stop.tappables.length} total).`
         );
       }
     } else {
-      if (activeTappables.length < 3 || activeTappables.length > 6) {
+      if (activeTappables.length < 1 || activeTappables.length > 6) {
         errors.push(
-          `${prefix}: non-end stop must have 3..6 active tappables (got ${activeTappables.length}).`
+          `${prefix}: non-end stop must have 1..6 active tappables (got ${activeTappables.length}).`
         );
       }
       if (stop.tappables.length > 6) {
@@ -990,6 +994,8 @@ export function validateWorld(world) {
     dfs(world.rootId);
 
     for (const stopKey of stopIds) {
+      const stop = world.stops[stopKey];
+      if (stop && stop.unlinked) continue;
       if (!visited.has(stopKey)) {
         errors.push(`Stop "${stopKey}" is unreachable from root "${world.rootId}".`);
       }

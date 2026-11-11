@@ -108,6 +108,54 @@ body {
   will-change: opacity;
 }
 
+/* Calm storybook affordance cue for active tappables (Issue #67) */
+.tappable-cue {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  border: 2px solid rgba(255, 238, 175, 0.72);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 248, 220, 0.22) 0%,
+    rgba(255, 240, 180, 0.08) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.tappable-cue::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffeaa7;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+}
+
+#stage[data-mode="night"] .tappable-cue {
+  border-color: rgba(255, 230, 160, 0.68);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 235, 170, 0.18) 0%,
+    rgba(255, 220, 140, 0.05) 65%,
+    transparent 100%
+  );
+}
+
+#stage[data-mode="day"] .tappable-cue {
+  border-color: rgba(255, 220, 130, 0.82);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 245, 190, 0.26) 0%,
+    rgba(255, 230, 150, 0.08) 65%,
+    transparent 100%
+  );
+}
+
 .tappable-layer[data-scenery="true"] {
   cursor: default;
 }
