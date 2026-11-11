@@ -529,7 +529,6 @@ export function validateWorld(world) {
     const PASS_THROUGH_STOPS = new Set([
       'b-street',
       'g-dinosaurs',
-      'd-snail-shell-spiral',
       'a-northern-lights',
       'a-shooting-star-satellite'
     ]);

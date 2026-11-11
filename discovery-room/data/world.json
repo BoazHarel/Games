@@ -2647,45 +2647,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 15,
-            "y": 48,
-            "w": 16,
-            "h": 20
+            "x": 58,
+            "y": 28,
+            "w": 36,
+            "h": 42
           },
           "outlinePolygon": [
             [
-              16.4,
-              49.8
+              60.8,
+              31.2
             ],
             [
-              29.6,
-              49.8
+              91.3,
+              31.2
             ],
             [
-              29.6,
-              66.2
+              91.3,
+              66.8
             ],
             [
-              16.4,
-              66.2
+              60.8,
+              66.8
             ]
           ],
           "hitPolygon": [
             [
-              15,
-              48
+              58,
+              28
             ],
             [
-              31,
-              48
+              94,
+              28
             ],
             [
-              31,
-              68
+              94,
+              70
             ],
             [
-              15,
-              68
+              58,
+              70
             ]
           ],
           "galPriority": 1,
@@ -2808,44 +2808,44 @@
           "layerImageByMode": null,
           "bounds": {
             "x": 54,
-            "y": 30,
-            "w": 20,
+            "y": 44,
+            "w": 18,
             "h": 20
           },
           "outlinePolygon": [
             [
-              55.8,
-              31.8
+              55.4,
+              45.5
             ],
             [
-              72.2,
-              31.8
+              70.7,
+              45.5
             ],
             [
-              72.2,
-              48.2
+              70.7,
+              62.4
             ],
             [
-              55.8,
-              48.2
+              55.4,
+              62.4
             ]
           ],
           "hitPolygon": [
             [
               54,
-              30
+              44
             ],
             [
-              74,
-              30
+              72,
+              44
             ],
             [
-              74,
-              50
+              72,
+              64
             ],
             [
               54,
-              50
+              64
             ]
           ],
           "galPriority": 6,
@@ -2861,45 +2861,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 26,
-            "y": 56,
-            "w": 16,
-            "h": 22
+            "x": 51,
+            "y": 65,
+            "w": 12,
+            "h": 20
           },
           "outlinePolygon": [
             [
-              27.4,
-              58
+              51.9,
+              66.5
             ],
             [
-              40.6,
-              58
+              62.1,
+              66.5
             ],
             [
-              40.6,
-              76
+              62.1,
+              83.4
             ],
             [
-              27.4,
-              76
+              51.9,
+              83.4
             ]
           ],
           "hitPolygon": [
             [
-              26,
-              56
+              51,
+              65
             ],
             [
-              42,
-              56
+              63,
+              65
             ],
             [
-              42,
-              78
+              63,
+              85
             ],
             [
-              26,
-              78
+              51,
+              85
             ]
           ],
           "galPriority": 3,
@@ -2915,45 +2915,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 64,
-            "y": 68,
-            "w": 16,
+            "x": 63,
+            "y": 64,
+            "w": 12,
             "h": 20
           },
           "outlinePolygon": [
             [
-              65.4,
-              69.8
+              63.9,
+              65.5
             ],
             [
-              78.6,
-              69.8
+              74.1,
+              65.5
             ],
             [
-              78.6,
-              86.2
+              74.1,
+              82.4
             ],
             [
-              65.4,
-              86.2
+              63.9,
+              82.4
             ]
           ],
           "hitPolygon": [
             [
-              64,
-              68
+              63,
+              64
             ],
             [
-              80,
-              68
+              75,
+              64
             ],
             [
-              80,
-              88
+              75,
+              84
             ],
             [
-              64,
-              88
+              63,
+              84
             ]
           ],
           "galPriority": 4,
@@ -3948,44 +3948,44 @@
           "layerImageByMode": null,
           "bounds": {
             "x": 28,
-            "y": 25,
-            "w": 44,
-            "h": 48
+            "y": 24,
+            "w": 56,
+            "h": 56
           },
           "outlinePolygon": [
             [
-              32,
-              29.3
+              32.2,
+              28.2
             ],
             [
-              68,
-              29.3
+              79.7,
+              28.2
             ],
             [
-              68,
-              68.7
+              79.7,
+              75.7
             ],
             [
-              32,
-              68.7
+              32.2,
+              75.7
             ]
           ],
           "hitPolygon": [
             [
               28,
-              25
+              24
             ],
             [
-              72,
-              25
+              84,
+              24
             ],
             [
-              72,
-              73
+              84,
+              80
             ],
             [
               28,
-              73
+              80
             ]
           ],
           "galPriority": 1,
@@ -4081,45 +4081,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 18,
-            "y": 55,
+            "x": 14,
+            "y": 64,
             "w": 16,
-            "h": 22
+            "h": 26
           },
           "outlinePolygon": [
             [
-              19.4,
-              57
+              15.2,
+              66.0
             ],
             [
-              32.6,
-              57
+              28.8,
+              66.0
             ],
             [
-              32.6,
-              75
+              28.8,
+              88.0
             ],
             [
-              19.4,
-              75
+              15.2,
+              88.0
             ]
           ],
           "hitPolygon": [
             [
-              18,
-              55
+              14,
+              64
             ],
             [
-              34,
-              55
+              30,
+              64
             ],
             [
-              34,
-              77
+              30,
+              90
             ],
             [
-              18,
-              77
+              14,
+              90
             ]
           ],
           "galPriority": 2,
@@ -4474,45 +4474,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 25,
-            "y": 24,
-            "w": 50,
-            "h": 48
+            "x": 22,
+            "y": 16,
+            "w": 64,
+            "h": 60
           },
           "outlinePolygon": [
             [
-              29.5,
-              28.3
+              26.9,
+              20.6
             ],
             [
-              70.5,
-              28.3
+              81.1,
+              20.6
             ],
             [
-              70.5,
-              67.7
+              81.1,
+              71.4
             ],
             [
-              29.5,
-              67.7
+              26.9,
+              71.4
             ]
           ],
           "hitPolygon": [
             [
-              25,
-              24
+              22,
+              16
             ],
             [
-              75,
-              24
+              86,
+              16
             ],
             [
-              75,
-              72
+              86,
+              76
             ],
             [
-              25,
-              72
+              22,
+              76
             ]
           ],
           "galPriority": 1,
@@ -4577,45 +4577,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 28,
-            "y": 24,
-            "w": 44,
-            "h": 48
+            "x": 10,
+            "y": 20,
+            "w": 64,
+            "h": 54
           },
           "outlinePolygon": [
             [
-              32,
-              28.3
+              14.9,
+              24.1
             ],
             [
-              68,
-              28.3
+              69.1,
+              24.1
             ],
             [
-              68,
-              67.7
+              69.1,
+              69.9
             ],
             [
-              32,
-              67.7
+              14.9,
+              69.9
             ]
           ],
           "hitPolygon": [
             [
-              28,
-              24
+              10,
+              20
             ],
             [
-              72,
-              24
+              74,
+              20
             ],
             [
-              72,
-              72
+              74,
+              74
             ],
             [
-              28,
-              72
+              10,
+              74
             ]
           ],
           "galPriority": 1,
@@ -5129,108 +5129,53 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 18,
-            "y": 18,
-            "w": 28,
-            "h": 38
+            "x": 16,
+            "y": 17,
+            "w": 30,
+            "h": 48
           },
           "outlinePolygon": [
             [
-              20.5,
-              21.4
+              18.3,
+              20.6
             ],
             [
-              43.5,
-              21.4
+              43.7,
+              20.6
             ],
             [
-              43.5,
-              52.6
+              43.7,
+              61.3
             ],
             [
-              20.5,
-              52.6
+              18.3,
+              61.3
             ]
           ],
           "hitPolygon": [
             [
-              18,
-              18
+              16,
+              17
             ],
             [
               46,
-              18
+              17
             ],
             [
               46,
-              56
+              65
             ],
             [
-              18,
-              56
+              16,
+              65
             ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-castle-courtyard",
-          "label": "fa-castle-courtyard",
-          "targetStopId": "fa-castle-courtyard",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 52,
-            "y": 38,
-            "w": 30,
-            "h": 38
-          },
-          "outlinePolygon": [
-            [
-              54.7,
-              41.4
-            ],
-            [
-              79.3,
-              41.4
-            ],
-            [
-              79.3,
-              72.6
-            ],
-            [
-              54.7,
-              72.6
-            ]
-          ],
-          "hitPolygon": [
-            [
-              52,
-              38
-            ],
-            [
-              82,
-              38
-            ],
-            [
-              82,
-              76
-            ],
-            [
-              52,
-              76
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": false
         }
       ],
       "children": [
-        "fa-friendly-castle",
-        "fa-castle-courtyard"
+        "fa-friendly-castle"
       ],
       "links": [],
       "parentQuestion": "Who do you think built this?",
@@ -8363,7 +8308,7 @@
       "branch": "D",
       "level": 3,
       "paletteColor": "#2b261d",
-      "end": false,
+      "end": true,
       "isRealPhoto": false,
       "reviewStatus": "approved",
       "image": {
@@ -8372,179 +8317,13 @@
         "width": 1600,
         "height": 900
       },
-      "tappables": [
-        {
-          "id": "tap-bug-garden",
-          "label": "m-bug-garden",
-          "targetStopId": "m-bug-garden",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 30,
-            "y": 25,
-            "w": 40,
-            "h": 40
-          },
-          "outlinePolygon": [
-            [
-              33.6,
-              28.6
-            ],
-            [
-              66.4,
-              28.6
-            ],
-            [
-              66.4,
-              61.4
-            ],
-            [
-              33.6,
-              61.4
-            ]
-          ],
-          "hitPolygon": [
-            [
-              30,
-              25
-            ],
-            [
-              70,
-              25
-            ],
-            [
-              70,
-              65
-            ],
-            [
-              30,
-              65
-            ]
-          ],
-          "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-spiral-groove",
-          "label": "tap-spiral-groove",
-          "targetStopId": null,
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": "F",
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 8,
-            "y": 65,
-            "w": 16,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              9.4,
-              66.8
-            ],
-            [
-              22.6,
-              66.8
-            ],
-            [
-              22.6,
-              83.2
-            ],
-            [
-              9.4,
-              83.2
-            ]
-          ],
-          "hitPolygon": [
-            [
-              8,
-              65
-            ],
-            [
-              24,
-              65
-            ],
-            [
-              24,
-              85
-            ],
-            [
-              8,
-              85
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": true
-        },
-        {
-          "id": "tap-moss-pebble",
-          "label": "tap-moss-pebble",
-          "targetStopId": null,
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": "F",
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 76,
-            "y": 65,
-            "w": 16,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              77.4,
-              66.8
-            ],
-            [
-              90.6,
-              66.8
-            ],
-            [
-              90.6,
-              83.2
-            ],
-            [
-              77.4,
-              83.2
-            ]
-          ],
-          "hitPolygon": [
-            [
-              76,
-              65
-            ],
-            [
-              92,
-              65
-            ],
-            [
-              92,
-              85
-            ],
-            [
-              76,
-              85
-            ]
-          ],
-          "galPriority": 3,
-          "sceneryOnlyInV1": true
-        }
-      ],
-      "children": [
-        "m-bug-garden"
-      ],
+      "tappables": [],
+      "children": [],
       "links": [],
       "parentQuestion": "Where does the snail go when it hides?",
       "galLine": "Round and round goes the snail's cozy house!",
       "parentNote": null,
-      "credits": null,
-      "passThrough": true
+      "credits": null
     },
     "d-worm-tunnels": {
       "id": "d-worm-tunnels",
@@ -8630,45 +8409,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 60,
-            "y": 10,
-            "w": 26,
-            "h": 48
+            "x": 14,
+            "y": 12,
+            "w": 38,
+            "h": 66
           },
           "outlinePolygon": [
             [
-              62.3,
-              14.3
+              16.9,
+              17.1
             ],
             [
-              83.7,
-              14.3
+              49.1,
+              17.1
             ],
             [
-              83.7,
-              53.7
+              49.1,
+              73.0
             ],
             [
-              62.3,
-              53.7
+              16.9,
+              73.0
             ]
           ],
           "hitPolygon": [
             [
-              60,
-              10
+              14,
+              12
             ],
             [
-              86,
-              10
+              52,
+              12
             ],
             [
-              86,
-              58
+              52,
+              78
             ],
             [
-              60,
-              58
+              14,
+              78
             ]
           ],
           "galPriority": 1,
@@ -8684,45 +8463,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 18,
-            "y": 35,
-            "w": 30,
+            "x": 62,
+            "y": 54,
+            "w": 34,
             "h": 32
           },
           "outlinePolygon": [
             [
-              20.7,
-              37.9
+              64.6,
+              56.5
             ],
             [
-              45.3,
-              37.9
+              93.4,
+              56.5
             ],
             [
-              45.3,
-              64.1
+              93.4,
+              83.6
             ],
             [
-              20.7,
-              64.1
+              64.6,
+              83.6
             ]
           ],
           "hitPolygon": [
             [
-              18,
-              35
+              62,
+              54
             ],
             [
-              48,
-              35
+              96,
+              54
             ],
             [
-              48,
-              67
+              96,
+              86
             ],
             [
-              18,
-              67
+              62,
+              86
             ]
           ],
           "galPriority": 2,
@@ -10213,45 +9992,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 26,
+            "x": 45,
             "y": 12,
-            "w": 42,
-            "h": 28
+            "w": 45,
+            "h": 32
           },
           "outlinePolygon": [
             [
-              29.8,
-              14.5
+              48.5,
+              14.4
             ],
             [
-              64.2,
-              14.5
+              86.6,
+              14.4
             ],
             [
-              64.2,
-              37.5
+              86.6,
+              41.5
             ],
             [
-              29.8,
-              37.5
+              48.5,
+              41.5
             ]
           ],
           "hitPolygon": [
             [
-              26,
+              45,
               12
             ],
             [
-              68,
+              90,
               12
             ],
             [
-              68,
-              40
+              90,
+              44
             ],
             [
-              26,
-              40
+              45,
+              44
             ]
           ],
           "galPriority": 1,
@@ -10321,45 +10100,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 68,
-            "y": 34,
-            "w": 24,
+            "x": 57,
+            "y": 52,
+            "w": 26,
             "h": 24
           },
           "outlinePolygon": [
             [
-              70.2,
-              36.2
+              59.0,
+              53.9
             ],
             [
-              89.8,
-              36.2
+              81.0,
+              53.9
             ],
             [
-              89.8,
-              55.8
+              81.0,
+              74.2
             ],
             [
-              70.2,
-              55.8
+              59.0,
+              74.2
             ]
           ],
           "hitPolygon": [
             [
-              68,
-              34
+              57,
+              52
             ],
             [
-              92,
-              34
+              83,
+              52
             ],
             [
-              92,
-              58
+              83,
+              76
             ],
             [
-              68,
-              58
+              57,
+              76
             ]
           ],
           "galPriority": 4,
@@ -10375,45 +10154,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 64,
+            "x": 83,
             "y": 66,
-            "w": 28,
-            "h": 24
+            "w": 15,
+            "h": 22
           },
           "outlinePolygon": [
             [
-              66.5,
-              68.2
+              84.2,
+              67.7
             ],
             [
-              89.5,
-              68.2
+              96.9,
+              67.7
             ],
             [
-              89.5,
-              87.8
+              96.9,
+              86.3
             ],
             [
-              66.5,
-              87.8
+              84.2,
+              86.3
             ]
           ],
           "hitPolygon": [
             [
-              64,
+              83,
               66
             ],
             [
-              92,
+              98,
               66
             ],
             [
-              92,
-              90
+              98,
+              88
             ],
             [
-              64,
-              90
+              83,
+              88
             ]
           ],
           "galPriority": 5,
@@ -10535,45 +10314,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 62,
-            "y": 32,
-            "w": 22,
-            "h": 24
+            "x": 16,
+            "y": 53,
+            "w": 14,
+            "h": 20
           },
           "outlinePolygon": [
             [
-              64,
-              34.2
+              17.1,
+              54.5
             ],
             [
-              82,
-              34.2
+              29.0,
+              54.5
             ],
             [
-              82,
-              53.8
+              29.0,
+              71.4
             ],
             [
-              64,
-              53.8
+              17.1,
+              71.4
             ]
           ],
           "hitPolygon": [
             [
-              62,
-              32
+              16,
+              53
             ],
             [
-              84,
-              32
+              30,
+              53
             ],
             [
-              84,
-              56
+              30,
+              73
             ],
             [
-              62,
-              56
+              16,
+              73
             ]
           ],
           "galPriority": 1,
@@ -10942,45 +10721,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 48,
+            "x": 44,
             "y": 16,
-            "w": 22,
-            "h": 24
+            "w": 24,
+            "h": 42
           },
           "outlinePolygon": [
             [
-              50,
-              18.2
+              45.9,
+              19.2
             ],
             [
-              68,
-              18.2
+              66.2,
+              19.2
             ],
             [
-              68,
-              37.8
+              66.2,
+              54.8
             ],
             [
-              50,
-              37.8
+              45.9,
+              54.8
             ]
           ],
           "hitPolygon": [
             [
-              48,
+              44,
               16
             ],
             [
-              70,
+              68,
               16
             ],
             [
-              70,
-              40
+              68,
+              58
             ],
             [
-              48,
-              40
+              44,
+              58
             ]
           ],
           "galPriority": 1,
@@ -11050,45 +10829,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 58,
-            "y": 58,
-            "w": 22,
-            "h": 22
+            "x": 70,
+            "y": 46,
+            "w": 20,
+            "h": 32
           },
           "outlinePolygon": [
             [
-              60,
-              60
+              71.5,
+              48.5
             ],
             [
-              78,
-              60
+              88.4,
+              48.5
             ],
             [
-              78,
-              78
+              88.4,
+              75.6
             ],
             [
-              60,
-              78
+              71.5,
+              75.6
             ]
           ],
           "hitPolygon": [
             [
-              58,
-              58
+              70,
+              46
             ],
             [
-              80,
-              58
+              90,
+              46
             ],
             [
-              80,
-              80
+              90,
+              78
             ],
             [
-              58,
-              80
+              70,
+              78
             ]
           ],
           "galPriority": 5,
@@ -11100,7 +10879,8 @@
         "m-ladybug",
         "m-ant-hill"
       ],
-      "links": []
+      "links": [],
+      "unlinked": true
     },
     "m-butterfly": {
       "id": "m-butterfly",
@@ -11125,7 +10905,8 @@
       },
       "tappables": [],
       "children": [],
-      "links": []
+      "links": [],
+      "unlinked": true
     },
     "m-ladybug": {
       "id": "m-ladybug",
@@ -11150,7 +10931,8 @@
       },
       "tappables": [],
       "children": [],
-      "links": []
+      "links": [],
+      "unlinked": true
     },
     "m-caterpillar": {
       "id": "m-caterpillar",
@@ -11227,7 +11009,8 @@
       },
       "tappables": [],
       "children": [],
-      "links": []
+      "links": [],
+      "unlinked": true
     },
     "m-snail": {
       "id": "m-snail",
@@ -12091,7 +11874,7 @@
       "credits": null,
       "parentQuestion": "Who lives on a farm?",
       "galLine": "Gal's ideal nurture-and-family theme; seeing gentle mothers caring for their babies provides emotional grounding, security, and animal recognition for young toddlers!",
-      "parentNote": "Out in the sunlit green pasture, animal families stay close together.\nA fluffy white mother sheep watches over her sweet little lamb.\nQuack, quack! A mother duck leads two fuzzy yellow ducklings through the grass.\nEveryone is safe and cozy in the warm afternoon sun.",
+      "parentNote": "Out in the sunlit green pasture, five animal families rest and play in the warm afternoon sun.\nA gentle mother rabbit watches her little bunny in the clover, while a spotted calf lies near its mother by the wooden fence.\nThree fuzzy yellow goslings follow their mother goose beside the pond, three pink piglets cuddle in the golden straw, and a puppy and kitten sit side by side on a cozy blanket.",
       "image": {
         "background": "docs/expansion-art/p-animal-babies.webp",
         "thumbnail": "docs/expansion-art/p-animal-babies.webp",
@@ -12110,45 +11893,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 12,
-            "y": 14,
-            "w": 20,
-            "h": 22
+            "x": 10,
+            "y": 15,
+            "w": 21,
+            "h": 28
           },
           "outlinePolygon": [
             [
-              13.8,
-              16
+              11.5,
+              17
             ],
             [
-              30.2,
-              16
+              29.5,
+              17
             ],
             [
-              30.2,
-              34
+              29.5,
+              41
             ],
             [
-              13.8,
-              34
+              11.5,
+              41
             ]
           ],
           "hitPolygon": [
             [
-              12,
-              14
+              10,
+              15
             ],
             [
-              32,
-              14
+              31,
+              15
             ],
             [
-              32,
-              36
+              31,
+              43
             ],
             [
-              12,
-              36
+              10,
+              43
             ]
           ],
           "galPriority": 1,
@@ -12166,25 +11949,25 @@
           "bounds": {
             "x": 68,
             "y": 12,
-            "w": 22,
-            "h": 24
+            "w": 24,
+            "h": 37
           },
           "outlinePolygon": [
             [
-              70,
-              14.2
+              69.8,
+              14.5
             ],
             [
-              88,
-              14.2
+              90.2,
+              14.5
             ],
             [
-              88,
-              33.8
+              90.2,
+              46.5
             ],
             [
-              70,
-              33.8
+              69.8,
+              46.5
             ]
           ],
           "hitPolygon": [
@@ -12193,16 +11976,16 @@
               12
             ],
             [
-              90,
+              92,
               12
             ],
             [
-              90,
-              36
+              92,
+              49
             ],
             [
               68,
-              36
+              49
             ]
           ],
           "galPriority": 2,
@@ -12218,45 +12001,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 18,
-            "y": 50,
-            "w": 22,
-            "h": 24
+            "x": 13,
+            "y": 55,
+            "w": 25,
+            "h": 35
           },
           "outlinePolygon": [
             [
-              20,
-              52.2
+              14.8,
+              57.5
             ],
             [
-              38,
-              52.2
+              36.2,
+              57.5
             ],
             [
-              38,
-              71.8
+              36.2,
+              87.5
             ],
             [
-              20,
-              71.8
+              14.8,
+              87.5
             ]
           ],
           "hitPolygon": [
             [
-              18,
-              50
+              13,
+              55
             ],
             [
-              40,
-              50
+              38,
+              55
             ],
             [
-              40,
-              74
+              38,
+              90
             ],
             [
-              18,
-              74
+              13,
+              90
             ]
           ],
           "galPriority": 3,
@@ -12272,45 +12055,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 48,
-            "y": 38,
-            "w": 24,
+            "x": 38.5,
+            "y": 43,
+            "w": 26.5,
             "h": 26
           },
           "outlinePolygon": [
             [
-              50.2,
-              40.3
+              40.5,
+              45
             ],
             [
-              69.8,
-              40.3
+              63,
+              45
             ],
             [
-              69.8,
-              61.7
+              63,
+              67
             ],
             [
-              50.2,
-              61.7
+              40.5,
+              67
             ]
           ],
           "hitPolygon": [
             [
-              48,
-              38
+              38.5,
+              43
             ],
             [
-              72,
-              38
+              65,
+              43
             ],
             [
-              72,
-              64
+              65,
+              69
             ],
             [
-              48,
-              64
+              38.5,
+              69
             ]
           ],
           "galPriority": 4,
@@ -12326,45 +12109,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 74,
-            "y": 55,
-            "w": 20,
-            "h": 24
+            "x": 68,
+            "y": 59,
+            "w": 28,
+            "h": 34
           },
           "outlinePolygon": [
             [
-              75.8,
-              57.2
+              70,
+              61.5
             ],
             [
-              92.2,
-              57.2
+              94,
+              61.5
             ],
             [
-              92.2,
-              76.8
+              94,
+              90.5
             ],
             [
-              75.8,
-              76.8
+              70,
+              90.5
             ]
           ],
           "hitPolygon": [
             [
-              74,
-              55
+              68,
+              59
             ],
             [
-              94,
-              55
+              96,
+              59
             ],
             [
-              94,
-              79
+              96,
+              93
             ],
             [
-              74,
-              79
+              68,
+              93
             ]
           ],
           "galPriority": 5,
@@ -15104,7 +14887,8 @@
       },
       "tappables": [],
       "children": [],
-      "links": []
+      "links": [],
+      "unlinked": true
     },
     "fa-gentle-dragon": {
       "id": "fa-gentle-dragon",
@@ -16442,45 +16226,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 46,
-            "y": 8,
-            "w": 34,
-            "h": 32
+            "x": 88,
+            "y": 18,
+            "w": 12,
+            "h": 20
           },
           "outlinePolygon": [
             [
-              49.1,
-              10.9
+              88.9,
+              19.6
             ],
             [
-              76.9,
-              10.9
+              99.1,
+              19.6
             ],
             [
-              76.9,
-              37.1
+              99.1,
+              36.5
             ],
             [
-              49.1,
-              37.1
+              88.9,
+              36.5
             ]
           ],
           "hitPolygon": [
             [
-              46,
-              8
+              88,
+              18
             ],
             [
-              80,
-              8
+              100,
+              18
             ],
             [
-              80,
-              40
+              100,
+              38
             ],
             [
-              46,
-              40
+              88,
+              38
             ]
           ],
           "galPriority": 1,
@@ -16496,45 +16280,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 36,
-            "y": 50,
-            "w": 22,
-            "h": 24
+            "x": 77,
+            "y": 31,
+            "w": 13,
+            "h": 20
           },
           "outlinePolygon": [
             [
-              38,
-              52.2
+              78.0,
+              32.5
             ],
             [
-              56,
-              52.2
+              89.0,
+              32.5
             ],
             [
-              56,
-              71.8
+              89.0,
+              49.4
             ],
             [
-              38,
-              71.8
+              78.0,
+              49.4
             ]
           ],
           "hitPolygon": [
             [
-              36,
-              50
+              77,
+              31
             ],
             [
-              58,
-              50
+              90,
+              31
             ],
             [
-              58,
-              74
+              90,
+              51
             ],
             [
-              36,
-              74
+              77,
+              51
             ]
           ],
           "galPriority": 4,
@@ -16579,45 +16363,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 26,
-            "y": 38,
-            "w": 26,
-            "h": 32
+            "x": 50,
+            "y": 46,
+            "w": 16,
+            "h": 22
           },
           "outlinePolygon": [
             [
-              28.3,
-              40.9
+              51.2,
+              47.7
             ],
             [
-              49.7,
-              40.9
+              64.8,
+              47.7
             ],
             [
-              49.7,
-              67.1
+              64.8,
+              66.3
             ],
             [
-              28.3,
-              67.1
+              51.2,
+              66.3
             ]
           ],
           "hitPolygon": [
             [
-              26,
-              38
+              50,
+              46
             ],
             [
-              52,
-              38
+              66,
+              46
             ],
             [
-              52,
-              70
+              66,
+              68
             ],
             [
-              26,
-              70
+              50,
+              68
             ]
           ],
           "galPriority": 6,
