@@ -3994,7 +3994,7 @@
       "tappables": [
         {
           "id": "tap-kindergarten-classroom",
-          "label": "y-kindergarten-classroom",
+          "label": "Kindergarten classroom",
           "targetStopId": "y-kindergarten-classroom",
           "targetByMode": null,
           "action": null,
@@ -4002,53 +4002,163 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 28,
-            "y": 24,
-            "w": 56,
-            "h": 56
+            "x": 4,
+            "y": 20,
+            "w": 32,
+            "h": 65
           },
           "outlinePolygon": [
             [
-              32.2,
-              28.2
+              6.9,
+              25.9
             ],
             [
-              79.7,
-              28.2
+              33.1,
+              25.9
             ],
             [
-              79.7,
-              75.7
+              33.1,
+              79.2
             ],
             [
-              32.2,
-              75.7
+              6.9,
+              79.2
             ]
           ],
           "hitPolygon": [
             [
-              28,
-              24
+              4,
+              20
             ],
             [
-              84,
-              24
+              36,
+              20
             ],
             [
-              84,
-              80
+              36,
+              85
             ],
             [
-              28,
-              80
+              4,
+              85
             ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-town-playground",
+          "label": "Town playground",
+          "targetStopId": "y-town-playground",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 38,
+            "y": 30,
+            "w": 28,
+            "h": 55
+          },
+          "outlinePolygon": [
+            [
+              40.5,
+              35
+            ],
+            [
+              63.5,
+              35
+            ],
+            [
+              63.5,
+              80.1
+            ],
+            [
+              40.5,
+              80.1
+            ]
+          ],
+          "hitPolygon": [
+            [
+              38,
+              30
+            ],
+            [
+              66,
+              30
+            ],
+            [
+              66,
+              85
+            ],
+            [
+              38,
+              85
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-sandbox-castles",
+          "label": "Sandbox castles",
+          "targetStopId": "y-sandbox-castles",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 68,
+            "y": 42,
+            "w": 28,
+            "h": 46
+          },
+          "outlinePolygon": [
+            [
+              70.5,
+              46.2
+            ],
+            [
+              93.5,
+              46.2
+            ],
+            [
+              93.5,
+              83.9
+            ],
+            [
+              70.5,
+              83.9
+            ]
+          ],
+          "hitPolygon": [
+            [
+              68,
+              42
+            ],
+            [
+              96,
+              42
+            ],
+            [
+              96,
+              88
+            ],
+            [
+              68,
+              88
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
         }
       ],
       "children": [
-        "y-kindergarten-classroom"
+        "y-kindergarten-classroom",
+        "y-town-playground",
+        "y-sandbox-castles"
       ],
       "links": [],
       "parentQuestion": "Why do we go to school?",
@@ -4657,7 +4767,7 @@
       "children": [],
       "links": [],
       "parentQuestion": "What did people use before money?",
-      "galLine": "Shiny round coins — clink, clink!",
+      "galLine": "Shiny round coins \u2014 clink, clink!",
       "parentNote": null,
       "credits": null
     },
@@ -4678,8 +4788,116 @@
       },
       "tappables": [
         {
+          "id": "tap-cupcake-carousel",
+          "label": "Cupcake carousel",
+          "targetStopId": "y-cupcake-carousel",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 30,
+            "y": 24,
+            "w": 16,
+            "h": 34
+          },
+          "outlinePolygon": [
+            [
+              32.5,
+              29
+            ],
+            [
+              43.5,
+              29
+            ],
+            [
+              43.5,
+              53
+            ],
+            [
+              32.5,
+              53
+            ]
+          ],
+          "hitPolygon": [
+            [
+              30,
+              24
+            ],
+            [
+              46,
+              24
+            ],
+            [
+              46,
+              58
+            ],
+            [
+              30,
+              58
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-decorating-cookies",
+          "label": "Decorating cookies",
+          "targetStopId": "y-decorating-cookies",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 44,
+            "y": 56,
+            "w": 28,
+            "h": 19
+          },
+          "outlinePolygon": [
+            [
+              48,
+              59
+            ],
+            [
+              68,
+              59
+            ],
+            [
+              68,
+              72
+            ],
+            [
+              48,
+              72
+            ]
+          ],
+          "hitPolygon": [
+            [
+              44,
+              56
+            ],
+            [
+              72,
+              56
+            ],
+            [
+              72,
+              75
+            ],
+            [
+              44,
+              75
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
           "id": "tap-bakery-kitchen",
-          "label": "y-bakery-kitchen",
+          "label": "Bakery kitchen",
           "targetStopId": "y-bakery-kitchen",
           "targetByMode": null,
           "action": null,
@@ -4687,53 +4905,165 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 10,
-            "y": 20,
-            "w": 64,
-            "h": 54
+            "x": 62,
+            "y": 8,
+            "w": 23,
+            "h": 42
           },
           "outlinePolygon": [
             [
-              14.9,
-              24.1
+              65,
+              14
             ],
             [
-              69.1,
-              24.1
+              82,
+              14
             ],
             [
-              69.1,
-              69.9
+              82,
+              44
             ],
             [
-              14.9,
-              69.9
+              65,
+              44
             ]
           ],
           "hitPolygon": [
             [
-              10,
-              20
+              62,
+              8
             ],
             [
-              74,
-              20
+              85,
+              8
             ],
             [
-              74,
-              74
+              85,
+              50
             ],
             [
-              10,
-              74
+              62,
+              50
             ]
           ],
-          "galPriority": 1,
+          "galPriority": 5,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-donut-glazing",
+          "label": "Glazing donuts",
+          "targetStopId": "y-donut-glazing",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 75,
+            "y": 52,
+            "w": 21,
+            "h": 33
+          },
+          "outlinePolygon": [
+            [
+              78,
+              57
+            ],
+            [
+              93,
+              57
+            ],
+            [
+              93,
+              80
+            ],
+            [
+              78,
+              80
+            ]
+          ],
+          "hitPolygon": [
+            [
+              75,
+              52
+            ],
+            [
+              96,
+              52
+            ],
+            [
+              96,
+              85
+            ],
+            [
+              75,
+              85
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-bakery-front-counter",
+          "label": "Bakery glass counter",
+          "targetStopId": "y-bakery-front-counter",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 36,
+            "y": 76,
+            "w": 32,
+            "h": 22
+          },
+          "outlinePolygon": [
+            [
+              40,
+              80
+            ],
+            [
+              64,
+              80
+            ],
+            [
+              64,
+              95
+            ],
+            [
+              40,
+              95
+            ]
+          ],
+          "hitPolygon": [
+            [
+              36,
+              76
+            ],
+            [
+              68,
+              76
+            ],
+            [
+              68,
+              98
+            ],
+            [
+              36,
+              98
+            ]
+          ],
+          "galPriority": 4,
           "sceneryOnlyInV1": false
         }
       ],
       "children": [
-        "y-bakery-kitchen"
+        "y-cupcake-carousel",
+        "y-decorating-cookies",
+        "y-bakery-kitchen",
+        "y-donut-glazing",
+        "y-bakery-front-counter"
       ],
       "links": [],
       "parentQuestion": "What time does the baker wake up?",
@@ -6421,7 +6751,7 @@
       "parentNote": "Real light micrograph of onion skin cells.",
       "credits": {
         "source": "Wikimedia Commons / Light Micrograph",
-        "attribution": "Berkshire Community College Bioscience Image Library — Allium cepa epidermis",
+        "attribution": "Berkshire Community College Bioscience Image Library \u2014 Allium cepa epidermis",
         "license": "CC0 1.0 Public Domain"
       }
     },
@@ -6448,7 +6778,7 @@
       "parentNote": "Real micrograph of pond water microorganisms.",
       "credits": {
         "source": "Wikimedia Commons / Darkfield Micrograph",
-        "attribution": "Frank Fox (mikro-foto.de) — Paramecium and pond microbiota",
+        "attribution": "Frank Fox (mikro-foto.de) \u2014 Paramecium and pond microbiota",
         "license": "CC BY-SA 3.0"
       }
     },
@@ -6475,7 +6805,7 @@
       "parentNote": "Real macro photograph of cubic salt (NaCl) crystals.",
       "credits": {
         "source": "Wikimedia Commons / Macro Micrograph",
-        "attribution": "W. Oelen — Halite (NaCl) cubic crystals",
+        "attribution": "W. Oelen \u2014 Halite (NaCl) cubic crystals",
         "license": "CC BY-SA 3.0"
       }
     },
@@ -6498,11 +6828,11 @@
       "children": [],
       "links": [],
       "parentQuestion": "What do you think your hair looks like up close?",
-      "galLine": "Touch your hair — look how big one strand is!",
+      "galLine": "Touch your hair \u2014 look how big one strand is!",
       "parentNote": "Real micrograph of a human hair strand.",
       "credits": {
         "source": "Wikimedia Commons / SEM Micrograph",
-        "attribution": "Dartmouth Electron Microscope Facility — Human hair shaft",
+        "attribution": "Dartmouth Electron Microscope Facility \u2014 Human hair shaft",
         "license": "Public Domain"
       }
     },
@@ -7979,11 +8309,11 @@
       "children": [],
       "links": [],
       "parentQuestion": "Your heart is made of cells like these too. Want to feel it beat?",
-      "galLine": "Put your hand on your chest — thump, thump!",
+      "galLine": "Put your hand on your chest \u2014 thump, thump!",
       "parentNote": "Real micrograph of cardiac muscle cells.",
       "credits": {
         "source": "Wikimedia Commons / Fluorescence Micrograph",
-        "attribution": "National Institutes of Health (NIH) — Cardiomyocytes",
+        "attribution": "National Institutes of Health (NIH) \u2014 Cardiomyocytes",
         "license": "Public Domain (US Gov)"
       }
     },
@@ -8010,7 +8340,7 @@
       "parentNote": "Real micrograph of red blood cells.",
       "credits": {
         "source": "Wikimedia Commons / SEM Micrograph",
-        "attribution": "National Cancer Institute (NCI) / Bruce Wetzel & Harry Schaefer — Red blood cells",
+        "attribution": "National Cancer Institute (NCI) / Bruce Wetzel & Harry Schaefer \u2014 Red blood cells",
         "license": "Public Domain (US Gov)"
       }
     },
@@ -8056,7 +8386,7 @@
       "children": [],
       "links": [],
       "parentQuestion": "Do frogs breathe like us?",
-      "galLine": "Puff, puff — take a big breath!",
+      "galLine": "Puff, puff \u2014 take a big breath!",
       "parentNote": "Friendly cutaway, never a dissection.",
       "credits": null
     },
@@ -8687,7 +9017,7 @@
       "credits": null,
       "parentQuestion": "Why do you think its arms were so small?",
       "galLine": "Transforms the famously ferocious predator into an endearing, smiling giant with funny little arms; strictly adheres to the \"wow, not scary\" tone guard for 3-and-4-year-olds!",
-      "parentNote": "Stomp, stomp, stomp! Here comes the big, friendly Tyrannosaurus rex.\nLook at its two tiny arms—they are much smaller than yours!\nIt has strong green legs for stomping through the tall ferns.\nRoar? No, it gives a warm, rumbling dinosaur chuckle!",
+      "parentNote": "Stomp, stomp, stomp! Here comes the big, friendly Tyrannosaurus rex.\nLook at its two tiny arms\u2014they are much smaller than yours!\nIt has strong green legs for stomping through the tall ferns.\nRoar? No, it gives a warm, rumbling dinosaur chuckle!",
       "image": {
         "background": "docs/expansion-art/j-trex.webp",
         "thumbnail": "docs/expansion-art/j-trex.webp",
@@ -9731,7 +10061,7 @@
       "credits": null,
       "parentQuestion": "How does a crane lift something so heavy?",
       "galLine": "Celebrates sheer height and the magic of lifting heavy things with pulleys; framed securely from ground level with zero vertigo fear!",
-      "parentNote": "Reach, reach, reach—all the way up into the sky!\nThe tall yellow crane is strong and steady.\nIts steel arm holds a heavy cable and a big hook.\nLook down below: the builders are stacking red bricks to make a new house!",
+      "parentNote": "Reach, reach, reach\u2014all the way up into the sky!\nThe tall yellow crane is strong and steady.\nIts steel arm holds a heavy cable and a big hook.\nLook down below: the builders are stacking red bricks to make a new house!",
       "image": {
         "background": "docs/expansion-art/k-crane.webp",
         "thumbnail": "docs/expansion-art/k-crane.webp",
@@ -10083,7 +10413,7 @@
       "credits": null,
       "parentQuestion": "What do you think lives in the ocean?",
       "galLine": "Warm, sunlit underwater setting with friendly, smiling sea creatures provides pure sensory delight with zero deep-ocean fear or predatory danger!",
-      "parentNote": "Splash! The warm blue ocean is full of wonder.\nA giant gentle whale glides through the sunny water above.\nDown on the reef, a friendly little octopus wiggles its arms.\nAnd look—a green sea turtle is swimming right past to say hello!",
+      "parentNote": "Splash! The warm blue ocean is full of wonder.\nA giant gentle whale glides through the sunny water above.\nDown on the reef, a friendly little octopus wiggles its arms.\nAnd look\u2014a green sea turtle is swimming right past to say hello!",
       "image": {
         "background": "docs/expansion-art/l-under-the-sea.webp",
         "thumbnail": "docs/expansion-art/l-under-the-sea.webp",
@@ -10416,7 +10746,7 @@
       "tappables": [
         {
           "id": "tap-clownfish",
-          "label": "l-clownfish",
+          "label": "Clownfish",
           "targetStopId": "l-clownfish",
           "targetByMode": null,
           "action": null,
@@ -10424,53 +10754,218 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 16,
-            "y": 53,
-            "w": 14,
-            "h": 20
+            "x": 8,
+            "y": 52,
+            "w": 22,
+            "h": 34
           },
           "outlinePolygon": [
             [
-              17.1,
-              54.5
+              10,
+              55.1
             ],
             [
-              29,
-              54.5
+              28,
+              55.1
             ],
             [
-              29,
-              71.4
+              28,
+              83
             ],
             [
-              17.1,
-              71.4
+              10,
+              83
             ]
           ],
           "hitPolygon": [
             [
-              16,
-              53
+              8,
+              52
             ],
             [
               30,
-              53
+              52
             ],
             [
               30,
-              73
+              86
             ],
             [
-              16,
-              73
+              8,
+              86
             ]
           ],
           "galPriority": 1,
           "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-tide-pool",
+          "label": "Tide pool",
+          "targetStopId": "l-tide-pool",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 60,
+            "y": 67,
+            "w": 32,
+            "h": 21
+          },
+          "outlinePolygon": [
+            [
+              64,
+              70
+            ],
+            [
+              88,
+              70
+            ],
+            [
+              88,
+              85
+            ],
+            [
+              64,
+              85
+            ]
+          ],
+          "hitPolygon": [
+            [
+              60,
+              67
+            ],
+            [
+              92,
+              67
+            ],
+            [
+              92,
+              88
+            ],
+            [
+              60,
+              88
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-dolphin",
+          "label": "Dolphin",
+          "targetStopId": "l-dolphin",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 50,
+            "y": 8,
+            "w": 36,
+            "h": 32
+          },
+          "outlinePolygon": [
+            [
+              53.3,
+              10.9
+            ],
+            [
+              82.8,
+              10.9
+            ],
+            [
+              82.8,
+              37.1
+            ],
+            [
+              53.3,
+              37.1
+            ]
+          ],
+          "hitPolygon": [
+            [
+              50,
+              8
+            ],
+            [
+              86,
+              8
+            ],
+            [
+              86,
+              40
+            ],
+            [
+              50,
+              40
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-seahorse",
+          "label": "Seahorse",
+          "targetStopId": "l-seahorse",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 77,
+            "y": 35,
+            "w": 18,
+            "h": 29
+          },
+          "outlinePolygon": [
+            [
+              80,
+              38
+            ],
+            [
+              92,
+              38
+            ],
+            [
+              92,
+              61
+            ],
+            [
+              80,
+              61
+            ]
+          ],
+          "hitPolygon": [
+            [
+              77,
+              35
+            ],
+            [
+              95,
+              35
+            ],
+            [
+              95,
+              64
+            ],
+            [
+              77,
+              64
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
         }
       ],
       "children": [
-        "l-clownfish"
+        "l-clownfish",
+        "l-tide-pool",
+        "l-dolphin",
+        "l-seahorse"
       ],
       "links": []
     },
@@ -10512,7 +11007,7 @@
       "credits": null,
       "parentQuestion": "Which way is the seahorse facing?",
       "galLine": "A horse-faced sea creature that swims upright with a curly tail creates instant storybook delight and gentle fascination for preschoolers!",
-      "parentNote": "Look at the magical little seahorse floating upright in the coral reef!\nIts head is shaped just like a friendly little pony, with a sweet, gentle snout.\nIts tail curls into a tight, cozy spiral to hold onto soft coral branches.\nFlutter, flutter—its tiny back fin buzzes like a little hummingbird wing!",
+      "parentNote": "Look at the magical little seahorse floating upright in the coral reef!\nIts head is shaped just like a friendly little pony, with a sweet, gentle snout.\nIts tail curls into a tight, cozy spiral to hold onto soft coral branches.\nFlutter, flutter\u2014its tiny back fin buzzes like a little hummingbird wing!",
       "image": {
         "background": "docs/expansion-art/l-seahorse.webp",
         "thumbnail": "docs/expansion-art/l-seahorse.webp",
@@ -10522,8 +11017,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "l-dolphin": {
       "id": "l-dolphin",
@@ -10538,7 +11032,7 @@
       "credits": null,
       "parentQuestion": "Can a dolphin jump higher than you?",
       "galLine": "A smiling, graceful dolphin gliding through sun-drenched tropical waters embodies pure marine joy, companionship, and boundless wonder!",
-      "parentNote": "Leap and glide! A playful dolphin swims through the warm, sunny ocean.\nIts smooth gray back catches the golden sunbeams shining down through the waves.\nWith a happy open-mouth smile, it sweeps its curved tail up and down.\nLook at the tiny yellow fish swimming below—everyone loves to play in the reef!",
+      "parentNote": "Leap and glide! A playful dolphin swims through the warm, sunny ocean.\nIts smooth gray back catches the golden sunbeams shining down through the waves.\nWith a happy open-mouth smile, it sweeps its curved tail up and down.\nLook at the tiny yellow fish swimming below\u2014everyone loves to play in the reef!",
       "image": {
         "background": "docs/expansion-art/l-dolphin.webp",
         "thumbnail": "docs/expansion-art/l-dolphin.webp",
@@ -10548,8 +11042,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "l-tide-pool": {
       "id": "l-tide-pool",
@@ -10558,7 +11051,7 @@
       "name": "Tide pool",
       "paletteColor": "#2C6B7F",
       "paletteColorByMode": null,
-      "end": false,
+      "end": true,
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
@@ -10572,232 +11065,9 @@
         "height": 900,
         "backgroundByMode": null
       },
-      "tappables": [
-        {
-          "id": "tap-tide-pool",
-          "label": "dd-tide-pool",
-          "targetStopId": "dd-tide-pool",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              7.5,
-              14
-            ],
-            [
-              18.5,
-              14
-            ],
-            [
-              18.5,
-              30
-            ],
-            [
-              7.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              6,
-              12
-            ],
-            [
-              20,
-              12
-            ],
-            [
-              20,
-              32
-            ],
-            [
-              6,
-              32
-            ]
-          ],
-          "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-sea-star-rock",
-          "label": "dd-sea-star-rock",
-          "targetStopId": "dd-sea-star-rock",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              39.5,
-              14
-            ],
-            [
-              50.5,
-              14
-            ],
-            [
-              50.5,
-              30
-            ],
-            [
-              39.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              38,
-              12
-            ],
-            [
-              52,
-              12
-            ],
-            [
-              52,
-              32
-            ],
-            [
-              38,
-              32
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-anemone-garden",
-          "label": "dd-anemone-garden",
-          "targetStopId": "dd-anemone-garden",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 6,
-            "y": 56,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              7.5,
-              58
-            ],
-            [
-              18.5,
-              58
-            ],
-            [
-              18.5,
-              74
-            ],
-            [
-              7.5,
-              74
-            ]
-          ],
-          "hitPolygon": [
-            [
-              6,
-              56
-            ],
-            [
-              20,
-              56
-            ],
-            [
-              20,
-              76
-            ],
-            [
-              6,
-              76
-            ]
-          ],
-          "galPriority": 3,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-pearl-oyster",
-          "label": "dd-pearl-oyster",
-          "targetStopId": "dd-pearl-oyster",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 38,
-            "y": 56,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              39.5,
-              58
-            ],
-            [
-              50.5,
-              58
-            ],
-            [
-              50.5,
-              74
-            ],
-            [
-              39.5,
-              74
-            ]
-          ],
-          "hitPolygon": [
-            [
-              38,
-              56
-            ],
-            [
-              52,
-              56
-            ],
-            [
-              52,
-              76
-            ],
-            [
-              38,
-              76
-            ]
-          ],
-          "galPriority": 4,
-          "sceneryOnlyInV1": false
-        }
-      ],
-      "children": [
-        "dd-tide-pool",
-        "dd-sea-star-rock",
-        "dd-anemone-garden",
-        "dd-pearl-oyster"
-      ],
-      "links": [],
-      "unlinked": true
+      "tappables": [],
+      "children": [],
+      "links": []
     },
     "m-bug-garden": {
       "id": "m-bug-garden",
@@ -11054,7 +11324,7 @@
       "credits": null,
       "parentQuestion": "What happens inside the chrysalis?",
       "galLine": "A plump, smiling caterpillar munching peacefully on a leaf is the quintessential preschool introduction to metamorphosis and life cycles!",
-      "parentNote": "Wiggle, crawl, inch! A friendly green caterpillar takes tiny steps across a fresh leaf.\nIts round, segmented body scrunches together and stretches out long again.\nMunch, munch, munch—it loves to nibble on tender greens in the warm sunshine.\nOne day soon, it will build a cozy chrysalis and wake up with colorful butterfly wings!",
+      "parentNote": "Wiggle, crawl, inch! A friendly green caterpillar takes tiny steps across a fresh leaf.\nIts round, segmented body scrunches together and stretches out long again.\nMunch, munch, munch\u2014it loves to nibble on tender greens in the warm sunshine.\nOne day soon, it will build a cozy chrysalis and wake up with colorful butterfly wings!",
       "image": {
         "background": "docs/expansion-art/m-caterpillar.webp",
         "thumbnail": "docs/expansion-art/m-caterpillar.webp",
@@ -11514,7 +11784,7 @@
       "credits": null,
       "parentQuestion": "What do you see in that cloud?",
       "galLine": "Cloud gazing is a classic imaginative game for 3-to-4-year-olds; finding animal shapes in clouds builds creative observation and calm, mindful relaxation!",
-      "parentNote": "Lie back on the warm green grass and look up at the sky!\nWhat shapes do you see in the drifting clouds?\nLook right in the middle—that fluffy white cloud looks just like a bunny rabbit!\nIt has two tall puffy ears and a round, soft nose.",
+      "parentNote": "Lie back on the warm green grass and look up at the sky!\nWhat shapes do you see in the drifting clouds?\nLook right in the middle\u2014that fluffy white cloud looks just like a bunny rabbit!\nIt has two tall puffy ears and a round, soft nose.",
       "image": {
         "background": "docs/expansion-art/o-clouds.webp",
         "thumbnail": "docs/expansion-art/o-clouds.webp",
@@ -11732,7 +12002,7 @@
       "credits": null,
       "parentQuestion": "Where does a rainbow start?",
       "galLine": "Rainbows are a peak delight for preschoolers; puddle stomping and bright colors provide gentle, comforting natural science after rain!",
-      "parentNote": "The rain has stopped, and the sun is peeking out through the clouds!\nLook up—a giant colorful rainbow stretches from hill to hill.\nRed, orange, yellow, green, blue, and purple shine brightly.\nLook down at the street: the puddles are catching the rainbow colors too!",
+      "parentNote": "The rain has stopped, and the sun is peeking out through the clouds!\nLook up\u2014a giant colorful rainbow stretches from hill to hill.\nRed, orange, yellow, green, blue, and purple shine brightly.\nLook down at the street: the puddles are catching the rainbow colors too!",
       "image": {
         "background": "docs/expansion-art/o-rainbow.webp",
         "thumbnail": "docs/expansion-art/o-rainbow.webp",
@@ -13186,7 +13456,7 @@
       "credits": null,
       "parentQuestion": "Why are sea slugs so brightly colored like little ribbons?",
       "galLine": "Framed as an adorable, fancy creature wearing a ruffled dress, this introduces soft marine biodiversity with zero ick-factor.",
-      "parentNote": "Meet the fanciest little creature on the reef—a colorful sea slug!",
+      "parentNote": "Meet the fanciest little creature on the reef\u2014a colorful sea slug!",
       "image": {
         "background": "docs/expansion-art/l-sea-slug.webp",
         "thumbnail": "docs/expansion-art/l-sea-slug.webp",
@@ -13821,7 +14091,7 @@
       "credits": null,
       "parentQuestion": "Is this little dinosaur smaller than a chicken?",
       "galLine": "Showing that some dinosaurs were tiny and pocket-sized creates an instant endearing connection for young children who love small baby animals.",
-      "parentNote": "Not all dinosaurs were as big as a house—look at this tiny little friend!",
+      "parentNote": "Not all dinosaurs were as big as a house\u2014look at this tiny little friend!",
       "image": {
         "background": "docs/expansion-art/j-tiny-dinosaur.webp",
         "thumbnail": "docs/expansion-art/j-tiny-dinosaur.webp",
@@ -13899,7 +14169,7 @@
       "credits": null,
       "parentQuestion": "Look closely at the tiny bumps on the ancient bone!",
       "galLine": "Magnifying glasses are an iconic, intuitive preschool investigation tool; looking closely at nature's miniature treasures builds observation and patience.",
-      "parentNote": "Look through the big glass lens—everything gets huge and clear!",
+      "parentNote": "Look through the big glass lens\u2014everything gets huge and clear!",
       "image": {
         "background": "docs/expansion-art/dd-fossil-magnifier.webp",
         "thumbnail": "docs/expansion-art/dd-fossil-magnifier.webp",
@@ -14594,7 +14864,7 @@
       "credits": null,
       "parentQuestion": "Do the soft anemone petals tickle like flowers?",
       "galLine": "Swaying anemones feel like an underwater flower garden; seeing a tiny crab use a shell for a house is a delightful, comforting preschool narrative of animal homes.",
-      "parentNote": "Look at the waving sea anemones—they look like underwater flowers, but they are gentle sea animals!",
+      "parentNote": "Look at the waving sea anemones\u2014they look like underwater flowers, but they are gentle sea animals!",
       "image": {
         "background": "docs/expansion-art/dd-anemone-garden.webp",
         "thumbnail": "docs/expansion-art/dd-anemone-garden.webp",
@@ -14723,7 +14993,7 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "What fun surprises are waiting inside the big striped tent?",
-      "galLine": "Celebrates traditional circus joy—music, colors, movement, and festive treats—in a gentle, daytime setting free of loud startling noises, high-altitude peril, or scary clown makeup.",
+      "galLine": "Celebrates traditional circus joy\u2014music, colors, movement, and festive treats\u2014in a gentle, daytime setting free of loud startling noises, high-altitude peril, or scary clown makeup.",
       "parentNote": "Tada! The friendly circus has arrived on the sunlit village green!",
       "image": {
         "background": "docs/expansion-art/fa-circus-tent.webp",
@@ -14853,7 +15123,7 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "What sparkles under the palm tree on the beach?",
-      "galLine": "Channeling classic treasure hunt excitement into tactile exploration of natural beach treasures—smooth shells, coconuts, and shiny coins—in a safe tropical paradise.",
+      "galLine": "Channeling classic treasure hunt excitement into tactile exploration of natural beach treasures\u2014smooth shells, coconuts, and shiny coins\u2014in a safe tropical paradise.",
       "parentNote": "The wooden rowboat touches down softly on warm white sand.",
       "image": {
         "background": "docs/expansion-art/fa-treasure-island.webp",
@@ -15060,7 +15330,7 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "What magic grows in this glowing evening garden?",
-      "galLine": "Connects early childhood delight in sensory exploration—sounds, glows, and tiny fairy worlds—within an utterly benign, sun-warmed natural garden environment.",
+      "galLine": "Connects early childhood delight in sensory exploration\u2014sounds, glows, and tiny fairy worlds\u2014within an utterly benign, sun-warmed natural garden environment.",
       "parentNote": "Welcome to the magic garden behind the castle walls!",
       "image": {
         "background": "docs/expansion-art/fa-magic-garden.webp",
@@ -16855,7 +17125,7 @@
       "credits": null,
       "parentQuestion": "How many hay bales can you count?",
       "galLine": "Giant round hay bales are an iconic roadside sight that children love spotting; counting the stacked bales provides tangible numeracy and celebrates harvest teamwork.",
-      "parentNote": "Look at all the big, round bales of golden hay resting in the sunlit field!\nThe tractor rolled the sweet summer grass into giant round bundles.\nCan you count the bales in the big stack? One, two, three, four, five, six—and one more rolling nearby!\nIn winter, the cows, horses, and sheep will eat this delicious, sweet-smelling hay.",
+      "parentNote": "Look at all the big, round bales of golden hay resting in the sunlit field!\nThe tractor rolled the sweet summer grass into giant round bundles.\nCan you count the bales in the big stack? One, two, three, four, five, six\u2014and one more rolling nearby!\nIn winter, the cows, horses, and sheep will eat this delicious, sweet-smelling hay.",
       "image": {
         "background": "docs/expansion-art/q-hay.webp",
         "thumbnail": "docs/expansion-art/q-hay.webp",
@@ -16880,7 +17150,7 @@
       "credits": null,
       "parentQuestion": "How many apples can you count?",
       "galLine": "Apple picking is an accessible, sensory-rich autumn experience; recognizing that apples grow on trees and are gathered into baskets fosters food awareness and harvest appreciation.",
-      "parentNote": "Welcome to the sunny apple orchard! The air smells sweet and crisp.\nLook at the big apple tree on the hill—its green branches are filled with bright red apples!\nA wooden ladder leans against the tree, ready for reaching the highest fruit.\nUnderneath, a woven basket is piled high with juicy, crunchy apples to eat.",
+      "parentNote": "Welcome to the sunny apple orchard! The air smells sweet and crisp.\nLook at the big apple tree on the hill\u2014its green branches are filled with bright red apples!\nA wooden ladder leans against the tree, ready for reaching the highest fruit.\nUnderneath, a woven basket is piled high with juicy, crunchy apples to eat.",
       "image": {
         "background": "docs/expansion-art/q-orchard.webp",
         "thumbnail": "docs/expansion-art/q-orchard.webp",
@@ -17254,7 +17524,7 @@
       "credits": null,
       "parentQuestion": "Who lives in a jungle?",
       "galLine": "A magical, peaceful rainforest hub where wild animals coexist in gentle harmony; the calm, friendly expressions of the lion and elephant remove all predatory scare, inspiring pure preschool wonder.",
-      "parentNote": "Step quietly into the warm, green jungle! Golden sunlight filters through the tall canopy trees.\nA gentle elephant flaps his big ears, and a calm lion rests peacefully in the cool moss.\nHigh up on a vine-covered branch, a playful little monkey waves hello!\nAnd look—a tall spotted giraffe and a striped zebra are grazing together among the flowers.",
+      "parentNote": "Step quietly into the warm, green jungle! Golden sunlight filters through the tall canopy trees.\nA gentle elephant flaps his big ears, and a calm lion rests peacefully in the cool moss.\nHigh up on a vine-covered branch, a playful little monkey waves hello!\nAnd look\u2014a tall spotted giraffe and a striped zebra are grazing together among the flowers.",
       "image": {
         "background": "docs/expansion-art/r-jungle.webp",
         "thumbnail": "docs/expansion-art/r-jungle.webp",
@@ -17502,7 +17772,7 @@
       "credits": null,
       "parentQuestion": "What is that long nose for?",
       "galLine": "A gentle, smiling elephant calf with rounded shapes and friendly eyes turns the largest land mammal into a cuddly, gentle giant that inspires affection and trunk-mimicking gestures.",
-      "parentNote": "Stomp, stomp, swish! A sweet young elephant smiles in the sunlit jungle path.\nHis big, floppy ears flap gently like giant fans to keep him cool.\nLook at his long, curvy trunk—it can pick up a tiny twig of tender green leaves!\nHe lifts his leafy snack to his mouth with a happy, friendly rumble.",
+      "parentNote": "Stomp, stomp, swish! A sweet young elephant smiles in the sunlit jungle path.\nHis big, floppy ears flap gently like giant fans to keep him cool.\nLook at his long, curvy trunk\u2014it can pick up a tiny twig of tender green leaves!\nHe lifts his leafy snack to his mouth with a happy, friendly rumble.",
       "image": {
         "background": "docs/expansion-art/r-elephant.webp",
         "thumbnail": "docs/expansion-art/r-elephant.webp",
@@ -18269,7 +18539,7 @@
       "credits": null,
       "parentQuestion": "What colors can you find on this parrot?",
       "galLine": "Parrots are a favorite vehicle for color identification (red, yellow, green, blue); the friendly open eye, open beak, and rainbow plumage offer rich visual delight and fun vocal mimicry.",
-      "parentNote": "Squawk, chirp! Perched on a mossy jungle branch sits a dazzling scarlet parrot!\nHis feathers shine in brilliant colors: bright red, sunny yellow, grass green, and ocean blue!\nLook at his strong, curved grey beak—it can crack open tasty nuts and seeds.\nWhen he spreads his colorful wings, he looks like a flying rainbow sailing through the trees!",
+      "parentNote": "Squawk, chirp! Perched on a mossy jungle branch sits a dazzling scarlet parrot!\nHis feathers shine in brilliant colors: bright red, sunny yellow, grass green, and ocean blue!\nLook at his strong, curved grey beak\u2014it can crack open tasty nuts and seeds.\nWhen he spreads his colorful wings, he looks like a flying rainbow sailing through the trees!",
       "image": {
         "background": "docs/expansion-art/r-parrot.webp",
         "thumbnail": "docs/expansion-art/r-parrot.webp",
@@ -18347,7 +18617,7 @@
       "credits": null,
       "parentQuestion": "Why does a hippo like the water?",
       "galLine": "Hippos in nature can be formidable, but here the round, smiling character and peaceful wading pool present a gentle, comforting bath-time friend that preschoolers adore.",
-      "parentNote": "Splish, splash! A round, friendly hippopotamus wades into the cool jungle river.\nThe cool water feels wonderful on his smooth, grey skin in the warm tropical heat.\nLook at his tiny, perky ears—they wiggle whenever water splashes on them!\nHe loves to float like a big friendly boat between the round green lily pads.",
+      "parentNote": "Splish, splash! A round, friendly hippopotamus wades into the cool jungle river.\nThe cool water feels wonderful on his smooth, grey skin in the warm tropical heat.\nLook at his tiny, perky ears\u2014they wiggle whenever water splashes on them!\nHe loves to float like a big friendly boat between the round green lily pads.",
       "image": {
         "background": "docs/expansion-art/r-hippo.webp",
         "thumbnail": "docs/expansion-art/r-hippo.webp",
@@ -18451,7 +18721,7 @@
       "credits": null,
       "parentQuestion": "Why do you think a sloth moves so slowly?",
       "galLine": "Slow, peaceful sloth movements naturally encourage calm breathing and unhurried bedtime relaxation.",
-      "parentNote": "Way up in the green jungle canopy, a sweet little brown sloth hangs upside-down.\nWith long, curved claws, it holds tight to the smooth branch and smiles sleepily.\nIt moves so, so slowly—one little reach at a time, without any hurry at all.\nTake your time, sleepy friend; the sunny day is yours to enjoy!",
+      "parentNote": "Way up in the green jungle canopy, a sweet little brown sloth hangs upside-down.\nWith long, curved claws, it holds tight to the smooth branch and smiles sleepily.\nIt moves so, so slowly\u2014one little reach at a time, without any hurry at all.\nTake your time, sleepy friend; the sunny day is yours to enjoy!",
       "image": {
         "background": "docs/expansion-art/r-sloth.webp",
         "thumbnail": "docs/expansion-art/r-sloth.webp",
@@ -18581,7 +18851,7 @@
       "credits": null,
       "parentQuestion": "What would it feel like to stand there?",
       "galLine": "Portraying the lunar landscape in warm buttery-cream sand with gentle rolling craters invites fun, imaginative bouncy footsteps for preschoolers.",
-      "parentNote": "We have landed right on the surface of the Moon!\nThe ground is soft and sandy, with smooth round craters everywhere.\nLook way up into the dark sky—there is our home, Earth, shining blue and bright!\nIf you took a little step here, you could jump high, high, high into the air!",
+      "parentNote": "We have landed right on the surface of the Moon!\nThe ground is soft and sandy, with smooth round craters everywhere.\nLook way up into the dark sky\u2014there is our home, Earth, shining blue and bright!\nIf you took a little step here, you could jump high, high, high into the air!",
       "image": {
         "background": "docs/expansion-art/s-moon-surface.webp",
         "thumbnail": "docs/expansion-art/s-moon-surface.webp",
@@ -18936,7 +19206,7 @@
       "credits": null,
       "parentQuestion": "What color is this planet?",
       "galLine": "Portraying the red planet with soft warm gouache tones and an inviting snowy cap makes planetary science cozy and approachable for little learners.",
-      "parentNote": "Here is Mars, the friendly red planet glowing brightly in space!\nIt has warm rusty-orange rocks and tall sleeping mountains.\nLook right at the very top—there is a white snowy cap of ice!\nMars floats peacefully like a big warm marble in the starry night.",
+      "parentNote": "Here is Mars, the friendly red planet glowing brightly in space!\nIt has warm rusty-orange rocks and tall sleeping mountains.\nLook right at the very top\u2014there is a white snowy cap of ice!\nMars floats peacefully like a big warm marble in the starry night.",
       "image": {
         "background": "docs/expansion-art/s-mars.webp",
         "thumbnail": "docs/expansion-art/s-mars.webp",
@@ -19443,7 +19713,7 @@
       "credits": null,
       "parentQuestion": "Which one is going around the other?",
       "galLine": "Showing an orbit as a sparkling golden train track makes planetary motion concrete, delightful, and easy for young minds to grasp.",
-      "parentNote": "Round and round goes the gentle Moon, traveling in a big loop around our Earth!\nLook at that sparkling golden track showing the Moon's quiet journey through space.\nThe Moon never gets lost—it circles our blue home like a loyal friend.\nRound and round, day and night, keeping us safe and cozy down below!",
+      "parentNote": "Round and round goes the gentle Moon, traveling in a big loop around our Earth!\nLook at that sparkling golden track showing the Moon's quiet journey through space.\nThe Moon never gets lost\u2014it circles our blue home like a loyal friend.\nRound and round, day and night, keeping us safe and cozy down below!",
       "image": {
         "background": "docs/expansion-art/s-orbit.webp",
         "thumbnail": "docs/expansion-art/s-orbit.webp",
@@ -20444,7 +20714,7 @@
       "credits": null,
       "parentQuestion": "What is growing in the garden?",
       "galLine": "Connects home life with living plants and seasonal harvest; emphasizes sensory delights of soil, water, and growing food safely within arms' reach.",
-      "parentNote": "Step right outside into the sunny green backyard garden!\nTall golden sunflowers and sweet peas stretch their petals toward the blue sky.\nA shiny green watering can rests on the stone path, full of cool water.\nLook down among the leaves—juicy red strawberries are ripening in the rich soil!",
+      "parentNote": "Step right outside into the sunny green backyard garden!\nTall golden sunflowers and sweet peas stretch their petals toward the blue sky.\nA shiny green watering can rests on the stone path, full of cool water.\nLook down among the leaves\u2014juicy red strawberries are ripening in the rich soil!",
       "image": {
         "background": "docs/expansion-art/t-backyard-garden.webp",
         "thumbnail": "docs/expansion-art/t-backyard-garden.webp",
@@ -21349,7 +21619,7 @@
       "credits": null,
       "parentQuestion": "Who is peeking from the fort?",
       "galLine": "Celebrates classic imaginative play where everyday recycled boxes become magical private spaces; fosters autonomy and cozy enclosure without claustrophobia.",
-      "parentNote": "It's not just a cardboard box—it's a secret castle, a spaceship, and a cozy hideout!\nTwo round portholes are cut in the side so you can peek out at the room.\nInside, a soft floor pillow and a warm yellow flashlight make it wonderfully cozy.\nKnock, knock on the flap door: who is visiting our secret play fort?",
+      "parentNote": "It's not just a cardboard box\u2014it's a secret castle, a spaceship, and a cozy hideout!\nTwo round portholes are cut in the side so you can peek out at the room.\nInside, a soft floor pillow and a warm yellow flashlight make it wonderfully cozy.\nKnock, knock on the flap door: who is visiting our secret play fort?",
       "image": {
         "background": "docs/expansion-art/t-cardboard-box-fort.webp",
         "thumbnail": "docs/expansion-art/t-cardboard-box-fort.webp",
@@ -22243,7 +22513,7 @@
       "credits": null,
       "parentQuestion": "What happens when we roll the dough?",
       "galLine": "Sensory-rich tactile action (squishing, flattening, rolling) mirrors physical play dough experiences, reinforcing cause-and-effect in an encouraging culinary context.",
-      "parentNote": "Roll, roll, roll! The smooth wooden rolling pin glides over the dough.\nFirst it was a round, squishy ball—now it stretches out flat and wide.\nTiny specks of cinnamon and sweet vanilla scent fill the kitchen air.\nLittle hands love to pat the soft dough and feel how smooth it has become!",
+      "parentNote": "Roll, roll, roll! The smooth wooden rolling pin glides over the dough.\nFirst it was a round, squishy ball\u2014now it stretches out flat and wide.\nTiny specks of cinnamon and sweet vanilla scent fill the kitchen air.\nLittle hands love to pat the soft dough and feel how smooth it has become!",
       "image": {
         "background": "docs/expansion-art/t-rolling-pin-dough.webp",
         "thumbnail": "docs/expansion-art/t-rolling-pin-dough.webp",
@@ -22777,7 +23047,7 @@
       "credits": null,
       "parentQuestion": "How high can the tower go?",
       "galLine": "Open-ended block construction is fundamental for spatial reasoning, gravity intuition, and fine-motor control; frames building as creative, patient experimentation.",
-      "parentNote": "Clack, clack, tap! Smooth wooden blocks can build anything you can imagine.\nRed cubes, blue arches, green cylinders, and natural pine triangles wait on the rug.\nStack one carefully on top of another—steady hands, don't let it wobble!\nHow high can our tall castle tower reach into the room?",
+      "parentNote": "Clack, clack, tap! Smooth wooden blocks can build anything you can imagine.\nRed cubes, blue arches, green cylinders, and natural pine triangles wait on the rug.\nStack one carefully on top of another\u2014steady hands, don't let it wobble!\nHow high can our tall castle tower reach into the room?",
       "image": {
         "background": "docs/expansion-art/t-wooden-blocks.webp",
         "thumbnail": "docs/expansion-art/t-wooden-blocks.webp",
@@ -23077,7 +23347,7 @@
       "credits": null,
       "parentQuestion": "What is the beaver holding?",
       "galLine": "Connects animal adaptations (flat paddle tail, wood-gnawing teeth, waterproof fur) to relatable preschool concepts (building, swimming, snacking) in a lovable character.",
-      "parentNote": "Meet the hardest-working builder in the whole forest!\nThe friendly brown beaver has thick, waterproof fur and strong orange teeth.\nHolding a smooth aspen branch in its little paws, it nibbles off the sweet green bark.\nThen—WHACK! It slaps its wide leathery tail against the water to say hello!",
+      "parentNote": "Meet the hardest-working builder in the whole forest!\nThe friendly brown beaver has thick, waterproof fur and strong orange teeth.\nHolding a smooth aspen branch in its little paws, it nibbles off the sweet green bark.\nThen\u2014WHACK! It slaps its wide leathery tail against the water to say hello!",
       "image": {
         "background": "docs/expansion-art/x-busy-beaver.webp",
         "thumbnail": "docs/expansion-art/x-busy-beaver.webp",
@@ -23103,7 +23373,7 @@
       "credits": null,
       "parentQuestion": "Where would you sleep inside the tent?",
       "galLine": "Channeling the universal preschool love of blanket forts and cozy dens, this scene turns sleeping outside into a soothing, deeply secure bedtime experience.",
-      "parentNote": "Step inside the wonderful cloth tent—it feels just like a secret blanket fort!\nTwo puffy sleeping bags are unrolled side by side, ready for bedtime.\nA little battery flashlight rests on a soft fleece pillow, glowing with cozy yellow light.\nOutside, pine trees whisper in the breeze, keeping everyone tucked in safe and snug.",
+      "parentNote": "Step inside the wonderful cloth tent\u2014it feels just like a secret blanket fort!\nTwo puffy sleeping bags are unrolled side by side, ready for bedtime.\nA little battery flashlight rests on a soft fleece pillow, glowing with cozy yellow light.\nOutside, pine trees whisper in the breeze, keeping everyone tucked in safe and snug.",
       "image": {
         "background": "docs/expansion-art/x-cozy-tent.webp",
         "thumbnail": "docs/expansion-art/x-cozy-tent.webp",
@@ -23539,7 +23809,7 @@
       "credits": null,
       "parentQuestion": "Who is sitting on the lily pad?",
       "galLine": "A classic favorite ecosystem that directly expands the room's frog terrarium into its natural habitat; explores animal life stages (tadpole to frog) in an accessible, joyful way.",
-      "parentNote": "Ribbit! Welcome to the sun-warmed lily pond where water lilies float like green dinner plates.\nA shiny green frog perches proudly on a pad, watching the water.\nLook down through the ripples—a school of wiggle-tail tadpoles swims past!\nGentle dragonflies flutter their wings and dance from flower to flower.",
+      "parentNote": "Ribbit! Welcome to the sun-warmed lily pond where water lilies float like green dinner plates.\nA shiny green frog perches proudly on a pad, watching the water.\nLook down through the ripples\u2014a school of wiggle-tail tadpoles swims past!\nGentle dragonflies flutter their wings and dance from flower to flower.",
       "image": {
         "background": "docs/expansion-art/x-lily-pond.webp",
         "thumbnail": "docs/expansion-art/x-lily-pond.webp",
@@ -23757,7 +24027,7 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "What is the red canoe waiting for?",
-      "galLine": "Fishing is presented purely as patient, playful observation—watching a bobber float, skipping flat stones, and marveling at swimming fish without hooks or harm to animals.",
+      "galLine": "Fishing is presented purely as patient, playful observation\u2014watching a bobber float, skipping flat stones, and marveling at swimming fish without hooks or harm to animals.",
       "parentNote": "Down at the gentle bend in the river, the water slows down into a calm blue pool.\nA little wooden dock reaches out into the water, warm from the sun.\nTie up the red canoe, find a smooth skipping stone, and watch the red-and-white bobber float!\nDown in the clear water, friendly silver fish swim between the river stones.",
       "image": {
         "background": "docs/expansion-art/x-river-bend-fishing.webp",
@@ -23784,7 +24054,7 @@
       "credits": null,
       "parentQuestion": "What do we bring so the canoe ride stays safe?",
       "galLine": "Connects water exploration to hands-on boating while naturally modeling water safety (bright life jacket, stable moored boat) so children feel confident and prepared.",
-      "parentNote": "Step aboard the glossy red wooden canoe resting beside the grassy bank!\nThe wooden hull rocks gently with each little lap of the cool river water.\nInside sit two smooth wooden paddles and a bright orange safety life jacket.\nDip the paddles into the water—stroke, glide, and float down the sunny stream!",
+      "parentNote": "Step aboard the glossy red wooden canoe resting beside the grassy bank!\nThe wooden hull rocks gently with each little lap of the cool river water.\nInside sit two smooth wooden paddles and a bright orange safety life jacket.\nDip the paddles into the water\u2014stroke, glide, and float down the sunny stream!",
       "image": {
         "background": "docs/expansion-art/x-river-canoe.webp",
         "thumbnail": "docs/expansion-art/x-river-canoe.webp",
@@ -23913,7 +24183,7 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "What is the bobber doing on the water?",
-      "galLine": "Captures the meditative, expectant charm of dockside play—watching water ripples and bobbing floats—grounded in calm tactile wooden textures.",
+      "galLine": "Captures the meditative, expectant charm of dockside play\u2014watching water ripples and bobbing floats\u2014grounded in calm tactile wooden textures.",
       "parentNote": "Walk along the sturdy wooden dock stretching out over the deep, cool river water.\nThe sun-warmed cedar boards feel wonderful under your feet.\nA round red-and-white bobber floats gently on the glassy surface.\nDip, dip! Did a friendly little fish just nibble?",
       "image": {
         "background": "docs/expansion-art/x-wooden-dock.webp",
@@ -24015,9 +24285,9 @@
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
-      "parentQuestion": "Roll the dough into a long, skinny snake—roll, roll, roll!",
+      "parentQuestion": "Roll the dough into a long, skinny snake\u2014roll, roll, roll!",
       "galLine": "Pick up the two ends, cross them over, and tuck them down tight.",
-      "parentNote": "Roll the dough into a long, skinny snake—roll, roll, roll!\nPick up the two ends, cross them over, and tuck them down tight.\nTa-da! You twisted a perfect, smiling pretzel loop!\nSprinkle crunchy white salt on top, and into the oven it goes!",
+      "parentNote": "Roll the dough into a long, skinny snake\u2014roll, roll, roll!\nPick up the two ends, cross them over, and tuck them down tight.\nTa-da! You twisted a perfect, smiling pretzel loop!\nSprinkle crunchy white salt on top, and into the oven it goes!",
       "image": {
         "background": "docs/expansion-art/y-pretzel-twisting.webp",
         "thumbnail": "docs/expansion-art/y-pretzel-twisting.webp",
@@ -24053,8 +24323,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-cupcake-carousel": {
       "id": "y-cupcake-carousel",
@@ -24079,8 +24348,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-decorating-cookies": {
       "id": "y-decorating-cookies",
@@ -24105,8 +24373,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-donut-glazing": {
       "id": "y-donut-glazing",
@@ -24121,7 +24388,7 @@
       "credits": null,
       "parentQuestion": "Dip, turn, and lift! Watch the golden donut dive into the chocolate bowl.",
       "galLine": "It comes out with a smooth, glossy chocolate coat that shines in the light.",
-      "parentNote": "Dip, turn, and lift! Watch the golden donut dive into the chocolate bowl.\nIt comes out with a smooth, glossy chocolate coat that shines in the light.\nQuick, shake on the rainbow sprinkles before the icing cools down!\nSweet, round, and delicious—with a perfect little round hole in the middle!",
+      "parentNote": "Dip, turn, and lift! Watch the golden donut dive into the chocolate bowl.\nIt comes out with a smooth, glossy chocolate coat that shines in the light.\nQuick, shake on the rainbow sprinkles before the icing cools down!\nSweet, round, and delicious\u2014with a perfect little round hole in the middle!",
       "image": {
         "background": "docs/expansion-art/y-donut-glazing.webp",
         "thumbnail": "docs/expansion-art/y-donut-glazing.webp",
@@ -24131,8 +24398,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-fire-station-garage": {
       "id": "y-fire-station-garage",
@@ -24141,7 +24407,7 @@
       "name": "Fire Station Garage",
       "paletteColor": "#8B4513",
       "paletteColorByMode": null,
-      "end": true,
+      "end": false,
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
@@ -24155,8 +24421,175 @@
         "height": 900,
         "backgroundByMode": null
       },
-      "tappables": [],
-      "children": [],
+      "tappables": [
+        {
+          "id": "tap-fire-engine",
+          "label": "Fire engine",
+          "targetStopId": "y-fire-engine",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 8,
+            "y": 38,
+            "w": 50,
+            "h": 50
+          },
+          "outlinePolygon": [
+            [
+              12.5,
+              42.5
+            ],
+            [
+              53.5,
+              42.5
+            ],
+            [
+              53.5,
+              83.5
+            ],
+            [
+              12.5,
+              83.5
+            ]
+          ],
+          "hitPolygon": [
+            [
+              8,
+              38
+            ],
+            [
+              58,
+              38
+            ],
+            [
+              58,
+              88
+            ],
+            [
+              8,
+              88
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-fire-ladder",
+          "label": "Fire engine ladder",
+          "targetStopId": "y-fire-ladder",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 12,
+            "y": 14,
+            "w": 43,
+            "h": 24
+          },
+          "outlinePolygon": [
+            [
+              15.9,
+              16.2
+            ],
+            [
+              51.1,
+              16.2
+            ],
+            [
+              51.1,
+              35.9
+            ],
+            [
+              15.9,
+              35.9
+            ]
+          ],
+          "hitPolygon": [
+            [
+              12,
+              14
+            ],
+            [
+              55,
+              14
+            ],
+            [
+              55,
+              38
+            ],
+            [
+              12,
+              38
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-firefighter-gear",
+          "label": "Firefighter gear",
+          "targetStopId": "y-firefighter-gear",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 64,
+            "y": 20,
+            "w": 30,
+            "h": 62
+          },
+          "outlinePolygon": [
+            [
+              66.7,
+              25.6
+            ],
+            [
+              91.3,
+              25.6
+            ],
+            [
+              91.3,
+              76.4
+            ],
+            [
+              66.7,
+              76.4
+            ]
+          ],
+          "hitPolygon": [
+            [
+              64,
+              20
+            ],
+            [
+              94,
+              20
+            ],
+            [
+              94,
+              82
+            ],
+            [
+              64,
+              82
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "y-fire-engine",
+        "y-fire-ladder",
+        "y-firefighter-gear"
+      ],
       "links": []
     },
     "y-fire-engine": {
@@ -24182,8 +24615,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-fire-ladder": {
       "id": "y-fire-ladder",
@@ -24208,8 +24640,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-firefighter-gear": {
       "id": "y-firefighter-gear",
@@ -24224,7 +24655,7 @@
       "credits": null,
       "parentQuestion": "Everything a firefighter needs hangs right here, ready for action!",
       "galLine": "Put on the big yellow helmet with its shiny clear visor.",
-      "parentNote": "Everything a firefighter needs hangs right here, ready for action!\nPut on the big yellow helmet with its shiny clear visor.\nPull on the heavy black rubber boots—thud, thud!\nThe thick coat keeps helpers warm, dry, and safe all day long.",
+      "parentNote": "Everything a firefighter needs hangs right here, ready for action!\nPut on the big yellow helmet with its shiny clear visor.\nPull on the heavy black rubber boots\u2014thud, thud!\nThe thick coat keeps helpers warm, dry, and safe all day long.",
       "image": {
         "background": "docs/expansion-art/y-firefighter-gear.webp",
         "thumbnail": "docs/expansion-art/y-firefighter-gear.webp",
@@ -24234,8 +24665,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-fire-dog-dalmatian": {
       "id": "y-fire-dog-dalmatian",
@@ -24275,7 +24705,7 @@
       "credits": null,
       "parentQuestion": "Curl up in Sparky's cozy corner under the warm station stairs!",
       "galLine": "His plush red dog bed is softer than a cloud, with a warm fleece blanket.",
-      "parentNote": "Curl up in Sparky's cozy corner under the warm station stairs!\nHis plush red dog bed is softer than a cloud, with a warm fleece blanket.\nSqueeze the little red fire hydrant toy—squeak, squeak!\nAfter a busy day keeping the town safe, every fire dog needs a good puppy nap.",
+      "parentNote": "Curl up in Sparky's cozy corner under the warm station stairs!\nHis plush red dog bed is softer than a cloud, with a warm fleece blanket.\nSqueeze the little red fire hydrant toy\u2014squeak, squeak!\nAfter a busy day keeping the town safe, every fire dog needs a good puppy nap.",
       "image": {
         "background": "docs/expansion-art/y-dalmatian-doghouse.webp",
         "thumbnail": "docs/expansion-art/y-dalmatian-doghouse.webp",
@@ -24493,7 +24923,7 @@
       "credits": null,
       "parentQuestion": "Step right up to the flower wagon and take a deep breath!",
       "galLine": "Tall golden sunflowers turn their big round faces toward the morning sun.",
-      "parentNote": "Step right up to the flower wagon and take a deep breath!\nTall golden sunflowers turn their big round faces toward the morning sun.\nPink tulips open their petals like little teacups.\nSprinkle some water from the green watering can—pitter-patter, flowers grow!",
+      "parentNote": "Step right up to the flower wagon and take a deep breath!\nTall golden sunflowers turn their big round faces toward the morning sun.\nPink tulips open their petals like little teacups.\nSprinkle some water from the green watering can\u2014pitter-patter, flowers grow!",
       "image": {
         "background": "docs/expansion-art/y-flower-cart.webp",
         "thumbnail": "docs/expansion-art/y-flower-cart.webp",
@@ -24541,9 +24971,9 @@
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
-      "parentQuestion": "Place the shiny red apples into the brass pan—plop, plop!",
+      "parentQuestion": "Place the shiny red apples into the brass pan\u2014plop, plop!",
       "galLine": "Watch the needle on the round scale dial wiggle back and forth.",
-      "parentNote": "Place the shiny red apples into the brass pan—plop, plop!\nWatch the needle on the round scale dial wiggle back and forth.\nTick-tick-tick... the pointer stops right at two big apples!\nThe shiny brass weights help us count how heavy our treats are.",
+      "parentNote": "Place the shiny red apples into the brass pan\u2014plop, plop!\nWatch the needle on the round scale dial wiggle back and forth.\nTick-tick-tick... the pointer stops right at two big apples!\nThe shiny brass weights help us count how heavy our treats are.",
       "image": {
         "background": "docs/expansion-art/y-market-scale.webp",
         "thumbnail": "docs/expansion-art/y-market-scale.webp",
@@ -24760,7 +25190,7 @@
       "credits": null,
       "parentQuestion": "Beep-beep! The friendly blue mail truck is here to deliver packages.",
       "galLine": "Its sturdy white roof keeps every letter and postcard dry in the rain.",
-      "parentNote": "Beep-beep! The friendly blue mail truck is here to deliver packages.\nIts sturdy white roof keeps every letter and postcard dry in the rain.\nSlide open the side door—look at all the wrapped parcels stacked neatly inside!\nOff goes the mail truck down the street, stopping at every cozy house.",
+      "parentNote": "Beep-beep! The friendly blue mail truck is here to deliver packages.\nIts sturdy white roof keeps every letter and postcard dry in the rain.\nSlide open the side door\u2014look at all the wrapped parcels stacked neatly inside!\nOff goes the mail truck down the street, stopping at every cozy house.",
       "image": {
         "background": "docs/expansion-art/y-mail-delivery-truck.webp",
         "thumbnail": "docs/expansion-art/y-mail-delivery-truck.webp",
@@ -24785,7 +25215,7 @@
       "credits": null,
       "parentQuestion": "Rustle, flip, slide! Letters are being sorted for the mail carrier's route.",
       "galLine": "Each envelope slips into its own special wooden cubby hole.",
-      "parentNote": "Rustle, flip, slide! Letters are being sorted for the mail carrier's route.\nEach envelope slips into its own special wooden cubby hole.\nLook at the stamps with tiny pictures of birds, flowers, and animals!\nStamp down the ink pad—thump! The letter is ready to go.",
+      "parentNote": "Rustle, flip, slide! Letters are being sorted for the mail carrier's route.\nEach envelope slips into its own special wooden cubby hole.\nLook at the stamps with tiny pictures of birds, flowers, and animals!\nStamp down the ink pad\u2014thump! The letter is ready to go.",
       "image": {
         "background": "docs/expansion-art/y-mail-sorting-room.webp",
         "thumbnail": "docs/expansion-art/y-mail-sorting-room.webp",
@@ -25052,7 +25482,7 @@
       "credits": null,
       "parentQuestion": "Can you see what is on the magic picture chart?",
       "galLine": "Look with your bright eyes: there is a sailboat sailing across the blue sea!",
-      "parentNote": "Can you see what is on the magic picture chart?\nLook with your bright eyes: there is a sailboat sailing across the blue sea!\nDown below is a red crunchy apple, a yellow quacking duck, and a twinkling star.\nCover one eye with the funny spoon paddle—peek-a-boo, you can see everything!",
+      "parentNote": "Can you see what is on the magic picture chart?\nLook with your bright eyes: there is a sailboat sailing across the blue sea!\nDown below is a red crunchy apple, a yellow quacking duck, and a twinkling star.\nCover one eye with the funny spoon paddle\u2014peek-a-boo, you can see everything!",
       "image": {
         "background": "docs/expansion-art/y-doctor-eye-chart.webp",
         "thumbnail": "docs/expansion-art/y-doctor-eye-chart.webp",
@@ -25076,8 +25506,8 @@
       "isRealPhoto": false,
       "credits": null,
       "parentQuestion": "You did such a wonderful job at your checkup!",
-      "galLine": "Pick your favorite bandage—dinosaur green, bright polka dots, or sunny stripes.",
-      "parentNote": "You did such a wonderful job at your checkup!\nPick your favorite bandage—dinosaur green, bright polka dots, or sunny stripes.\nHere is a shiny gold star sticker to wear right on your shirt!\nA big smile, a gentle high-five, and a sweet berry lollipop for being so brave.",
+      "galLine": "Pick your favorite bandage\u2014dinosaur green, bright polka dots, or sunny stripes.",
+      "parentNote": "You did such a wonderful job at your checkup!\nPick your favorite bandage\u2014dinosaur green, bright polka dots, or sunny stripes.\nHere is a shiny gold star sticker to wear right on your shirt!\nA big smile, a gentle high-five, and a sweet berry lollipop for being so brave.",
       "image": {
         "background": "docs/expansion-art/y-bandaid-and-stickers.webp",
         "thumbnail": "docs/expansion-art/y-bandaid-and-stickers.webp",
@@ -25294,7 +25724,7 @@
       "credits": null,
       "parentQuestion": "Good boy! This fluffy golden puppy is getting his regular health checkup.",
       "galLine": "The vet checks his wet black nose, his soft floppy ears, and his shiny coat.",
-      "parentNote": "Good boy! This fluffy golden puppy is getting his regular health checkup.\nThe vet checks his wet black nose, his soft floppy ears, and his shiny coat.\nListen with the stethoscope: thump-thump, thump-thump goes his happy puppy heart!\nHe was so brave and gentle—time for a crunchy dog biscuit!",
+      "parentNote": "Good boy! This fluffy golden puppy is getting his regular health checkup.\nThe vet checks his wet black nose, his soft floppy ears, and his shiny coat.\nListen with the stethoscope: thump-thump, thump-thump goes his happy puppy heart!\nHe was so brave and gentle\u2014time for a crunchy dog biscuit!",
       "image": {
         "background": "docs/expansion-art/y-vet-puppy-checkup.webp",
         "thumbnail": "docs/expansion-art/y-vet-puppy-checkup.webp",
@@ -25446,7 +25876,7 @@
       "credits": null,
       "parentQuestion": "Criss-cross applesauce! It is circle time on the rainbow rug.",
       "galLine": "Sit down right beside the big friendly green teddy bear.",
-      "parentNote": "Criss-cross applesauce! It is circle time on the rainbow rug.\nSit down right beside the big friendly green teddy bear.\nPlay a happy tune on the wooden xylophone—ding, dang, dong!\nHere we sing our favorite morning songs and listen to wonderful stories.",
+      "parentNote": "Criss-cross applesauce! It is circle time on the rainbow rug.\nSit down right beside the big friendly green teddy bear.\nPlay a happy tune on the wooden xylophone\u2014ding, dang, dong!\nHere we sing our favorite morning songs and listen to wonderful stories.",
       "image": {
         "background": "docs/expansion-art/y-circle-time-rug.webp",
         "thumbnail": "docs/expansion-art/y-circle-time-rug.webp",
@@ -25498,7 +25928,7 @@
       "credits": null,
       "parentQuestion": "Curl up in the coziest corner of the library!",
       "galLine": "Soft velvet pillows make a wonderful nest for reading.",
-      "parentNote": "Curl up in the coziest corner of the library!\nSoft velvet pillows make a wonderful nest for reading.\nReach into the low book trough to find magical tales of friendly bears and tall ships.\nLook at this giant picture book—when you turn the page, something pops right out!",
+      "parentNote": "Curl up in the coziest corner of the library!\nSoft velvet pillows make a wonderful nest for reading.\nReach into the low book trough to find magical tales of friendly bears and tall ships.\nLook at this giant picture book\u2014when you turn the page, something pops right out!",
       "image": {
         "background": "docs/expansion-art/y-picture-book-nook.webp",
         "thumbnail": "docs/expansion-art/y-picture-book-nook.webp",
@@ -25524,7 +25954,7 @@
       "credits": null,
       "parentQuestion": "Open the book, and magic pops right up into the air!",
       "galLine": "Folded paper turns into a magnificent fairy castle with tall towers and flying flags.",
-      "parentNote": "Open the book, and magic pops right up into the air!\nFolded paper turns into a magnificent fairy castle with tall towers and flying flags.\nPeek through the castle gate—a friendly little green dragon is smiling at you!\nPull the paper tab, and two fluffy white clouds glide across the golden sky.",
+      "parentNote": "Open the book, and magic pops right up into the air!\nFolded paper turns into a magnificent fairy castle with tall towers and flying flags.\nPeek through the castle gate\u2014a friendly little green dragon is smiling at you!\nPull the paper tab, and two fluffy white clouds glide across the golden sky.",
       "image": {
         "background": "docs/expansion-art/y-pop-up-book.webp",
         "thumbnail": "docs/expansion-art/y-pop-up-book.webp",
@@ -25544,7 +25974,7 @@
       "name": "Town Playground",
       "paletteColor": "#8B4513",
       "paletteColorByMode": null,
-      "end": false,
+      "end": true,
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
@@ -25558,177 +25988,9 @@
         "height": 900,
         "backgroundByMode": null
       },
-      "tappables": [
-        {
-          "id": "tap-playground-slide",
-          "label": "y-playground-slide",
-          "targetStopId": "y-playground-slide",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              7.5,
-              14
-            ],
-            [
-              18.5,
-              14
-            ],
-            [
-              18.5,
-              30
-            ],
-            [
-              7.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              6,
-              12
-            ],
-            [
-              20,
-              12
-            ],
-            [
-              20,
-              32
-            ],
-            [
-              6,
-              32
-            ]
-          ],
-          "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-playground-swing-set",
-          "label": "y-playground-swing-set",
-          "targetStopId": "y-playground-swing-set",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              39.5,
-              14
-            ],
-            [
-              50.5,
-              14
-            ],
-            [
-              50.5,
-              30
-            ],
-            [
-              39.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              38,
-              12
-            ],
-            [
-              52,
-              12
-            ],
-            [
-              52,
-              32
-            ],
-            [
-              38,
-              32
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-playground-seesaw",
-          "label": "y-playground-seesaw",
-          "targetStopId": "y-playground-seesaw",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 70,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              71.5,
-              14
-            ],
-            [
-              82.5,
-              14
-            ],
-            [
-              82.5,
-              30
-            ],
-            [
-              71.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              70,
-              12
-            ],
-            [
-              84,
-              12
-            ],
-            [
-              84,
-              32
-            ],
-            [
-              70,
-              32
-            ]
-          ],
-          "galPriority": 3,
-          "sceneryOnlyInV1": false
-        }
-      ],
-      "children": [
-        "y-playground-slide",
-        "y-playground-swing-set",
-        "y-playground-seesaw"
-      ],
-      "links": [],
-      "unlinked": true
+      "tappables": [],
+      "children": [],
+      "links": []
     },
     "y-playground-slide": {
       "id": "y-playground-slide",
@@ -25769,7 +26031,7 @@
       "credits": null,
       "parentQuestion": "Up in the air and down to the ground!",
       "galLine": "Hold on tight to the cool steel swing chains.",
-      "parentNote": "Up in the air and down to the ground!\nHold on tight to the cool steel swing chains.\nYour toes reach high toward the fluffy white clouds, then sweep back down.\nLook right beside the swings—a sandbox full of buckets and shovels is waiting!",
+      "parentNote": "Up in the air and down to the ground!\nHold on tight to the cool steel swing chains.\nYour toes reach high toward the fluffy white clouds, then sweep back down.\nLook right beside the swings\u2014a sandbox full of buckets and shovels is waiting!",
       "image": {
         "background": "docs/expansion-art/y-playground-swing-set.webp",
         "thumbnail": "docs/expansion-art/y-playground-swing-set.webp",
@@ -25795,7 +26057,7 @@
       "credits": null,
       "parentQuestion": "Up you go, into the sky! Down you come, back to the grass!",
       "galLine": "The long red seesaw tilts up and down like a gentle boat on the water.",
-      "parentNote": "Up you go, into the sky! Down you come, back to the grass!\nThe long red seesaw tilts up and down like a gentle boat on the water.\nSoft black rubber tires on the ground cushion every landing—bump, bump!\nHold tight to the yellow handles, kick your feet, and soar!",
+      "parentNote": "Up you go, into the sky! Down you come, back to the grass!\nThe long red seesaw tilts up and down like a gentle boat on the water.\nSoft black rubber tires on the ground cushion every landing\u2014bump, bump!\nHold tight to the yellow handles, kick your feet, and soar!",
       "image": {
         "background": "docs/expansion-art/y-playground-seesaw.webp",
         "thumbnail": "docs/expansion-art/y-playground-seesaw.webp",
@@ -25815,7 +26077,7 @@
       "name": "Sandbox Castles",
       "paletteColor": "#8B4513",
       "paletteColorByMode": null,
-      "end": false,
+      "end": true,
       "passThrough": false,
       "isRealPhoto": false,
       "credits": null,
@@ -25829,177 +26091,9 @@
         "height": 900,
         "backgroundByMode": null
       },
-      "tappables": [
-        {
-          "id": "tap-jungle-gym-dome",
-          "label": "y-jungle-gym-dome",
-          "targetStopId": "y-jungle-gym-dome",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              7.5,
-              14
-            ],
-            [
-              18.5,
-              14
-            ],
-            [
-              18.5,
-              30
-            ],
-            [
-              7.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              6,
-              12
-            ],
-            [
-              20,
-              12
-            ],
-            [
-              20,
-              32
-            ],
-            [
-              6,
-              32
-            ]
-          ],
-          "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-tricycle-track",
-          "label": "y-tricycle-track",
-          "targetStopId": "y-tricycle-track",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              39.5,
-              14
-            ],
-            [
-              50.5,
-              14
-            ],
-            [
-              50.5,
-              30
-            ],
-            [
-              39.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              38,
-              12
-            ],
-            [
-              52,
-              12
-            ],
-            [
-              52,
-              32
-            ],
-            [
-              38,
-              32
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-playground-water-sprinkler",
-          "label": "y-playground-water-sprinkler",
-          "targetStopId": "y-playground-water-sprinkler",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 70,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              71.5,
-              14
-            ],
-            [
-              82.5,
-              14
-            ],
-            [
-              82.5,
-              30
-            ],
-            [
-              71.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              70,
-              12
-            ],
-            [
-              84,
-              12
-            ],
-            [
-              84,
-              32
-            ],
-            [
-              70,
-              32
-            ]
-          ],
-          "galPriority": 3,
-          "sceneryOnlyInV1": false
-        }
-      ],
-      "children": [
-        "y-jungle-gym-dome",
-        "y-tricycle-track",
-        "y-playground-water-sprinkler"
-      ],
-      "links": [],
-      "unlinked": true
+      "tappables": [],
+      "children": [],
+      "links": []
     },
     "y-jungle-gym-dome": {
       "id": "y-jungle-gym-dome",
@@ -26014,7 +26108,7 @@
       "credits": null,
       "parentQuestion": "Climb like a little monkey all over the giant playground dome!",
       "galLine": "Red, blue, and yellow bars connect together to make a round play igloo.",
-      "parentNote": "Climb like a little monkey all over the giant playground dome!\nRed, blue, and yellow bars connect together to make a round play igloo.\nReach your hands up from bar to bar—step, grip, reach!\nFrom the very top, you can look out across the whole town park!",
+      "parentNote": "Climb like a little monkey all over the giant playground dome!\nRed, blue, and yellow bars connect together to make a round play igloo.\nReach your hands up from bar to bar\u2014step, grip, reach!\nFrom the very top, you can look out across the whole town park!",
       "image": {
         "background": "docs/expansion-art/y-jungle-gym-dome.webp",
         "thumbnail": "docs/expansion-art/y-jungle-gym-dome.webp",
@@ -26040,7 +26134,7 @@
       "credits": null,
       "parentQuestion": "Pedal, pedal, roll! Follow the smooth winding path around the park.",
       "galLine": "Here is a bright red tricycle with ribbons dancing from the handlebars!",
-      "parentNote": "Pedal, pedal, roll! Follow the smooth winding path around the park.\nHere is a bright red tricycle with ribbons dancing from the handlebars!\nDing-ding! Ring the shiny bell to let everyone know you are rolling by.\nLook at the friendly painted road stripes—around the bend we go!",
+      "parentNote": "Pedal, pedal, roll! Follow the smooth winding path around the park.\nHere is a bright red tricycle with ribbons dancing from the handlebars!\nDing-ding! Ring the shiny bell to let everyone know you are rolling by.\nLook at the friendly painted road stripes\u2014around the bend we go!",
       "image": {
         "background": "docs/expansion-art/y-tricycle-track.webp",
         "thumbnail": "docs/expansion-art/y-tricycle-track.webp",
