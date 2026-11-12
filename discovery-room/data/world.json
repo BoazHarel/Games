@@ -3012,6 +3012,60 @@
           ],
           "galPriority": 5,
           "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-bug-garden",
+          "label": "m-bug-garden",
+          "targetStopId": "m-bug-garden",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 15,
+            "y": 61,
+            "w": 14,
+            "h": 20
+          },
+          "outlinePolygon": [
+            [
+              16.3,
+              62.8
+            ],
+            [
+              27.7,
+              62.8
+            ],
+            [
+              27.7,
+              79.2
+            ],
+            [
+              16.3,
+              79.2
+            ]
+          ],
+          "hitPolygon": [
+            [
+              15,
+              61
+            ],
+            [
+              29,
+              61
+            ],
+            [
+              29,
+              81
+            ],
+            [
+              15,
+              81
+            ]
+          ],
+          "galPriority": 6,
+          "sceneryOnlyInV1": false
         }
       ],
       "children": [
@@ -3019,7 +3073,8 @@
         "g-our-town",
         "n-bicycle",
         "n-scooter",
-        "d-bird-and-nest"
+        "d-bird-and-nest",
+        "m-bug-garden"
       ],
       "links": [],
       "parentQuestion": "What do you hear outside our window?",
@@ -4089,19 +4144,19 @@
           "outlinePolygon": [
             [
               15.2,
-              66.0
+              66
             ],
             [
               28.8,
-              66.0
+              66
             ],
             [
               28.8,
-              88.0
+              88
             ],
             [
               15.2,
-              88.0
+              88
             ]
           ],
           "hitPolygon": [
@@ -4435,12 +4490,67 @@
           ],
           "galPriority": 3,
           "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-town-square",
+          "label": "y-town-square",
+          "targetStopId": "y-town-square",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 33,
+            "y": 4,
+            "w": 24,
+            "h": 24
+          },
+          "outlinePolygon": [
+            [
+              35.5,
+              6.5
+            ],
+            [
+              54.5,
+              6.5
+            ],
+            [
+              54.5,
+              25.5
+            ],
+            [
+              35.5,
+              25.5
+            ]
+          ],
+          "hitPolygon": [
+            [
+              33,
+              4
+            ],
+            [
+              57,
+              4
+            ],
+            [
+              57,
+              28
+            ],
+            [
+              33,
+              28
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
         }
       ],
       "children": [
         "g-where-food-comes-from",
         "g-coins-money",
-        "g-bakery"
+        "g-bakery",
+        "y-town-square"
       ],
       "links": [],
       "parentQuestion": "Why do things cost money?",
@@ -8425,11 +8535,11 @@
             ],
             [
               49.1,
-              73.0
+              73
             ],
             [
               16.9,
-              73.0
+              73
             ]
           ],
           "hitPolygon": [
@@ -10107,19 +10217,19 @@
           },
           "outlinePolygon": [
             [
-              59.0,
+              59,
               53.9
             ],
             [
-              81.0,
+              81,
               53.9
             ],
             [
-              81.0,
+              81,
               74.2
             ],
             [
-              59.0,
+              59,
               74.2
             ]
           ],
@@ -10325,11 +10435,11 @@
               54.5
             ],
             [
-              29.0,
+              29,
               54.5
             ],
             [
-              29.0,
+              29,
               71.4
             ],
             [
@@ -10692,7 +10802,7 @@
     "m-bug-garden": {
       "id": "m-bug-garden",
       "branch": "M",
-      "level": 4,
+      "level": 2,
       "name": "Bug Garden",
       "paletteColor": "#5E7A42",
       "paletteColorByMode": null,
@@ -10879,13 +10989,12 @@
         "m-ladybug",
         "m-ant-hill"
       ],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "m-butterfly": {
       "id": "m-butterfly",
       "branch": "M",
-      "level": 5,
+      "level": 3,
       "name": "Butterfly",
       "paletteColor": "#5E7A42",
       "paletteColorByMode": null,
@@ -10905,13 +11014,12 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "m-ladybug": {
       "id": "m-ladybug",
       "branch": "M",
-      "level": 5,
+      "level": 3,
       "name": "Ladybug",
       "paletteColor": "#5E7A42",
       "paletteColorByMode": null,
@@ -10931,8 +11039,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "m-caterpillar": {
       "id": "m-caterpillar",
@@ -10989,7 +11096,7 @@
     "m-ant-hill": {
       "id": "m-ant-hill",
       "branch": "M",
-      "level": 5,
+      "level": 3,
       "name": "Ant Hill",
       "paletteColor": "#5E7A42",
       "paletteColorByMode": null,
@@ -11009,8 +11116,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "m-snail": {
       "id": "m-snail",
@@ -16287,19 +16393,19 @@
           },
           "outlinePolygon": [
             [
-              78.0,
+              78,
               32.5
             ],
             [
-              89.0,
+              89,
               32.5
             ],
             [
-              89.0,
+              89,
               49.4
             ],
             [
-              78.0,
+              78,
               49.4
             ]
           ],
@@ -24205,60 +24311,6 @@
       },
       "tappables": [
         {
-          "id": "tap-flower-cart",
-          "label": "y-flower-cart",
-          "targetStopId": "y-flower-cart",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              7.5,
-              14
-            ],
-            [
-              18.5,
-              14
-            ],
-            [
-              18.5,
-              30
-            ],
-            [
-              7.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              6,
-              12
-            ],
-            [
-              20,
-              12
-            ],
-            [
-              20,
-              32
-            ],
-            [
-              6,
-              32
-            ]
-          ],
-          "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
           "id": "tap-fruit-crates",
           "label": "y-fruit-crates",
           "targetStopId": "y-fruit-crates",
@@ -24268,48 +24320,48 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 2,
+            "y": 14,
+            "w": 29,
+            "h": 76
           },
           "outlinePolygon": [
             [
-              39.5,
-              14
+              4.62,
+              20.85
             ],
             [
-              50.5,
-              14
+              28.39,
+              20.85
             ],
             [
-              50.5,
-              30
+              28.39,
+              83.15
             ],
             [
-              39.5,
-              30
+              4.62,
+              83.15
             ]
           ],
           "hitPolygon": [
             [
-              38,
-              12
+              2,
+              14
             ],
             [
-              52,
-              12
+              31,
+              14
             ],
             [
-              52,
-              32
+              31,
+              90
             ],
             [
-              38,
-              32
+              2,
+              90
             ]
           ],
-          "galPriority": 2,
+          "galPriority": 1,
           "sceneryOnlyInV1": false
         },
         {
@@ -24322,45 +24374,99 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 70,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 32,
+            "y": 4,
+            "w": 34,
+            "h": 53
           },
           "outlinePolygon": [
             [
-              71.5,
-              14
+              35.06,
+              8.78
             ],
             [
-              82.5,
-              14
+              62.93,
+              8.78
             ],
             [
-              82.5,
-              30
+              62.93,
+              52.22
             ],
             [
-              71.5,
-              30
+              35.06,
+              52.22
             ]
           ],
           "hitPolygon": [
             [
-              70,
-              12
+              32,
+              4
             ],
             [
-              84,
-              12
+              66,
+              4
             ],
             [
-              84,
-              32
+              66,
+              57
             ],
             [
-              70,
-              32
+              32,
+              57
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-flower-cart",
+          "label": "y-flower-cart",
+          "targetStopId": "y-flower-cart",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 67,
+            "y": 29,
+            "w": 31,
+            "h": 63
+          },
+          "outlinePolygon": [
+            [
+              69.8,
+              34.68
+            ],
+            [
+              95.21,
+              34.68
+            ],
+            [
+              95.21,
+              86.32
+            ],
+            [
+              69.8,
+              86.32
+            ]
+          ],
+          "hitPolygon": [
+            [
+              67,
+              29
+            ],
+            [
+              98,
+              29
+            ],
+            [
+              98,
+              92
+            ],
+            [
+              67,
+              92
             ]
           ],
           "galPriority": 3,
@@ -24372,8 +24478,7 @@
         "y-fruit-crates",
         "y-market-scale"
       ],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-flower-cart": {
       "id": "y-flower-cart",
@@ -24398,8 +24503,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-fruit-crates": {
       "id": "y-fruit-crates",
@@ -24424,8 +24528,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-market-scale": {
       "id": "y-market-scale",
@@ -24450,8 +24553,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-post-office": {
       "id": "y-post-office",
@@ -24485,102 +24587,48 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 13,
+            "y": 34,
+            "w": 23,
+            "h": 28
           },
           "outlinePolygon": [
             [
-              7.5,
-              14
+              15.07,
+              36.52
             ],
             [
-              18.5,
-              14
+              33.92,
+              36.52
             ],
             [
-              18.5,
-              30
+              33.92,
+              59.47
             ],
             [
-              7.5,
-              30
+              15.07,
+              59.47
             ]
           ],
           "hitPolygon": [
             [
-              6,
-              12
+              13,
+              34
             ],
             [
-              20,
-              12
+              36,
+              34
             ],
             [
-              20,
-              32
+              36,
+              62
             ],
             [
-              6,
-              32
+              13,
+              62
             ]
           ],
           "galPriority": 1,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-mail-sorting-room",
-          "label": "y-mail-sorting-room",
-          "targetStopId": "y-mail-sorting-room",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              39.5,
-              14
-            ],
-            [
-              50.5,
-              14
-            ],
-            [
-              50.5,
-              30
-            ],
-            [
-              39.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              38,
-              12
-            ],
-            [
-              52,
-              12
-            ],
-            [
-              52,
-              32
-            ],
-            [
-              38,
-              32
-            ]
-          ],
-          "galPriority": 2,
           "sceneryOnlyInV1": false
         },
         {
@@ -24593,45 +24641,99 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 70,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 37,
+            "y": 46,
+            "w": 22,
+            "h": 32
           },
           "outlinePolygon": [
             [
-              71.5,
-              14
+              38.98,
+              48.88
             ],
             [
-              82.5,
-              14
+              57.01,
+              48.88
             ],
             [
-              82.5,
-              30
+              57.01,
+              75.11
             ],
             [
-              71.5,
-              30
+              38.98,
+              75.11
             ]
           ],
           "hitPolygon": [
             [
-              70,
-              12
+              37,
+              46
             ],
             [
-              84,
-              12
+              59,
+              46
             ],
             [
-              84,
-              32
+              59,
+              78
             ],
             [
-              70,
-              32
+              37,
+              78
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-mail-sorting-room",
+          "label": "y-mail-sorting-room",
+          "targetStopId": "y-mail-sorting-room",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 60,
+            "y": 8,
+            "w": 38,
+            "h": 62
+          },
+          "outlinePolygon": [
+            [
+              63.42,
+              13.59
+            ],
+            [
+              94.57,
+              13.59
+            ],
+            [
+              94.57,
+              64.41
+            ],
+            [
+              63.42,
+              64.41
+            ]
+          ],
+          "hitPolygon": [
+            [
+              60,
+              8
+            ],
+            [
+              98,
+              8
+            ],
+            [
+              98,
+              70
+            ],
+            [
+              60,
+              70
             ]
           ],
           "galPriority": 3,
@@ -24643,8 +24745,7 @@
         "y-mail-sorting-room",
         "y-mail-stamps"
       ],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-mail-delivery-truck": {
       "id": "y-mail-delivery-truck",
@@ -24669,8 +24770,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-mail-sorting-room": {
       "id": "y-mail-sorting-room",
@@ -24695,8 +24795,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-mail-stamps": {
       "id": "y-mail-stamps",
@@ -24721,8 +24820,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-health-clinic": {
       "id": "y-health-clinic",
@@ -24756,45 +24854,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 30,
+            "y": 42,
+            "w": 50,
+            "h": 46
           },
           "outlinePolygon": [
             [
-              7.5,
-              14
+              34.51,
+              46.15
             ],
             [
-              18.5,
-              14
+              75.49,
+              46.15
             ],
             [
-              18.5,
-              30
+              75.49,
+              83.85
             ],
             [
-              7.5,
-              30
+              34.51,
+              83.85
             ]
           ],
           "hitPolygon": [
             [
-              6,
-              12
+              30,
+              42
             ],
             [
-              20,
-              12
+              80,
+              42
             ],
             [
-              20,
-              32
+              80,
+              88
             ],
             [
-              6,
-              32
+              30,
+              88
             ]
           ],
           "galPriority": 1,
@@ -24810,45 +24908,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 72,
+            "y": 4,
+            "w": 17,
+            "h": 35
           },
           "outlinePolygon": [
             [
-              39.5,
-              14
+              73.53,
+              7.15
             ],
             [
-              50.5,
-              14
+              87.46,
+              7.15
             ],
             [
-              50.5,
-              30
+              87.46,
+              35.84
             ],
             [
-              39.5,
-              30
+              73.53,
+              35.84
             ]
           ],
           "hitPolygon": [
             [
-              38,
-              12
+              72,
+              4
             ],
             [
-              52,
-              12
+              89,
+              4
             ],
             [
-              52,
-              32
+              89,
+              39
             ],
             [
-              38,
-              32
+              72,
+              39
             ]
           ],
           "galPriority": 2,
@@ -24864,45 +24962,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 70,
-            "y": 12,
+            "x": 84,
+            "y": 43,
             "w": 14,
-            "h": 20
+            "h": 30
           },
           "outlinePolygon": [
             [
-              71.5,
-              14
+              85.26,
+              45.7
             ],
             [
-              82.5,
-              14
+              96.74,
+              45.7
             ],
             [
-              82.5,
-              30
+              96.74,
+              70.29
             ],
             [
-              71.5,
-              30
+              85.26,
+              70.29
             ]
           ],
           "hitPolygon": [
             [
-              70,
-              12
+              84,
+              43
+            ],
+            [
+              98,
+              43
+            ],
+            [
+              98,
+              73
             ],
             [
               84,
-              12
-            ],
-            [
-              84,
-              32
-            ],
-            [
-              70,
-              32
+              73
             ]
           ],
           "galPriority": 3,
@@ -24914,8 +25012,7 @@
         "y-doctor-eye-chart",
         "y-bandaid-and-stickers"
       ],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-doctor-exam-room": {
       "id": "y-doctor-exam-room",
@@ -24940,8 +25037,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-doctor-eye-chart": {
       "id": "y-doctor-eye-chart",
@@ -24966,8 +25062,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-bandaid-and-stickers": {
       "id": "y-bandaid-and-stickers",
@@ -24992,8 +25087,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-vet-clinic": {
       "id": "y-vet-clinic",
@@ -25018,6 +25112,60 @@
       },
       "tappables": [
         {
+          "id": "tap-puppy-treats",
+          "label": "y-puppy-treats",
+          "targetStopId": "y-puppy-treats",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 8,
+            "y": 30,
+            "w": 14,
+            "h": 24
+          },
+          "outlinePolygon": [
+            [
+              9.26,
+              32.16
+            ],
+            [
+              20.74,
+              32.16
+            ],
+            [
+              20.74,
+              51.83
+            ],
+            [
+              9.26,
+              51.83
+            ]
+          ],
+          "hitPolygon": [
+            [
+              8,
+              30
+            ],
+            [
+              22,
+              30
+            ],
+            [
+              22,
+              54
+            ],
+            [
+              8,
+              54
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
           "id": "tap-vet-puppy-checkup",
           "label": "y-vet-puppy-checkup",
           "targetStopId": "y-vet-puppy-checkup",
@@ -25027,48 +25175,48 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 6,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 36,
+            "y": 14,
+            "w": 23,
+            "h": 36
           },
           "outlinePolygon": [
             [
-              7.5,
-              14
+              38.08,
+              17.24
             ],
             [
-              18.5,
-              14
+              56.93,
+              17.24
             ],
             [
-              18.5,
-              30
+              56.93,
+              46.75
             ],
             [
-              7.5,
-              30
+              38.08,
+              46.75
             ]
           ],
           "hitPolygon": [
             [
-              6,
-              12
+              36,
+              14
             ],
             [
-              20,
-              12
+              59,
+              14
             ],
             [
-              20,
-              32
+              59,
+              50
             ],
             [
-              6,
-              32
+              36,
+              50
             ]
           ],
-          "galPriority": 1,
+          "galPriority": 2,
           "sceneryOnlyInV1": false
         },
         {
@@ -25081,99 +25229,45 @@
           "layerImage": null,
           "layerImageByMode": null,
           "bounds": {
-            "x": 38,
-            "y": 12,
-            "w": 14,
-            "h": 20
+            "x": 60,
+            "y": 51,
+            "w": 35,
+            "h": 39
           },
           "outlinePolygon": [
             [
-              39.5,
-              14
+              63.16,
+              54.52
             ],
             [
-              50.5,
-              14
+              91.85,
+              54.52
             ],
             [
-              50.5,
-              30
+              91.85,
+              86.49
             ],
             [
-              39.5,
-              30
+              63.16,
+              86.49
             ]
           ],
           "hitPolygon": [
             [
-              38,
-              12
+              60,
+              51
             ],
             [
-              52,
-              12
+              95,
+              51
             ],
             [
-              52,
-              32
+              95,
+              90
             ],
             [
-              38,
-              32
-            ]
-          ],
-          "galPriority": 2,
-          "sceneryOnlyInV1": false
-        },
-        {
-          "id": "tap-puppy-treats",
-          "label": "y-puppy-treats",
-          "targetStopId": "y-puppy-treats",
-          "targetByMode": null,
-          "action": null,
-          "unbuiltBranch": null,
-          "layerImage": null,
-          "layerImageByMode": null,
-          "bounds": {
-            "x": 70,
-            "y": 12,
-            "w": 14,
-            "h": 20
-          },
-          "outlinePolygon": [
-            [
-              71.5,
-              14
-            ],
-            [
-              82.5,
-              14
-            ],
-            [
-              82.5,
-              30
-            ],
-            [
-              71.5,
-              30
-            ]
-          ],
-          "hitPolygon": [
-            [
-              70,
-              12
-            ],
-            [
-              84,
-              12
-            ],
-            [
-              84,
-              32
-            ],
-            [
-              70,
-              32
+              60,
+              90
             ]
           ],
           "galPriority": 3,
@@ -25185,8 +25279,7 @@
         "y-vet-kitten-basket",
         "y-puppy-treats"
       ],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-vet-puppy-checkup": {
       "id": "y-vet-puppy-checkup",
@@ -25211,8 +25304,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-vet-kitten-basket": {
       "id": "y-vet-kitten-basket",
@@ -25237,8 +25329,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-puppy-treats": {
       "id": "y-puppy-treats",
@@ -25263,8 +25354,7 @@
       },
       "tappables": [],
       "children": [],
-      "links": [],
-      "unlinked": true
+      "links": []
     },
     "y-kindergarten-classroom": {
       "id": "y-kindergarten-classroom",
@@ -25988,6 +26078,253 @@
       "children": [],
       "links": [],
       "unlinked": true
+    },
+    "y-town-square": {
+      "id": "y-town-square",
+      "branch": "Y",
+      "level": 4,
+      "name": "Town Square",
+      "paletteColor": "#C89D66",
+      "paletteColorByMode": null,
+      "end": false,
+      "passThrough": false,
+      "isRealPhoto": false,
+      "credits": null,
+      "parentQuestion": "Who helps our town every day?",
+      "galLine": "Point to the puppy in the window and the bright yellow sunflowers!",
+      "parentNote": "In the sunny cobblestone town square, neighborhood helpers are busy all around.\nA blue mail van parks beside the brick post office, and a friendly health clinic welcomes families across the way.\nDown in the square, fresh apples, pears, and sunflowers fill the farmers market stall right next to the cozy vet clinic where a puppy and kitten peek out the window.",
+      "image": {
+        "background": "docs/expansion-art/y-town-square.webp",
+        "thumbnail": "docs/expansion-art/y-town-square.webp",
+        "width": 1600,
+        "height": 900,
+        "backgroundByMode": null
+      },
+      "tappables": [
+        {
+          "id": "tap-post-office",
+          "label": "y-post-office",
+          "targetStopId": "y-post-office",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 4,
+            "y": 4,
+            "w": 40,
+            "h": 42
+          },
+          "outlinePolygon": [
+            [
+              7.61,
+              7.79
+            ],
+            [
+              40.4,
+              7.79
+            ],
+            [
+              40.4,
+              42.22
+            ],
+            [
+              7.61,
+              42.22
+            ]
+          ],
+          "hitPolygon": [
+            [
+              4,
+              4
+            ],
+            [
+              44,
+              4
+            ],
+            [
+              44,
+              46
+            ],
+            [
+              4,
+              46
+            ]
+          ],
+          "galPriority": 1,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-health-clinic",
+          "label": "y-health-clinic",
+          "targetStopId": "y-health-clinic",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 60,
+            "y": 4,
+            "w": 36,
+            "h": 36
+          },
+          "outlinePolygon": [
+            [
+              63.24,
+              7.24
+            ],
+            [
+              92.75,
+              7.24
+            ],
+            [
+              92.75,
+              36.75
+            ],
+            [
+              63.24,
+              36.75
+            ]
+          ],
+          "hitPolygon": [
+            [
+              60,
+              4
+            ],
+            [
+              96,
+              4
+            ],
+            [
+              96,
+              40
+            ],
+            [
+              60,
+              40
+            ]
+          ],
+          "galPriority": 2,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-farmers-market",
+          "label": "y-farmers-market",
+          "targetStopId": "y-farmers-market",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 4,
+            "y": 48,
+            "w": 42,
+            "h": 48
+          },
+          "outlinePolygon": [
+            [
+              7.79,
+              52.33
+            ],
+            [
+              42.22,
+              52.33
+            ],
+            [
+              42.22,
+              91.67
+            ],
+            [
+              7.79,
+              91.67
+            ]
+          ],
+          "hitPolygon": [
+            [
+              4,
+              48
+            ],
+            [
+              46,
+              48
+            ],
+            [
+              46,
+              96
+            ],
+            [
+              4,
+              96
+            ]
+          ],
+          "galPriority": 3,
+          "sceneryOnlyInV1": false
+        },
+        {
+          "id": "tap-vet-clinic",
+          "label": "y-vet-clinic",
+          "targetStopId": "y-vet-clinic",
+          "targetByMode": null,
+          "action": null,
+          "unbuiltBranch": null,
+          "layerImage": null,
+          "layerImageByMode": null,
+          "bounds": {
+            "x": 60,
+            "y": 43,
+            "w": 36,
+            "h": 53
+          },
+          "outlinePolygon": [
+            [
+              63.24,
+              47.78
+            ],
+            [
+              92.75,
+              47.78
+            ],
+            [
+              92.75,
+              91.22
+            ],
+            [
+              63.24,
+              91.22
+            ]
+          ],
+          "hitPolygon": [
+            [
+              60,
+              43
+            ],
+            [
+              96,
+              43
+            ],
+            [
+              96,
+              96
+            ],
+            [
+              60,
+              96
+            ]
+          ],
+          "galPriority": 4,
+          "sceneryOnlyInV1": false
+        }
+      ],
+      "children": [
+        "y-post-office",
+        "y-health-clinic",
+        "y-farmers-market",
+        "y-vet-clinic"
+      ],
+      "links": []
     }
   }
 }
