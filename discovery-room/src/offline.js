@@ -1,5 +1,15 @@
 export const CACHE_PREFIX = 'discovery-room-';
 export const CAPACITY_VERIFY_CACHE = 'discovery-room-capacity-verify';
+
+/**
+ * A real picture cache is named exactly `discovery-room-<8 hex content hash>` (see
+ * `getCacheName`). Every other `discovery-room-*` cache (`-lru-metadata`, `-staging-*`,
+ * `-capacity-verify`, ...) is a helper and must NEVER be treated as the live picture cache,
+ * migrated into it, or deleted as an "old version".
+ */
+export function isVersionedCacheName(name) {
+  return typeof name === 'string' && /^discovery-room-[0-9a-f]{8}$/.test(name);
+}
 export const DEFAULT_CAPACITY_TARGET_BYTES = 32 * 1024 * 1024; // 32 MB (~10 MB v1 + ~22 MB v2+ backlog)
 
 export const APP_SHELL_ASSETS = [
@@ -106,7 +116,19 @@ export function buildAssetManifest(world, shellAssets = APP_SHELL_ASSETS) {
 
   const rootId = world.rootId || 'room';
   const rootStop = world.stops[rootId];
-  const immediateChildIds = new Set(Array.isArray(rootStop?.children) ? rootStop.children : []);
+  const startStopIds = new Set([rootId]);
+  if (Array.isArray(rootStop?.children)) {
+    for (const id of rootStop.children) {
+      startStopIds.add(id);
+    }
+  }
+  // Include street pass-through targets (e.g. g-our-town) so initial hubs are pinned and precached
+  const streetStop = world.stops?.['b-street'];
+  if (Array.isArray(streetStop?.children)) {
+    for (const id of streetStop.children) {
+      startStopIds.add(id);
+    }
+  }
 
   const stopIds = Object.keys(world.stops).sort();
   for (const stopId of stopIds) {
@@ -122,7 +144,7 @@ export function buildAssetManifest(world, shellAssets = APP_SHELL_ASSETS) {
     for (const url of stopUrls) {
       branchSet.add(url);
       allAssetSet.add(url);
-      if (stopId === rootId || immediateChildIds.has(stopId)) {
+      if (startStopIds.has(stopId)) {
         coreSceneSet.add(url);
       }
     }
@@ -225,7 +247,8 @@ export function resolveScopedUrl(relPath, baseScopeUrl) {
 
 /**
  * Atomically fetches and caches a complete list of assets into `cacheName`.
- * If ANY asset fails to fetch or returns `!response.ok`, deletes the incomplete `cacheName`
+ * Uses a staging cache so a failed install NEVER wipes or deletes an existing active cache.
+ * If ANY asset fails to fetch or returns `!response.ok`, deletes ONLY the staging cache
  * and throws so an incomplete update never activates.
  */
 export async function populateVersionedCacheAtomically(
@@ -240,8 +263,9 @@ export async function populateVersionedCacheAtomically(
   }
 
   const uniqueUrls = [...new Set(assetUrls.map((u) => resolveScopedUrl(u, baseScopeUrl)))];
+  const stagingCacheName = `${cacheName}-staging-${Date.now()}`;
 
-  // 1. Fetch and validate ALL responses before committing the cache activation
+  // 1. Fetch and validate ALL responses into the staging cache
   const fetchedEntries = [];
   try {
     for (const fullUrl of uniqueUrls) {
@@ -256,10 +280,23 @@ export async function populateVersionedCacheAtomically(
       });
     }
 
-    // 2. Open the versioned cache and write all verified responses
-    const cache = await cachesApi.open(cacheName);
+    // 2. Open staging cache and write all verified responses
+    const stagingCache = await cachesApi.open(stagingCacheName);
     for (const entry of fetchedEntries) {
-      await cache.put(entry.url, entry.response);
+      await stagingCache.put(entry.url, entry.response);
+    }
+
+    // 3. Atomically commit verified responses to target cache
+    const targetCache = await cachesApi.open(cacheName);
+    for (const entry of fetchedEntries) {
+      await targetCache.put(entry.url, entry.response);
+    }
+
+    // 4. Clean up staging cache
+    try {
+      await cachesApi.delete(stagingCacheName);
+    } catch {
+      // Ignore cleanup error
     }
 
     return {
@@ -268,9 +305,9 @@ export async function populateVersionedCacheAtomically(
       urls: uniqueUrls
     };
   } catch (err) {
-    // Rollback incomplete versioned cache so old cache stays active
+    // Rollback ONLY the staging cache. Existing live cache is NEVER deleted!
     try {
-      await cachesApi.delete(cacheName);
+      await cachesApi.delete(stagingCacheName);
     } catch {
       // Ignore rollback cleanup errors
     }
@@ -280,8 +317,11 @@ export async function populateVersionedCacheAtomically(
 
 /**
  * Deletes outdated `discovery-room-*` caches ONLY after verifying that `activeCacheName`
- * exists in Cache Storage. Strictly ignores any cache not prefixed with `discovery-room-`
- * so sibling games on `BoazHarel/Games` are never affected.
+ * exists in Cache Storage.
+ * Migrates previously saved branch pictures from the old cache into `activeCacheName`
+ * so an update never deletes pictures a child has already explored.
+ * Strictly ignores any cache not prefixed with `discovery-room-` so sibling games on
+ * `BoazHarel/Games` are never affected.
  */
 export async function cleanupOutdatedDiscoveryRoomCaches(cachesApi, activeCacheName) {
   if (typeof activeCacheName !== 'string' || !activeCacheName.startsWith(CACHE_PREFIX)) {
@@ -295,15 +335,34 @@ export async function cleanupOutdatedDiscoveryRoomCaches(cachesApi, activeCacheN
     );
   }
 
+  const activeCache = await cachesApi.open(activeCacheName);
   const deleted = [];
   const preserved = [];
 
   for (const key of allKeys) {
-    if (
-      key.startsWith(CACHE_PREFIX) &&
-      key !== activeCacheName &&
-      key !== CAPACITY_VERIFY_CACHE
-    ) {
+    if (isVersionedCacheName(key) && key !== activeCacheName) {
+      // Migrate saved branch pictures from old cache into activeCache before deleting
+      try {
+        const oldCache = await cachesApi.open(key);
+        const oldRequests = await oldCache.keys();
+        for (const req of oldRequests) {
+          const reqUrl = typeof req === 'string' ? req : req.url;
+          const alreadyInActive = await activeCache.match(reqUrl);
+          if (!alreadyInActive) {
+            const oldRes = await oldCache.match(reqUrl);
+            if (oldRes) {
+              await activeCache.put(reqUrl, oldRes);
+            }
+          }
+        }
+      } catch {
+        // Ignore individual migration errors
+      }
+
+      await cachesApi.delete(key);
+      deleted.push(key);
+    } else if (key.includes('-staging-')) {
+      // Clean up orphaned staging caches if any
       await cachesApi.delete(key);
       deleted.push(key);
     } else {
@@ -315,15 +374,18 @@ export async function cleanupOutdatedDiscoveryRoomCaches(cachesApi, activeCacheN
 }
 
 /**
- * Lazily caches any missing assets for a branch into `cacheName` (strictly scoped to `baseScopeUrl`).
+ * Lazily caches missing assets for a branch into `cacheName` (strictly scoped to `baseScopeUrl`),
+ * and refreshes repainted pictures in cache when visited while online.
  */
 export async function cacheBranchAssets(
   cachesApi,
   fetchFn,
   cacheName,
   branchUrls,
-  baseScopeUrl
+  baseScopeUrl,
+  options = {}
 ) {
+  const { refresh = true } = options;
   if (typeof cacheName !== 'string' || !cacheName.startsWith(CACHE_PREFIX)) {
     throw new Error(`Cache name must start with "${CACHE_PREFIX}"`);
   }
@@ -331,27 +393,154 @@ export async function cacheBranchAssets(
   const cache = await cachesApi.open(cacheName);
   const resolvedUrls = [...new Set(branchUrls.map((u) => resolveScopedUrl(u, baseScopeUrl)))];
   let newlyCachedCount = 0;
+  let refreshedCount = 0;
 
   for (const fullUrl of resolvedUrls) {
     const existing = await cache.match(fullUrl);
-    if (existing) continue;
-
-    const response = await fetchFn(fullUrl);
-    if (!response || !response.ok) {
-      throw new Error(`Failed to lazy-cache branch asset "${fullUrl}"`);
+    if (existing && !refresh) {
+      continue;
     }
-    await cache.put(
-      fullUrl,
-      typeof response.clone === 'function' ? response.clone() : response
-    );
-    newlyCachedCount++;
+
+    try {
+      const response = await fetchFn(fullUrl, { cache: 'no-cache' });
+      if (response && response.ok) {
+        await cache.put(
+          fullUrl,
+          typeof response.clone === 'function' ? response.clone() : response
+        );
+        if (existing) {
+          refreshedCount++;
+        } else {
+          newlyCachedCount++;
+        }
+      } else if (!existing) {
+        throw new Error(`Failed to lazy-cache branch asset "${fullUrl}"`);
+      }
+    } catch (err) {
+      if (!existing) {
+        throw err;
+      }
+      // If asset already exists and network is unavailable (offline), keep existing cached asset
+    }
   }
 
   return {
     cacheName,
     totalBranchUrls: resolvedUrls.length,
-    newlyCachedCount
+    newlyCachedCount,
+    refreshedCount
   };
+}
+
+/**
+ * Evicts oldest non-pinned cache entries when total cache size exceeds `maxBytes` (default 32 MB).
+ * Pinned assets (shell + Room + immediate Room children) are NEVER evicted.
+ */
+export async function evictCacheEntriesExceedingCap(
+  cachesApi,
+  cacheName,
+  maxBytes = DEFAULT_CAPACITY_TARGET_BYTES,
+  pinnedUrls = [],
+  options = {}
+) {
+  if (!cachesApi || typeof cacheName !== 'string') {
+    return { evictedCount: 0, evictedBytes: 0, totalBytes: 0 };
+  }
+
+  const cache = await cachesApi.open(cacheName);
+  const requests = await cache.keys();
+  const pinnedSet = new Set(
+    pinnedUrls.map((u) => (typeof u === 'string' ? u : u.url))
+  );
+
+  const lruMap = options.lruMap || {};
+  const urlToLevel = new Map();
+  if (options.world && options.world.stops) {
+    for (const stop of Object.values(options.world.stops)) {
+      const urls = getStopAllAssetUrls(stop);
+      const lvl = typeof stop.level === 'number' ? stop.level : 99;
+      for (const u of urls) {
+        urlToLevel.set(u, Math.min(urlToLevel.get(u) ?? 99, lvl));
+      }
+    }
+  }
+
+  const entries = [];
+  let totalBytes = 0;
+
+  for (const req of requests) {
+    const res = await cache.match(req);
+    if (!res) continue;
+    let byteSize = 0;
+    const cl = res.headers?.get?.('content-length');
+    if (cl) {
+      byteSize = parseInt(cl, 10);
+    }
+    if (!byteSize || Number.isNaN(byteSize)) {
+      try {
+        const buf = await res.clone().arrayBuffer();
+        byteSize = buf.byteLength;
+      } catch {
+        byteSize = 150 * 1024;
+      }
+    }
+    totalBytes += byteSize;
+    const reqUrl = typeof req === 'string' ? req : req.url;
+
+    let lastAccessed = lruMap[reqUrl] || 0;
+    if (!lastAccessed) {
+      const dateHdr = res.headers?.get?.('date') || res.headers?.get?.('x-last-accessed');
+      if (dateHdr) {
+        const parsed = Date.parse(dateHdr);
+        if (!Number.isNaN(parsed)) lastAccessed = parsed;
+      }
+    }
+
+    let level = 99;
+    for (const [relPath, lvl] of urlToLevel.entries()) {
+      if (reqUrl.endsWith(relPath.slice(2))) {
+        level = lvl;
+        break;
+      }
+    }
+
+    entries.push({
+      request: req,
+      url: reqUrl,
+      byteSize,
+      lastAccessed,
+      level,
+      isPinned: pinnedSet.has(reqUrl)
+    });
+  }
+
+  if (totalBytes <= maxBytes) {
+    return { evictedCount: 0, evictedBytes: 0, totalBytes };
+  }
+
+  const targetBudget = Math.floor(maxBytes * 0.9);
+  let evictedCount = 0;
+  let evictedBytes = 0;
+
+  // Evict unpinned oldest accessed (or deepest leaves when equal) first!
+  entries.sort((a, b) => {
+    if (a.lastAccessed !== b.lastAccessed) {
+      return a.lastAccessed - b.lastAccessed;
+    }
+    return b.level - a.level;
+  });
+
+  for (const entry of entries) {
+    if (totalBytes <= targetBudget) break;
+    if (entry.isPinned) continue;
+
+    await cache.delete(entry.request);
+    evictedCount++;
+    evictedBytes += entry.byteSize;
+    totalBytes -= entry.byteSize;
+  }
+
+  return { evictedCount, evictedBytes, totalBytes };
 }
 
 /**
@@ -566,6 +755,20 @@ export function initOfflineManager(options = {}) {
         await cacheBranchAssets(cachesApi, fetchFn, cacheName, urls, baseScopeUrl);
       }
 
+      // 3. Enforce 32 MB cache cap with pinned core assets
+      if (cachesApi) {
+        const pinnedUrls = [
+          ...manifest.precacheAssets.map((u) => resolveScopedUrl(u, baseScopeUrl)),
+          resolveScopedUrl('./', baseScopeUrl)
+        ];
+        await evictCacheEntriesExceedingCap(
+          cachesApi,
+          cacheName,
+          DEFAULT_CAPACITY_TARGET_BYTES,
+          pinnedUrls
+        );
+      }
+
       cachedBranches.add(branchId);
       return {
         branchId,
@@ -585,12 +788,15 @@ export function initOfflineManager(options = {}) {
 
   /**
    * Lazily caches all branches associated with a stop and its immediate children.
+   * At the Room root (L0), immediate hubs are already in the core install set (manifest.precacheAssets);
+   * deeper expansion branches are cached lazily when visited.
    */
   async function cacheNeighborhoodBranches(stopId) {
     const stop = world?.stops?.[stopId];
     if (!stop) return;
+    const rootId = world?.rootId || 'room';
     const branchesToCache = new Set([stop.branch || 'root']);
-    if (Array.isArray(stop.children)) {
+    if (stopId !== rootId && Array.isArray(stop.children)) {
       for (const childId of stop.children) {
         const child = world.stops[childId];
         if (child?.branch) {
@@ -634,7 +840,7 @@ export function initOfflineManager(options = {}) {
       }
     }
 
-    // Pre-cache shell + all v1 branches in background so first visit is 100% offline-ready
+    // Pre-cache core set (shell + Room + immediate Room children)
     try {
       if (cachesApi && fetchFn) {
         await cacheBranchAssets(
@@ -645,7 +851,7 @@ export function initOfflineManager(options = {}) {
           baseScopeUrl
         );
       }
-      await cacheAllBranches();
+      cachedBranches.add('root');
     } catch {
       // Offline reload may already have all assets cached; mark cached branches from Cache Storage
       if (cachesApi) {
@@ -701,6 +907,8 @@ export function initOfflineManager(options = {}) {
     cacheNeighborhoodBranches,
     cacheAllBranches,
     verifyCacheCapacity: runCapacityVerification,
+    evictCacheEntriesExceedingCap: (maxBytes, pinnedUrls) =>
+      evictCacheEntriesExceedingCap(cachesApi, cacheName, maxBytes, pinnedUrls),
     getDiagnostics,
     waitUntilReady: () => readyPromise
   };
